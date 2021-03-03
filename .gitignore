@@ -1,0 +1,7 @@
+# ignore composer dependency directories
+vendor
+/composer.lock
+
+# ignore node dependency directories
+/assets/node_modules/
+/assets/package-lock.json

@@ -6,24 +6,23 @@ const gulp = require('gulp'),
   rename = require('gulp-rename'),
   del = require('del'),
   sass = require('gulp-sass'),
-  plumber = require("gulp-plumber"),
-  notify = require("gulp-notify"),
+  plumber = require('gulp-plumber'),
+  notify = require('gulp-notify'),
   autoprefixer = require('gulp-autoprefixer'),
   sourcemaps = require('gulp-sourcemaps'),
   gulpif = require('gulp-if'),
   argv = require('yargs').argv,
-  cleanCSS = require('gulp-clean-css');
+  cleanCSS = require('gulp-clean-css')
 
 /** styles */
 
 gulp.task('styles', function () {
-  return gulp.src('dev/scss/styles.scss')
-    .pipe(rename("styles.min.scss"))
+  return gulp.src(['dev/scss/styles.scss', 'dev/scss/admin-styles.scss'])
     .pipe(plumber())
     .pipe(gulpif(argv.dev, sourcemaps.init()))
     .pipe(sass())
-    .on("error", notify.onError(function (error) {
-      return "Something happened: " + error.message;
+    .on('error', notify.onError(function (error) {
+      return 'Something happened: ' + error.message
     }))
     .pipe(autoprefixer(['last 2 version']))
     .pipe(cleanCSS())
@@ -31,47 +30,45 @@ gulp.task('styles', function () {
     .pipe(gulp.dest('dist/css'))
     .pipe(gulpif(argv.dev, browsersync.reload({
       stream: true
-    })));
-});
+    })))
+})
 
 /** scripts */
 
 gulp.task('scripts', function (done) {
   const scripts = {
-    'index': [
+    index: [
       'dev/js/scripts.js',
+      'dev/js/admin.js'
     ]
-  };
+  }
   Object.keys(scripts).forEach(name => {
     gulp.src(scripts[name])
       .pipe(babel({
         presets: ['@babel/env']
       }))
-      .pipe(concat('scripts.js'))
       .pipe(gulpif(argv.prod, uglify()))
       .pipe(gulp.dest(`dist/js/${name}`))
       .pipe(gulpif(argv.dev, browsersync.reload({
         stream: true
-      })));
-  });
+      })))
+  })
   done()
-});
+})
 
 gulp.task('libs', function (done) {
   const libs = {
-    'index': [
-      'node_modules/jquery/dist/jquery.min.js',
+    index: [
+      'node_modules/jquery/dist/jquery.min.js'
     ]
-  };
+  }
   Object.keys(libs).forEach(name => {
     gulp.src(libs[name])
       .pipe(concat('libs.js'))
       .pipe(gulp.dest(`dist/js/${name}`))
-  });
+  })
   done()
-});
-
-/*** */
+})
 
 gulp.task('repaint', (done) => {
   browsersync({
@@ -79,23 +76,23 @@ gulp.task('repaint', (done) => {
       baseDir: 'dist',
       directory: true
     }
-  });
-  done();
-});
+  })
+  done()
+})
 
 gulp.task('clean', function (done) {
-  del.sync(['public/js', 'public/css']);
-  done();
-});
+  del.sync(['public/js', 'public/css'])
+  done()
+})
 
 gulp.task('watch', () => {
-  gulp.watch('src/scss/**/*.scss', gulp.series('styles'));
-  gulp.watch('src/js/**/*.js', gulp.series('scripts'));
-});
+  gulp.watch('src/scss/**/*.scss', gulp.series('styles'))
+  gulp.watch('src/js/**/*.js', gulp.series('scripts'))
+})
 
 gulp.task('production', (done) => {
-  gulp.series('clean', gulp.parallel('styles', 'libs', 'scripts'))(done);
-});
+  gulp.series('clean', gulp.parallel('styles', 'libs', 'scripts'))(done)
+})
 gulp.task('dev', (done) => {
   gulp.series('watch')(done)
-});
+})

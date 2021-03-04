@@ -68,4 +68,5 @@ jobs:
           name: "mto-woocommerce-${{ github.sha }}"
           artifacts: "mto-woocommerce-${{ github.sha }}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
-          prerelease: true      
+          prerelease: true   
+          tag: ${{ github.sha }}

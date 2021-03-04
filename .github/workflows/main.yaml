@@ -1,0 +1,71 @@
+name: Test and Build mto-woocommerce
+
+on:
+  push:
+    branches:
+      - master
+      - pipeline
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+        matrix:
+          php-versions: ['7.3', '7.4']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+      
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+      
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
+      # Docs: https://getcomposer.org/doc/articles/scripts.md
+
+      # - name: Run test suite
+      #   run: composer run-script test
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+  
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+    
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Build
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: "mto-woocommerce-${{ github.sha }}.zip"
+          exclusions: '*.git* /*node_modules/* .editorconfig'
+
+      - name: Upload Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: "mto-woocommerce-${{ github.sha }}"
+          artifacts: "mto-woocommerce-${{ github.sha }}.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: true      

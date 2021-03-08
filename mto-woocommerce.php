@@ -14,12 +14,13 @@
 namespace Maatoo\WooCommerce;
 
 use Maatoo\WooCommerce\Registry\AdminAssets;
+use Maatoo\WooCommerce\Service\Ajax\AjaxHooks;
 use Maatoo\WooCommerce\Registry\FrontAssets;
 use Maatoo\WooCommerce\Registry\Options;
 
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-if(!is_plugin_active('woocommerce/woocommerce.php')) {
+if (!is_plugin_active('woocommerce/woocommerce.php')) {
     die('WooCommerce plugin is disabled. WooCommerce plugin needs to be activated to keep using Maatoo.');
 }
 
@@ -32,19 +33,19 @@ if (file_exists($composer_path)) {
 }
 
 
-if(!defined('MTO_PLUGIN_DIR')){
+if (!defined('MTO_PLUGIN_DIR')) {
     define('MTO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 }
 
-if(!defined('MTO_PLUGIN_URL')){
+if (!defined('MTO_PLUGIN_URL')) {
     define('MTO_PLUGIN_URL', plugin_dir_url(__FILE__));
 }
 
-if(!defined('MTO_PLUGIN_TEMPLATES')){
+if (!defined('MTO_PLUGIN_TEMPLATES')) {
     define('MTO_PLUGIN_TEMPLATES', MTO_PLUGIN_DIR . 'template/');
 }
 
-if(!defined('MTO_PLUGIN_ASSETS')){
+if (!defined('MTO_PLUGIN_ASSETS')) {
     define('MTO_PLUGIN_ASSETS', MTO_PLUGIN_URL . 'assets/dist/');
 }
 
@@ -56,6 +57,7 @@ class MtoWoocommerce
     {
         $this->registerAssets();
         $this->registerPluginSettings();
+        $this->registerAjaxHooks();
     }
 
     private function registerAssets()
@@ -67,5 +69,11 @@ class MtoWoocommerce
     private function registerPluginSettings()
     {
         add_action('admin_menu', new Options());
+    }
+
+    private function registerAjaxHooks()
+    {
+        $ajaxCallbacks = new AjaxHooks();
+        $ajaxCallbacks->registryAdminAjax();
     }
 }

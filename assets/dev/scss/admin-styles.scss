@@ -1,0 +1,70 @@
+.mto-dashboard {
+  max-width: 400px;
+  margin: 0 auto;
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  input {
+    width: 100%;
+  }
+
+  input[type=submit] {
+    color: #fff;
+    background-color: #088ae1;
+    border-color: #088ae1;
+    padding: 10px 16px;
+    font-size: 16px;
+    line-height: 1.25;
+    border-radius: 4px;
+    font-weight: 600;
+    text-align: center;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    white-space: nowrap;
+    margin: 15px;
+    width: auto;
+  }
+
+  label {
+    margin: 15px;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .status-bar {
+    span:not(.hidden) {
+      max-width: 100%;
+      display: block;
+      padding: 20px;
+
+      &:before{
+        margin-right: 10px;
+      }
+    }
+
+    .success {
+      background-color: #e4e6e4;
+      color: green;
+
+      &:before {
+        content: "\f12a";
+      }
+    }
+
+    .error {
+      background-color: #d6d6d6;
+      color: red;
+
+      &:before {
+        content: "\f153";
+      }
+    }
+  }
+}

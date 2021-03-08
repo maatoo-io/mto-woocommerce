@@ -2,9 +2,13 @@
 /***
  * Plugin Name: Maatoo
  * Plugin URI:  https://github.com/maatoo-io/mto-woocommerce/
- * Description: Maatoo is a swiss-based SaaS that helps online shops to drive more revenue through targeted marketing
- * messages over email and other channels. Version:     1.0.0 Requires at least: 5.0 Requires PHP: 7.4 Author: Alina
- * Valovenko Text Domain: mto Domain Path: /languages
+ * Description: Maatoo is a swiss-based SaaS that helps online shops to drive more revenue through targeted marketing messages over email and other channels.
+ * Version:     1.0.0
+ * Requires at least: 5.0
+ * Requires PHP: 7.4
+ * Author: Alina Valovenko
+ * Text Domain: mto
+ * Domain Path: /languages
  */
 
 namespace Maatoo\WooCommerce;

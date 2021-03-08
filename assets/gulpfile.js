@@ -48,7 +48,7 @@ gulp.task('scripts', function (done) {
         presets: ['@babel/env']
       }))
       .pipe(gulpif(argv.prod, uglify()))
-      .pipe(gulp.dest(`dist/js/${name}`))
+      .pipe(gulp.dest('dist/js/'))
       .pipe(gulpif(argv.dev, browsersync.reload({
         stream: true
       })))
@@ -65,7 +65,7 @@ gulp.task('libs', function (done) {
   Object.keys(libs).forEach(name => {
     gulp.src(libs[name])
       .pipe(concat('libs.js'))
-      .pipe(gulp.dest(`dist/js/${name}`))
+      .pipe(gulp.dest('dist/js/'))
   })
   done()
 })
@@ -81,13 +81,13 @@ gulp.task('repaint', (done) => {
 })
 
 gulp.task('clean', function (done) {
-  del.sync(['public/js', 'public/css'])
+  del.sync(['dist/js', 'dist/css'])
   done()
 })
 
 gulp.task('watch', () => {
-  gulp.watch('src/scss/**/*.scss', gulp.series('styles'))
-  gulp.watch('src/js/**/*.js', gulp.series('scripts'))
+  gulp.watch('dev/scss/**/*.scss', gulp.series('styles'))
+  gulp.watch('dev/js/**/*.js', gulp.series('scripts'))
 })
 
 gulp.task('production', (done) => {

@@ -14,6 +14,9 @@
       "Maatoo\\WooCommerce\\":"src/"
     }
   },
+  "require": {
+    "guzzlehttp/guzzle": "^7.0"
+  },
   "require-dev": {
     "phpunit/phpunit": "^8"
   }

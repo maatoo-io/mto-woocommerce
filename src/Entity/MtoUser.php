@@ -8,7 +8,19 @@ class MtoUser
 {
     private ?string $username;
     private ?string $password;
-    private ?string $token;
+    private ?string $url;
+
+    public function __construct()
+    {
+        $options = get_option('mto');
+        if (empty($options)) {
+            return null;
+        }
+
+        $this->username = $options['username'] ?? null;
+        $this->password = $options['password'] ?? null;
+        $this->url = $options['url'] ?? null;
+    }
 
     /**
      * @return string|null
@@ -21,9 +33,9 @@ class MtoUser
     /**
      * @return string|null
      */
-    public function getToken(): ?string
+    public function getUrl(): ?string
     {
-        return $this->token;
+        return $this->url;
     }
 
     /**
@@ -32,5 +44,52 @@ class MtoUser
     public function getUsername(): ?string
     {
         return $this->username;
+    }
+
+    /**
+     * Set Password.
+     *
+     * @param $password
+     *
+     * @return $this
+     */
+    public function setPassword($password): MtoUser
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    /**
+     * Set Username.
+     *
+     * @param $username
+     *
+     * @return $this
+     */
+    public function setUsername($username): MtoUser
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * Set Url.
+     *
+     * @param $url
+     *
+     * @return $this
+     */
+    public function setUrl($url): MtoUser
+    {
+        $this->url = $url;
+        return $this;
+    }
+
+    public static function toMtoUser($username, $password, $url)
+    {
+        $user = new MtoUser();
+        return $user->setUsername($username)
+                    ->setPassword($password)
+                    ->setUrl($url);
     }
 }

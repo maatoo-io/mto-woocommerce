@@ -11,7 +11,7 @@
     width: 100%;
   }
 
-  input[type=submit] {
+  input[type=submit], button {
     color: #fff;
     background-color: #088ae1;
     border-color: #088ae1;
@@ -28,6 +28,11 @@
     white-space: nowrap;
     margin: 15px;
     width: auto;
+
+    &:disabled{
+      background-color: grey;
+      color: white;
+    }
   }
 
   label {

@@ -104,8 +104,12 @@ $mtoUser = new MtoUser();
                                 </svg>
     <form class="mto-credentials js-mto-credentials">
         <div class="status-bar js-status-bar">
-            <?php if($mtoUser) : ?>
+            <?php if(MTO_STORE_ID) : ?>
                 <span class="success dashicons-before"><?php _e('Your credentials are valid', 'mto'); ?></span>
+                <div class="run-sync">
+                    <button class="js-run-sync-products"><?php _e('Run products sync', 'mto'); ?></button>
+                    <button class="js-run-sync-orders"><?php _e('Run orders sync', 'mto'); ?></button>
+                </div>
             <?php else : ?>
                 <span class="success hidden dashicons-before"></span>
             <?php endif; ?>

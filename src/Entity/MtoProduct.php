@@ -4,17 +4,25 @@ namespace Maatoo\WooCommerce\Entity;
 
 class MtoProduct
 {
-    private ?int $store = null;
     private string $externalProductId;
     private float $price = 0;
     private string $url;
     private string $title;
     private string $description;
     private string $sku;
+    private string $imageUrl;
 
     public function __construct($product_id = null)
     {
         $product = wc_get_product($product_id);
+
+        $this->sku = $product->get_sku();
+        $this->externalProductId = (string)$product_id;
+        $this->price = $product->get_price() ? : 0;
+        $this->url = $product->get_permalink();
+        $this->title = $product->get_title() ? : 'untitled';
+        $this->description = $product->get_description() ? : '';
+        $this->imageUrl = wp_get_attachment_image_url($product->get_image_id()) ? : '';
     }
 
     /**
@@ -62,7 +70,7 @@ class MtoProduct
      */
     public function getStore(): ?int
     {
-        return $this->store;
+        return MTO_STORE_ID;
     }
 
     /**
@@ -73,4 +81,25 @@ class MtoProduct
         return $this->url;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getImageUrl(): ?string
+    {
+        return $this->imageUrl;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'store' => $this->getStore(),
+            'externalProductId' => $this->getExternalProductId(),
+            'price' => $this->getPrice(),
+            'url' => $this->getUrl(),
+            'title' => $this->getTitle(),
+            'description' => $this->getDescription(),
+            'sku' => $this->getSku(),
+            'imageUrl' => $this->getImageUrl(),
+        ];
+    }
 }

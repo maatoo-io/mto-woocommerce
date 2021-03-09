@@ -10,10 +10,11 @@
     },
     "retrieve": {
       "route": "api\/stores\/{id}",
-      "method": "GET",
-      "params": [
-        "name"
-      ]
+      "method": "GET"
+    },
+    "list": {
+      "route": "api\/stores",
+      "method": "GET"
     },
     "edit": {
       "route": "api\/stores\/{id}\/edit",
@@ -21,6 +22,24 @@
     },
     "delete": {
       "route": "api\/stores\/{id}\/delete",
+      "method": "DEL"
+    }
+  },
+  "product": {
+    "create": {
+      "route": "api\/products\/new",
+      "method": "POST"
+    },
+    "retrieve": {
+      "route": "api\/products\/{id}",
+      "method": "GET"
+    },
+    "edit": {
+      "route": "api\/products\/{id}\/edit",
+      "method": "PATCH"
+    },
+    "delete": {
+      "route": "api\/products\/{id}\/delete",
       "method": "DEL"
     }
   }

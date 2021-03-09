@@ -21,6 +21,7 @@ class PluginOptions
     public function __construct()
     {
         $this->response = new AjaxResponse();
+        $this->mtoOptions = get_option('mto') ?: [];
     }
 
     public function __invoke()
@@ -40,12 +41,9 @@ class PluginOptions
             $provider = new MtoConnector($mtoUser);
 
             if ($provider->healthCheck()) {
-                $this->mtoOptions =
-                    [
-                        'username' => $mtoUser->getUsername(),
-                        'password' => $mtoUser->getPassword(),
-                        'url' => $mtoUser->getUrl(),
-                    ];
+                $this->mtoOptions['username'] = $mtoUser->getUsername();
+                $this->mtoOptions['password'] = $mtoUser->getPassword();
+                $this->mtoOptions['url'] = $mtoUser->getUrl();
                 $msg[] = __('Credentials are valid and saved', 'mto');
                 update_option('mto', $this->mtoOptions);
                 //register store if not exist and get status message
@@ -78,6 +76,7 @@ class PluginOptions
             } else {
                 $msg = __('Store on Maatoo created successful', 'mto');
                 $this->mtoOptions['store'] = $store->toArray();
+                $this->mtoOptions['store']['id'] = $store->getId();
                 update_option('mto', $this->mtoOptions);
             }
         }

@@ -7,6 +7,7 @@ jQuery(function ($) {
   $form.on('submit', function (e) {
     e.preventDefault();
     $statusBar.find('.success').addClass('hidden');
+    $statusBar.find('.error').addClass('hidden');
     $.ajax({
       method: 'POST',
       url: ajaxUrl,

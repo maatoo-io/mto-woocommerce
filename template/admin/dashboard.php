@@ -113,7 +113,7 @@ $mtoUser = new MtoUser();
         </div>
         <label for="url"><?php
             _e('Maatoo URL', 'mto'); ?>
-            <input type="text" id="url" name="url" value="<?php echo $mtoUser->getUrl() ?? ''; ?>" required/>
+            <input type="url" id="url" name="url" value="<?php echo $mtoUser->getUrl() ?? ''; ?>" required/>
         </label>
         <label for="login"><?php
             _e('Username or email', 'mto'); ?>

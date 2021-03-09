@@ -29,7 +29,11 @@ class PluginOptions
                                ->setIsError(true)
                                ->send();
             }
-            $mtoUser = MtoUser::toMtoUser($_POST['username'], $_POST['pass'], $_POST['url']);
+            $mtoUser = MtoUser::toMtoUser(
+                trim($_POST['username']),
+                trim($_POST['pass']),
+                filter_var(rtrim($_POST['url'], '/'), FILTER_SANITIZE_URL)
+            );
             $provider = new MtoConnector($mtoUser);
             if ($provider->healthCheck()) {
                 update_option(

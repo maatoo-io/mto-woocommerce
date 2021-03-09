@@ -9,11 +9,13 @@ namespace Maatoo\WooCommerce\Entity;
  */
 class MtoStore
 {
+    private ?int $id;
     private ?string $name;
     private ?string $shortName;
     private ?string $currency;
     private ?string $externalStoreId;
     private ?string $platform;
+    private ?string $domain;
 
     /**
      * To Mto Store.
@@ -26,14 +28,65 @@ class MtoStore
      *
      * @return MtoStore
      */
-    public static function toMtoStore($name, $shortName, $currency, $externalStoreId, $platform = 'woocommerce'): MtoStore
-    {
+    public static function toMtoStore(
+        $name,
+        $shortName,
+        $currency,
+        $externalStoreId,
+        $domain,
+        $id = null,
+        $platform = 'woocommerce'
+    ): MtoStore {
         $store = new MtoStore();
         return $store->setName($name)
-            ->setShortName($shortName)
-            ->setCurrency($currency)
-            ->setExternalStoreId($externalStoreId)
-            ->setPlatform($platform);
+                     ->setShortName($shortName)
+                     ->setCurrency($currency)
+                     ->setExternalStoreId($externalStoreId)
+                     ->setPlatform($platform)
+                     ->setId($id)
+                     ->setDomain($domain);
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set Id.
+     *
+     * @param int|null $id
+     *
+     * @return $this
+     */
+    public function setId(?int $id): MtoStore
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDomain(): ?string
+    {
+        return $this->domain;
+    }
+
+    /**
+     * Set Domain.
+     *
+     * @param string|null $domain
+     *
+     * @return $this
+     */
+    public function setDomain(?string $domain): MtoStore
+    {
+        $this->domain = $domain;
+        return $this;
     }
 
     /**
@@ -130,5 +183,16 @@ class MtoStore
     {
         $this->platform = $platform;
         return $this;
+    }
+
+    public function toArray(){
+        return [
+            'domain' => $this->getDomain(),
+            'name' => $this->getName(),
+            'shortName' => $this->getShortName(),
+            'currency' => $this->getCurrency(),
+            'externalStoreId' => $this->getExternalStoreId(),
+            'platform' => $this->getPlatform(),
+        ];
     }
 }

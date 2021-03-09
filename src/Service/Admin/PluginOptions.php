@@ -31,7 +31,7 @@ class PluginOptions
             }
             $mtoUser = MtoUser::toMtoUser($_POST['username'], $_POST['pass'], $_POST['url']);
             $provider = new MtoConnector($mtoUser);
-            if ($provider->isCredentialsOk()) {
+            if ($provider->healthCheck()) {
                 update_option(
                     'mto',
                     [

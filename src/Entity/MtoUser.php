@@ -19,7 +19,7 @@ class MtoUser
 
         $this->username = $options['username'] ?? null;
         $this->password = $options['password'] ?? null;
-        $this->url = $options['url'] ?? null;
+        $this->url = rtrim($options['url']) ?? null;
     }
 
     /**
@@ -81,7 +81,7 @@ class MtoUser
      */
     public function setUrl($url): MtoUser
     {
-        $this->url = $url;
+        $this->url = rtrim($url);
         return $this;
     }
 

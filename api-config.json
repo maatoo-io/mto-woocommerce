@@ -1,4 +1,8 @@
 {
+  "healthCheck": {
+    "route": "\/api\/health-check",
+    "method": "GET"
+  },
   "store": {
     "create": {
       "route": "\/api\/stores\/new",

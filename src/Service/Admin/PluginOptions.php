@@ -29,9 +29,13 @@ class PluginOptions
                                ->setIsError(true)
                                ->send();
             }
-            $mtoUser = MtoUser::toMtoUser($_POST['username'], $_POST['pass'], $_POST['url']);
+            $mtoUser = MtoUser::toMtoUser(
+                trim($_POST['username']),
+                trim($_POST['pass']),
+                filter_var(rtrim($_POST['url'], '/'), FILTER_SANITIZE_URL)
+            );
             $provider = new MtoConnector($mtoUser);
-            if ($provider->isCredentialsOk()) {
+            if ($provider->healthCheck()) {
                 update_option(
                     'mto',
                     [
@@ -40,7 +44,7 @@ class PluginOptions
                         'url' => $mtoUser->getUrl(),
                     ]
                 );
-                $this->response->setResponseBody(__('Credentials Saved', 'mto'))
+                $this->response->setResponseBody(__('Credentials are valid and saved', 'mto'))
                                ->send();
             } else {
                 $this->response->setResponseBody(__('Credentials are invalid', 'mto'))

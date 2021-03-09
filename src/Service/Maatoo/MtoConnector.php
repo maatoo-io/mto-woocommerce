@@ -62,7 +62,7 @@ class MtoConnector
      */
     public function healthCheck()
     {
-        if (is_null(static::$apiEndPionts)) {
+        if (is_null($this->isCredentialsOk)) {
             $response = $this->getResponseData(static::getApiEndPoint('healthCheck'));
 
             if (isset($response['status'])) {

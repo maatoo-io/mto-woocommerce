@@ -40,7 +40,7 @@ class PluginOptions
                         'url' => $mtoUser->getUrl(),
                     ]
                 );
-                $this->response->setResponseBody(__('Credentials Saved', 'mto'))
+                $this->response->setResponseBody(__('Credentials are valid and saved', 'mto'))
                                ->send();
             } else {
                 $this->response->setResponseBody(__('Credentials are invalid', 'mto'))

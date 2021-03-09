@@ -4,6 +4,10 @@ namespace Maatoo\WooCommerce\Service\Maatoo;
 
 use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Pool;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Response;
+use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
 
@@ -95,7 +99,7 @@ class MtoConnector
                 $endpointConfig->route,
                 ['form_params' => $args]
             );
-            $responseData = (array)json_decode($response->getBody()->getContents());
+            $responseData = (array)json_decode($response->getBody()->getContents(), 'true');
         } catch (Exception $exception) {
             //TODO Add to log
             return null;
@@ -108,15 +112,54 @@ class MtoConnector
      * Register Store.
      *
      * @param MtoStore $store
+     *
+     * @return false|MtoStore
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function registerStore(MtoStore $store)
     {
+        if ($store->getId()) {
+            return $store;
+        }
+
+        $storeId = $this->isStoreRegistered($store);
+
+        if ($storeId) {
+            return $store->setId($storeId);
+        }
+
         $formData = $store->toArray();
         $endpoint = static::getApiEndPoint('store')->create ?? null;
         $response = $this->getResponseData($endpoint, $formData);
 
         if (!empty($response['store'])) {
-            return $store->setId($response['store']->id ?? null);
+            return $store->setId($response['store']['id'] ?? null);
+        }
+
+        return false;
+    }
+
+    /**
+     * Return store is if Store was registered for domain
+     *
+     * @param MtoStore $store
+     *
+     * @return false|mixed
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    private function isStoreRegistered(MtoStore $store)
+    {
+        $endpoint = static::getApiEndPoint('store')->list ?? null;
+        $response = $this->getResponseData($endpoint);
+
+        if (empty($response['stores'])) {
+            return false;
+        }
+        $keys = array_keys($response['stores']);
+        $relKey = array_search($store->getDomain(), array_column($response['stores'], 'domain'));
+        if($relKey!== false){
+            return $keys[$relKey];
         }
 
         return false;
@@ -129,7 +172,32 @@ class MtoConnector
      */
     public function syncProducts(array $products)
     {
-        //TODO Push products to remote maatoo store
+        try {
+            $endpoint = static::getApiEndPoint('product')->create ?? null;
+            $requests = $this->productsGenerator($products, $endpoint);
+
+            $pool = new Pool(
+                $this->client, $requests, [
+                                 'concurrency' => 10,
+                                 'fulfilled' => function (Response $response, $index) {
+                                     // this is delivered each successful response
+                                     $t = 'test';
+                                 },
+                                 'rejected' => function (RequestException $reason, $index) {
+                                     // this is delivered each failed request
+                                     $t = 'test';
+                                 },
+                             ]
+            );
+            // Initiate the transfers and create a promise
+            $promise = $pool->promise();
+
+            // Force the pool of requests to complete.
+            $promise->wait();
+        } catch (Exception $exception){
+            //TODO Put message to log
+            return $exception->getMessage();
+        }
     }
 
     /**
@@ -140,5 +208,13 @@ class MtoConnector
     public function syncOrders(array $orders)
     {
         //TODO Push orders to remote maatoo store
+    }
+
+    private function productsGenerator($products, $endpoint)
+    {
+        foreach ($products as $productId) {
+            $product = new MtoProduct($productId);
+            yield $this->client->request($endpoint->method, $endpoint->route, ['form_params' => $product->toArray()]);
+        }
     }
 }

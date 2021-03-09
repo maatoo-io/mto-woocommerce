@@ -6,9 +6,9 @@ namespace Maatoo\WooCommerce\Entity;
 
 class MtoUser
 {
-    private ?string $username;
-    private ?string $password;
-    private ?string $url;
+    private ?string $username = null;
+    private ?string $password= null;
+    private ?string $url= null;
 
     public function __construct()
     {

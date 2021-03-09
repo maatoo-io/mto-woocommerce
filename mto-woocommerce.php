@@ -2,13 +2,9 @@
 /***
  * Plugin Name: Maatoo
  * Plugin URI:  https://github.com/maatoo-io/mto-woocommerce/
- * Description: Maatoo is a swiss-based SaaS that helps online shops to drive more revenue through targeted marketing messages over email and other channels.
- * Version:     1.0.0
- * Requires at least: 5.0
- * Requires PHP: 7.4
- * Author: Alina Valovenko
- * Text Domain: mto
- * Domain Path: /languages
+ * Description: Maatoo is a swiss-based SaaS that helps online shops to drive more revenue through targeted marketing
+ * messages over email and other channels. Version:     1.0.0 Requires at least: 5.0 Requires PHP: 7.4 Author: Alina
+ * Valovenko Text Domain: mto Domain Path: /languages
  */
 
 namespace Maatoo\WooCommerce;
@@ -17,6 +13,7 @@ use Maatoo\WooCommerce\Registry\AdminAssets;
 use Maatoo\WooCommerce\Service\Ajax\AjaxHooks;
 use Maatoo\WooCommerce\Registry\FrontAssets;
 use Maatoo\WooCommerce\Registry\Options;
+use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
@@ -49,6 +46,12 @@ if (!defined('MTO_PLUGIN_ASSETS')) {
     define('MTO_PLUGIN_ASSETS', MTO_PLUGIN_URL . 'assets/dist/');
 }
 
+if (!defined('MTO_STORE_ID')) {
+    $store = MtoStoreManger::getStoreData();
+
+    define('MTO_STORE_ID', $store ? $store->getId() : null);
+}
+
 add_action('init', new MtoWoocommerce());
 
 class MtoWoocommerce
@@ -73,7 +76,9 @@ class MtoWoocommerce
 
     private function registerAjaxHooks()
     {
-        $ajaxCallbacks = new AjaxHooks();
-        $ajaxCallbacks->registryAdminAjax();
+        if (wp_doing_ajax()) {
+            $ajaxCallbacks = new AjaxHooks();
+            $ajaxCallbacks->registryAdminAjax();
+        }
     }
 }

@@ -3,9 +3,17 @@
 namespace Maatoo\WooCommerce\Service\Store;
 
 use Maatoo\WooCommerce\Entity\MtoStore;
+use WP_Query;
 
 class MtoStoreManger
 {
+    /**
+     * Store object.
+     *
+     * @var MtoStore|null
+     */
+    private static ?MtoStore $store = null;
+
     /**
      * Create.
      *
@@ -13,6 +21,9 @@ class MtoStoreManger
      */
     public static function getStoreData(): ?MtoStore
     {
+        if (!is_null(static::$store)) {
+            return static::$store;
+        }
         $storeOption = get_option('mto');
 
         if (empty($storeOption)) {
@@ -27,7 +38,7 @@ class MtoStoreManger
                     explode('.', parse_url($storeOption['url'])['host'])[0]
                 ) ?? 'untitledstore';
             $externalId = substr(sha1(rand()), 0, 6);
-            $currency = get_woocommerce_currency();
+            $currency = get_option('woocommerce_currency') ?: 'USD';
             $domain = get_home_url();
             $id = null;
         } else {
@@ -36,15 +47,31 @@ class MtoStoreManger
             $externalId = $storeOption['store']['externalStoreId'] ?? null;
             $currency = $storeOption['store']['currency'] ?? null;
             $domain = $storeOption['store']['domain'] ?? null;
-            $id = null;
+            $id = $storeOption['store']['id'] ?? null;
         }
 
         return MtoStore::toMtoStore($name, $shortName, $currency, $externalId, $domain, $id);
     }
 
+    /**
+     * Get All Products.
+     *
+     * @return array
+     */
     public static function getAllProducts(): array
     {
+        $products = new WP_Query(
+            [
+                'post_type' => 'product',
+                'posts_per_page' => -1,
+                'fields' => 'ids',
+            ]
+        );
 
-        return [];
+        if (!$products->have_posts()) {
+            return [];
+        }
+
+        return $products->posts;
     }
 }

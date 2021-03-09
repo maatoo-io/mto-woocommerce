@@ -113,16 +113,16 @@ $mtoUser = new MtoUser();
         </div>
         <label for="url"><?php
             _e('Maatoo URL', 'mto'); ?>
-            <input type="text" id="url" name="url" value="<?php echo $mtoUser->getUrl() ?? ''; ?>"/>
+            <input type="text" id="url" name="url" value="<?php echo $mtoUser->getUrl() ?? ''; ?>" required/>
         </label>
         <label for="login"><?php
             _e('Username or email', 'mto'); ?>
-            <input type="text" id="login" name="login" value="<?php echo $mtoUser->getUsername() ?? ''; ?>"/>
+            <input type="text" id="login" name="login" value="<?php echo $mtoUser->getUsername() ?? ''; ?>" required/>
         </label>
 
         <label for="password"><?php
             _e('Password', 'mto'); ?>
-            <input type="password" name="password" id="password" value="<?php echo $mtoUser->getPassword() ?? ''; ?>">
+            <input type="password" name="password" id="password" value="<?php echo $mtoUser->getPassword() ?? ''; ?> " required/>
         </label>
         <input type="submit" name="save" value="<?php
         _e('Save Credentials', 'mto'); ?>">

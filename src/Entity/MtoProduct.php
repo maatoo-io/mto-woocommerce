@@ -4,6 +4,7 @@ namespace Maatoo\WooCommerce\Entity;
 
 class MtoProduct
 {
+    private ?int $id = null;
     private string $externalProductId;
     private float $price = 0;
     private string $url;
@@ -15,7 +16,11 @@ class MtoProduct
     public function __construct($product_id = null)
     {
         $product = wc_get_product($product_id);
+        if (!$product) {
+            return null;
+        }
 
+        $this->id = get_post_meta($product_id, '_mto_id', true) ?: null;
         $this->sku = $product->get_sku();
         $this->externalProductId = (string)$product_id;
         $this->price = $product->get_price() ? : 0;
@@ -89,6 +94,19 @@ class MtoProduct
         return $this->imageUrl;
     }
 
+    /**
+     * @return int|mixed|null
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * To Array.
+     *
+     * @return array
+     */
     public function toArray(): array
     {
         return [

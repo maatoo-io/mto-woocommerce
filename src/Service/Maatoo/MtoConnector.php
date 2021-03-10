@@ -10,6 +10,7 @@ use GuzzleHttp\Psr7\Response;
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
+use MtoOrder;
 
 class MtoConnector
 {
@@ -63,6 +64,7 @@ class MtoConnector
      * Health Check.
      *
      * @return bool|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function healthCheck()
     {
@@ -166,55 +168,97 @@ class MtoConnector
     }
 
     /**
-     * Sync Products.
+     * Create Products on maatoo service.
      *
      * @param array $products
+     *
+     * @return string with state
      */
-    public function syncProducts(array $products)
+    public function createProducts(array $products)
     {
         try {
             $endpoint = static::getApiEndPoint('product')->create ?? null;
-            $requests = $this->productsGenerator($products, $endpoint);
-
-            $pool = new Pool(
-                $this->client, $requests, [
-                                 'concurrency' => 10,
-                                 'fulfilled' => function (Response $response, $index) {
-                                     // this is delivered each successful response
-                                     $t = 'test';
-                                 },
-                                 'rejected' => function (RequestException $reason, $index) {
-                                     // this is delivered each failed request
-                                     $t = 'test';
-                                 },
-                             ]
-            );
-            // Initiate the transfers and create a promise
+            $client = $this->client;
+            $requests = function ($products, $endpoint) use ($client) {
+                foreach ($products as $productId) {
+                    $product = new MtoProduct($productId);
+                    if(!$product) {
+                        continue;
+                    }
+                    yield function() use ($client, $endpoint, $product) {
+                        return $client->postAsync($endpoint->route, ['form_params' => $product->toArray()]);
+                    };
+                }
+            };
+            $pool = new Pool($client, $requests($products, $endpoint), [
+                'concurrency' => 5,
+                'fulfilled' => function (Response $response, $index) {
+                    $responseDecoded = json_decode($response->getBody()->getContents(), true);
+                    if(!empty($responseDecoded['product'])){
+                        $id = $responseDecoded['product']['externalProductId'] ?? null;
+                        if($id && !empty($responseDecoded['product']['id'])){
+                            update_post_meta((int)$id, '_mto_id', $responseDecoded['product']['id']);
+                        }
+                    }
+                },
+                'rejected' => function (RequestException $reason, $index) {
+                    //TODO Put message into log
+                    },
+            ]);
             $promise = $pool->promise();
-
-            // Force the pool of requests to complete.
             $promise->wait();
+
+            return $promise->getState();
         } catch (Exception $exception){
-            //TODO Put message to log
+            //TODO Put message into log
             return $exception->getMessage();
         }
     }
 
     /**
-     * Sync Orders.
+     * Create Orders.
      *
      * @param array $orders
+     *
+     * @return string
      */
-    public function syncOrders(array $orders)
+    public function createOrders(array $orders)
     {
-        //TODO Push orders to remote maatoo store
-    }
+        try {
+            $endpoint = static::getApiEndPoint('order')->create ?? null;
+            $client = $this->client;
+            $requests = function ($orders, $endpoint) use ($client) {
+                foreach ($orders as $orderId) {
+                    $order = new MtoOrder($orderId);
+                    if(!$order){
+                        continue;
+                    }
+                    yield function() use ($client, $endpoint, $order) {
+                        return $client->postAsync($endpoint->route, ['form_params' => $order->toArray()]);
+                    };
+                }
+            };
+            $pool = new Pool($client, $requests($orders, $endpoint), [
+                'concurrency' => 5,
+                'fulfilled' => function (Response $response, $index) {
+                    $responseDecoded = json_decode($response->getBody()->getContents(), true);
+                    if(!empty($responseDecoded['order'])){
+                        $id = $responseDecoded['order']['externalOrderId'] ?? null;
+                        if($id && !empty($responseDecoded['order']['id'])){
+                            update_post_meta((int)$id, '_mto_id', $responseDecoded['order']['id']);
+                        }
+                    }
+                },
+                'rejected' => function (RequestException $reason, $index) {
+                    //TODO Put message into log
+                },
+            ]);
+            $promise = $pool->promise();
+            $promise->wait();
 
-    private function productsGenerator($products, $endpoint)
-    {
-        foreach ($products as $productId) {
-            $product = new MtoProduct($productId);
-            yield $this->client->request($endpoint->method, $endpoint->route, ['form_params' => $product->toArray()]);
+            return $promise->getState();
+        } catch (Exception $exception){
+            //TODO Put message into log
         }
     }
 }

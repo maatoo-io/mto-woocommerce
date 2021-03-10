@@ -5,6 +5,7 @@ namespace Maatoo\WooCommerce\Service\Admin;
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\Ajax\AbstractAjaxCallback;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
+use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 /**
  * Class MtoOrderSync
@@ -16,6 +17,7 @@ class MtoOrderSync extends AbstractAjaxCallback
     protected function responseCallback()
     {
         $provider = new MtoConnector(new MtoUser());
-        $this->response->setResponseBody('test');
+        $status = $provider->createProducts(MtoStoreManger::getAllOrders());
+        $this->response->setResponseBody($status);
     }
 }

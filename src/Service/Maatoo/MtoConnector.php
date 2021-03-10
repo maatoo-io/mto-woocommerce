@@ -251,6 +251,7 @@ class MtoConnector
                 },
                 'rejected' => function (RequestException $reason, $index) {
                     //TODO Put message into log
+                    $msg =$reason->getMessage();
                 },
             ]);
             $promise = $pool->promise();

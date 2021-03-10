@@ -34,12 +34,38 @@
       "route": "api\/products\/{id}",
       "method": "GET"
     },
+    "list": {
+      "route": "api\/products",
+      "method": "GET"
+    },
     "edit": {
       "route": "api\/products\/{id}\/edit",
       "method": "PATCH"
     },
     "delete": {
       "route": "api\/products\/{id}\/delete",
+      "method": "DEL"
+    }
+  },
+  "order": {
+    "create": {
+      "route": "api\/orders\/new",
+      "method": "POST"
+    },
+    "retrieve": {
+      "route": "api\/orders\/{id}",
+      "method": "GET"
+    },
+    "list": {
+      "route": "api\/orders",
+      "method": "GET"
+    },
+    "edit": {
+      "route": "api\/orders\/{id}\/edit",
+      "method": "PATCH"
+    },
+    "delete": {
+      "route": "api\/orders\/{id}\/delete",
       "method": "DEL"
     }
   }

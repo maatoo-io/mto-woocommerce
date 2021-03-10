@@ -4,10 +4,29 @@ jQuery(function ($) {
   var $form = $('.js-mto-credentials');
   var $statusBar = $('.js-status-bar');
   var ajaxUrl = window.ajaxurl;
-  $form.on('submit', function (e) {
-    e.preventDefault();
+
+  var resetStatusBar = function resetStatusBar() {
     $statusBar.find('.success').addClass('hidden');
     $statusBar.find('.error').addClass('hidden');
+  };
+
+  var successMsg = function successMsg(response) {
+    var $holder = $statusBar.find('.success');
+
+    if (response.isError) {
+      $holder = $statusBar.find('.error');
+    }
+
+    $holder.html(response.body).removeClass('hidden');
+  };
+
+  var errorMsg = function errorMsg(response) {
+    $statusBar.find('.error').html(response.body).removeClass('hidden');
+  };
+
+  $form.on('submit', function (e) {
+    e.preventDefault();
+    resetStatusBar();
     $.ajax({
       method: 'POST',
       url: ajaxUrl,
@@ -19,15 +38,9 @@ jQuery(function ($) {
       },
       dataType: 'json'
     }).done(function (response) {
-      var $holder = $statusBar.find('.success');
-
-      if (response.isError) {
-        $holder = $statusBar.find('.error');
-      }
-
-      $holder.html(response.body).removeClass('hidden');
+      successMsg(response);
     }).fail(function (response) {
-      $statusBar.find('.error').html(response.body).removeClass('hidden');
+      errorMsg(response);
     });
   });
   $('.js-run-sync-products').on('click', function (e) {
@@ -40,6 +53,7 @@ jQuery(function ($) {
   });
 
   var mtoRunSync = function mtoRunSync(action) {
+    resetStatusBar();
     $.ajax({
       method: 'POST',
       url: ajaxUrl,
@@ -48,9 +62,9 @@ jQuery(function ($) {
       },
       dataType: 'json'
     }).done(function (response) {
-      console.log(response);
+      successMsg(response);
     }).fail(function (response) {
-      console.log(response);
+      errorMsg(response);
     });
   };
 });

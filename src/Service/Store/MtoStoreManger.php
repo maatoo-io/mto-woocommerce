@@ -3,8 +3,12 @@
 namespace Maatoo\WooCommerce\Service\Store;
 
 use Maatoo\WooCommerce\Entity\MtoStore;
-use WP_Query;
 
+/**
+ * Class MtoStoreManger
+ *
+ * @package Maatoo\WooCommerce\Service\Store
+ */
 class MtoStoreManger
 {
     /**
@@ -70,7 +74,7 @@ class MtoStoreManger
      */
     public static function getAllOrders(): array
     {
-        return self::getAllItemsByCPT('order');
+        return self::getAllItemsByCPT('shop_order');
     }
 
     /**
@@ -82,19 +86,22 @@ class MtoStoreManger
      */
     private static function getAllItemsByCPT(string $cpt, $newOnly = true)
     {
-        $items = new WP_Query(
-            [
-                'post_type' => $cpt,
-                'posts_per_page' => -1,
-                'fields' => 'ids',
-                'meta_query' => [
-                    [
-                        'key' => '_mto_id',
-                        'compare' => 'NOT EXISTS',
-                    ],
+        $args = [
+            'post_type' => $cpt,
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'post_status'=>'any'
+        ];
+
+        if ($newOnly) {
+            $args['meta_query'] = [
+                [
+                    'key' => '_mto_id',
+                    'compare' => 'NOT EXISTS',
                 ],
-            ]
-        );
+            ];
+        }
+        $items = new \WP_Query($args);
 
         if (!$items->have_posts()) {
             return [];

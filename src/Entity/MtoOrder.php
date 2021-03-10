@@ -17,7 +17,7 @@ class MtoOrder
     private string $email;
     private string $firstName;
     private string $lastName;
-    private array $conversion = ['type' => 'email', 'id' => '6']; //TODO replace by real data
+    private array $conversion = ['type' => null, 'id' => null]; //TODO replace by real data
 
     public function __construct($orderId)
     {

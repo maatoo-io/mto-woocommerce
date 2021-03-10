@@ -3,10 +3,26 @@ jQuery(($) => {
   const $statusBar = $('.js-status-bar')
   const ajaxUrl = window.ajaxurl
 
-  $form.on('submit', (e) => {
-    e.preventDefault()
+  const resetStatusBar = () => {
     $statusBar.find('.success').addClass('hidden')
     $statusBar.find('.error').addClass('hidden')
+  }
+
+  const successMsg = (response) => {
+    let $holder = $statusBar.find('.success')
+    if (response.isError) {
+      $holder = $statusBar.find('.error')
+    }
+    $holder.html(response.body).removeClass('hidden')
+  }
+
+  const errorMsg = (response) => {
+    $statusBar.find('.error').html(response.body).removeClass('hidden')
+  }
+
+  $form.on('submit', (e) => {
+    e.preventDefault()
+    resetStatusBar()
     $.ajax({
       method: 'POST',
       url: ajaxUrl,
@@ -19,14 +35,10 @@ jQuery(($) => {
       dataType: 'json'
     })
       .done(function (response) {
-        let $holder = $statusBar.find('.success')
-        if (response.isError) {
-          $holder = $statusBar.find('.error')
-        }
-        $holder.html(response.body).removeClass('hidden')
+        successMsg(response)
       })
       .fail(function (response) {
-        $statusBar.find('.error').html(response.body).removeClass('hidden')
+        errorMsg(response)
       })
   })
 
@@ -41,6 +53,7 @@ jQuery(($) => {
   })
 
   const mtoRunSync = (action) => {
+    resetStatusBar()
     $.ajax({
       method: 'POST',
       url: ajaxUrl,
@@ -50,10 +63,10 @@ jQuery(($) => {
       dataType: 'json'
     })
       .done(function (response) {
-        console.log(response)
+        successMsg(response)
       })
       .fail(function (response) {
-        console.log(response)
+        errorMsg(response)
       })
   }
 })

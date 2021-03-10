@@ -7,10 +7,10 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
+use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
-use MtoOrder;
 
 class MtoConnector
 {
@@ -251,6 +251,7 @@ class MtoConnector
                 },
                 'rejected' => function (RequestException $reason, $index) {
                     //TODO Put message into log
+                    $msg =$reason->getMessage();
                 },
             ]);
             $promise = $pool->promise();

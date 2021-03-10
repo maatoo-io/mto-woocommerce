@@ -38,7 +38,7 @@ class MtoStoreManger
                     explode('.', parse_url($storeOption['url'])['host'])[0]
                 ) ?? 'untitledstore';
             $externalId = substr(sha1(rand()), 0, 6);
-            $currency = get_option('woocommerce_currency') ?: 'USD';
+            $currency = get_option('woocommerce_currency') ? : 'USD';
             $domain = get_home_url();
             $id = null;
         } else {
@@ -56,22 +56,50 @@ class MtoStoreManger
     /**
      * Get All Products.
      *
-     * @return array
+     * @return array|int[]
      */
     public static function getAllProducts(): array
     {
-        $products = new WP_Query(
+        return self::getAllItemsByCPT('product');
+    }
+
+    /**
+     * Get All Orders.
+     *
+     * @return array|int[]
+     */
+    public static function getAllOrders(): array
+    {
+        return self::getAllItemsByCPT('order');
+    }
+
+    /**
+     * Get All Items By CPT.
+     *
+     * @param string $cpt
+     *
+     * @return array|int[]
+     */
+    private static function getAllItemsByCPT(string $cpt, $newOnly = true)
+    {
+        $items = new WP_Query(
             [
-                'post_type' => 'product',
+                'post_type' => $cpt,
                 'posts_per_page' => -1,
                 'fields' => 'ids',
+                'meta_query' => [
+                    [
+                        'key' => '_mto_id',
+                        'compare' => 'NOT EXISTS',
+                    ],
+                ],
             ]
         );
 
-        if (!$products->have_posts()) {
+        if (!$items->have_posts()) {
             return [];
         }
 
-        return $products->posts;
+        return $items->posts;
     }
 }

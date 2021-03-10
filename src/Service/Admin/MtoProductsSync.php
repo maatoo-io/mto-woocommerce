@@ -17,7 +17,6 @@ class MtoProductsSync extends AbstractAjaxCallback
     protected function responseCallback()
     {
         $provider = new MtoConnector(new MtoUser());
-        $provider->syncProducts(MtoStoreManger::getAllProducts());
-        $this->response->setResponseBody('test');
-    }
+        $status = $provider->createProducts(MtoStoreManger::getAllProducts());
+        $this->response->setResponseBody($status);    }
 }

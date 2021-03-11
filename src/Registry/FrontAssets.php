@@ -16,7 +16,7 @@ class FrontAssets extends AbstractAssets
     {
         wp_enqueue_style(
             $this->handle,
-            MTO_PLUGIN_ASSETS . 'css/styles.min.css',
+            MTO_PLUGIN_ASSETS . 'css/styles.css',
         );
     }
 
@@ -27,7 +27,7 @@ class FrontAssets extends AbstractAssets
     {
         wp_enqueue_script(
             $this->handleLibs,
-            MTO_PLUGIN_ASSETS . 'js/libs.css',
+            MTO_PLUGIN_ASSETS . 'js/libs.js',
             [],
             false,
             true
@@ -35,10 +35,19 @@ class FrontAssets extends AbstractAssets
 
         wp_enqueue_script(
             $this->handle,
-            MTO_PLUGIN_ASSETS . 'js/scripts.css',
+            MTO_PLUGIN_ASSETS . 'js/scripts.js',
             [$this->handleLibs],
             false,
             true
+        );
+
+        wp_localize_script(
+            $this->handle,
+            'mto',
+            [
+                "ajaxUrl" => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('_mtoAjax_nonceHash'),
+            ]
         );
     }
 }

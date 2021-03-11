@@ -68,5 +68,23 @@
       "route": "api\/orders\/{id}\/delete",
       "method": "DEL"
     }
+  },
+  "orderLine": {
+    "create": {
+      "route": "api\/orderLines\/new",
+      "method": "POST"
+    },
+    "batch": {
+      "route": "api\/orderLines\/batch\/new",
+      "method": "POST"
+    },
+    "list": {
+      "route": "api\/orderLines",
+      "method": "GET"
+    },
+    "delete": {
+      "route": "api\/orderLines\/{id}\/delete",
+      "method": "DEL"
+    }
   }
 }

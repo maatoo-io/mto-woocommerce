@@ -11,6 +11,7 @@ use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 class MtoConnector
 {
@@ -160,7 +161,7 @@ class MtoConnector
         }
         $keys = array_keys($response['stores']);
         $relKey = array_search($store->getDomain(), array_column($response['stores'], 'domain'));
-        if($relKey!== false){
+        if ($relKey !== false) {
             return $keys[$relKey];
         }
 
@@ -182,34 +183,37 @@ class MtoConnector
             $requests = function ($products, $endpoint) use ($client) {
                 foreach ($products as $productId) {
                     $product = new MtoProduct($productId);
-                    if(!$product) {
+                    if (!$product) {
                         continue;
                     }
-                    yield function() use ($client, $endpoint, $product) {
+                    yield function () use ($client, $endpoint, $product) {
                         return $client->postAsync($endpoint->route, ['form_params' => $product->toArray()]);
                     };
                 }
             };
-            $pool = new Pool($client, $requests($products, $endpoint), [
+            $pool = new Pool(
+                $client, $requests($products, $endpoint), [
                 'concurrency' => 5,
                 'fulfilled' => function (Response $response, $index) {
                     $responseDecoded = json_decode($response->getBody()->getContents(), true);
-                    if(!empty($responseDecoded['product'])){
+                    if (!empty($responseDecoded['product'])) {
                         $id = $responseDecoded['product']['externalProductId'] ?? null;
-                        if($id && !empty($responseDecoded['product']['id'])){
+                        if ($id && !empty($responseDecoded['product']['id'])) {
                             update_post_meta((int)$id, '_mto_id', $responseDecoded['product']['id']);
+                            update_post_meta((int)$id, '_mto_last_sync', $responseDecoded['product']['dateCreated']);
                         }
                     }
                 },
                 'rejected' => function (RequestException $reason, $index) {
                     //TODO Put message into log
-                    },
-            ]);
+                },
+            ]
+            );
             $promise = $pool->promise();
             $promise->wait();
 
             return $promise->getState();
-        } catch (Exception $exception){
+        } catch (Exception $exception) {
             //TODO Put message into log
             return $exception->getMessage();
         }
@@ -230,35 +234,48 @@ class MtoConnector
             $requests = function ($orders, $endpoint) use ($client) {
                 foreach ($orders as $orderId) {
                     $order = new MtoOrder($orderId);
-                    if(!$order){
+                    if (!$order) {
                         continue;
                     }
-                    yield function() use ($client, $endpoint, $order) {
+                    yield function () use ($client, $endpoint, $order) {
                         return $client->postAsync($endpoint->route, ['form_params' => $order->toArray()]);
                     };
                 }
             };
-            $pool = new Pool($client, $requests($orders, $endpoint), [
+            $pool = new Pool(
+                $client, $requests($orders, $endpoint), [
                 'concurrency' => 5,
                 'fulfilled' => function (Response $response, $index) {
                     $responseDecoded = json_decode($response->getBody()->getContents(), true);
-                    if(!empty($responseDecoded['order'])){
+                    if (!empty($responseDecoded['order'])) {
                         $id = $responseDecoded['order']['externalOrderId'] ?? null;
-                        if($id && !empty($responseDecoded['order']['id'])){
+                        if ($id && !empty($responseDecoded['order']['id'])) {
                             update_post_meta((int)$id, '_mto_id', $responseDecoded['order']['id']);
+                            update_post_meta((int)$id, '_mto_last_sync', $responseDecoded['order']['dateCreated']);
                         }
                     }
                 },
                 'rejected' => function (RequestException $reason, $index) {
                     //TODO Put message into log
-                    $msg =$reason->getMessage();
+                    $msg = $reason->getMessage();
                 },
-            ]);
+            ]
+            );
             $promise = $pool->promise();
             $promise->wait();
 
             return $promise->getState();
-        } catch (Exception $exception){
+        } catch (Exception $exception) {
+            //TODO Put message into log
+        }
+    }
+
+    public function batchOrderLines(array $orderLines)
+    {
+        try {
+            $endpoint = static::getApiEndPoint('orderLine')->batch ?? null;
+            return $this->getResponseData($endpoint, $orderLines);
+        } catch (Exception $exception) {
             //TODO Put message into log
         }
     }

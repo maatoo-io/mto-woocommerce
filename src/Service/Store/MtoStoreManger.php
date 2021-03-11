@@ -2,6 +2,7 @@
 
 namespace Maatoo\WooCommerce\Service\Store;
 
+use Maatoo\WooCommerce\Entity\MtoOrderLine;
 use Maatoo\WooCommerce\Entity\MtoStore;
 
 /**
@@ -90,7 +91,7 @@ class MtoStoreManger
             'post_type' => $cpt,
             'posts_per_page' => -1,
             'fields' => 'ids',
-            'post_status'=>'any'
+            'post_status' => 'any',
         ];
 
         if ($newOnly) {
@@ -108,5 +109,29 @@ class MtoStoreManger
         }
 
         return $items->posts;
+    }
+
+    public static function getOrdersLines($items = null)
+    {
+        if (is_numeric($items)) {
+            $orderLines = new MtoOrderLine($items);
+            if ($orderLines) {
+                return $orderLines->toArray();
+            }
+            return [];
+        } elseif (is_array($items)) {
+            $data = [];
+            foreach ($items as $orderId) {
+                $orderLines = new MtoOrderLine($orderId);
+                if (!$orderLines) {
+                    continue;
+                }
+                foreach ($orderLines->toArray() as $orderLine) {
+                    $data[] = $orderLine;
+                }
+            }
+            return $data;
+        }
+        return [];
     }
 }

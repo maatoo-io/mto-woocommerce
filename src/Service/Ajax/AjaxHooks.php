@@ -13,5 +13,7 @@ class AjaxHooks
         add_action('wp_ajax_mto_save_options', new PluginOptions());
         add_action('wp_ajax_mto_run_product_sync', new MtoProductsSync());
         add_action('wp_ajax_mto_run_order_sync', new MtoOrderSync());
+        add_action('wp_ajax_mto_get_contact_id', new GetContactId());
+        add_action('wp_ajax_nopriv_mto_get_contact_id', new GetContactId());
     }
 }

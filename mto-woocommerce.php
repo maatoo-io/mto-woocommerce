@@ -16,6 +16,7 @@ use Maatoo\WooCommerce\Registry\Options;
 use Maatoo\WooCommerce\Service\Front\MtoConversion;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
+use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
 
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
@@ -93,5 +94,7 @@ class MtoWoocommerce
 
     private function registerWcHooks(){
         add_action('wp', new OrderHooks());
+        //add_action('wp', new ProductHooks());
+        $productHooks = new ProductHooks();
     }
 }

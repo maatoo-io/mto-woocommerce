@@ -185,7 +185,8 @@ class MtoConnector
                         continue;
                     }
                     yield function () use ($client, $endpoint, $product) {
-                        return $client->requestAsync($endpoint->method, $endpoint->route, ['form_params' => $product->toArray()]);
+                        $route = str_replace('{id}', $product->getId(), $endpoint->route);
+                        return $client->requestAsync($endpoint->method, $route, ['form_params' => $product->toArray()]);
                     };
                 }
             };
@@ -235,7 +236,8 @@ class MtoConnector
                         continue;
                     }
                     yield function () use ($client, $endpoint, $order) {
-                        return $client->requestAsync($endpoint->method, $endpoint->route, ['form_params' => $order->toArray()]);
+                        $route = str_replace('{id}', $order->getId(), $endpoint->route);
+                        return $client->requestAsync($endpoint->method, $route, ['form_params' => $order->toArray()]);
                     };
                 }
             };

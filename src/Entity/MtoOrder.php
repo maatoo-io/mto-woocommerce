@@ -7,7 +7,7 @@ namespace Maatoo\WooCommerce\Entity;
  *
  * @package Maatoo\WooCommerce\Entity
  */
-class MtoOrder
+class MtoOrder extends AbstractMtoEntity
 {
     private ?int $id = null;
     private string $externalOrderId = '';
@@ -21,6 +21,7 @@ class MtoOrder
 
     public function __construct($orderId)
     {
+        parent::__construct($orderId);
         $order = wc_get_order($orderId);
         if (!$order) {
             return null;
@@ -33,13 +34,12 @@ class MtoOrder
         $this->email = $order->get_billing_email() ?? '';
         $this->firstName = $order->get_billing_first_name() ?? '';
         $this->lastName = $order->get_billing_last_name() ?? '';
-        // TODO clarify with client
-//        if (MTO_CONTACT_ID) {
-//            $this->conversion = [
-//                'type' => 'email',
-//                'id' => MTO_CONTACT_ID,
-//            ];
-//        }
+        if (!empty($_SESSION['mtc_id'])) {
+            $this->conversion = [
+                'type' => 'email',
+                'id' => $_SESSION['mtc_id'],
+            ];
+        }
     }
 
     /**

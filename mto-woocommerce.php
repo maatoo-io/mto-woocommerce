@@ -15,6 +15,7 @@ use Maatoo\WooCommerce\Registry\FrontAssets;
 use Maatoo\WooCommerce\Registry\Options;
 use Maatoo\WooCommerce\Service\Front\MtoConversion;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
+use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
 
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
@@ -52,9 +53,6 @@ if (!defined('MTO_STORE_ID')) {
 
     define('MTO_STORE_ID', $store ? $store->getId() : null);
 }
-if (!defined('MTO_CONTACT_ID')) {
-    define('MTO_CONTACT_ID', get_option('mto_contact_id') ?: null);
-}
 
 add_action('init', new MtoWoocommerce());
 
@@ -66,6 +64,7 @@ class MtoWoocommerce
         $this->registerPluginSettings();
         $this->registerAjaxHooks();
         $this->conversionTracker();
+        $this->registerWcHooks();
     }
 
     private function registerAssets()
@@ -90,5 +89,9 @@ class MtoWoocommerce
     private function conversionTracker()
     {
         add_action('wp', new MtoConversion());
+    }
+
+    private function registerWcHooks(){
+        add_action('wp', new OrderHooks());
     }
 }

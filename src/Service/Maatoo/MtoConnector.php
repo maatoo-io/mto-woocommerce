@@ -11,7 +11,6 @@ use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
-use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 class MtoConnector
 {
@@ -41,7 +40,7 @@ class MtoConnector
      *
      * @return array|null
      */
-    protected static function getApiEndPoint($option)
+    public static function getApiEndPoint($option)
     {
         if (is_null(static::$apiEndPionts)) {
             clearstatcache();
@@ -175,10 +174,9 @@ class MtoConnector
      *
      * @return string with state
      */
-    public function createProducts(array $products)
+    public function sendProducts(array $products, $endpoint)
     {
         try {
-            $endpoint = static::getApiEndPoint('product')->create ?? null;
             $client = $this->client;
             $requests = function ($products, $endpoint) use ($client) {
                 foreach ($products as $productId) {
@@ -187,7 +185,7 @@ class MtoConnector
                         continue;
                     }
                     yield function () use ($client, $endpoint, $product) {
-                        return $client->postAsync($endpoint->route, ['form_params' => $product->toArray()]);
+                        return $client->requestAsync($endpoint->method, $endpoint->route, ['form_params' => $product->toArray()]);
                     };
                 }
             };
@@ -211,7 +209,6 @@ class MtoConnector
             );
             $promise = $pool->promise();
             $promise->wait();
-
             return $promise->getState();
         } catch (Exception $exception) {
             //TODO Put message into log
@@ -226,7 +223,7 @@ class MtoConnector
      *
      * @return string
      */
-    public function createOrders(array $orders)
+    public function sendOrders(array $orders)
     {
         try {
             $endpoint = static::getApiEndPoint('order')->create ?? null;
@@ -238,7 +235,7 @@ class MtoConnector
                         continue;
                     }
                     yield function () use ($client, $endpoint, $order) {
-                        return $client->postAsync($endpoint->route, ['form_params' => $order->toArray()]);
+                        return $client->requestAsync($endpoint->method, $endpoint->route, ['form_params' => $order->toArray()]);
                     };
                 }
             };

@@ -20,7 +20,7 @@ class MtoOrderSync extends AbstractAjaxCallback
 
         $orders = MtoStoreManger::getAllOrders();
         //create orders
-        $status = $provider->createOrders($orders);
+        $status = $provider->sendOrders($orders);
 
         //update order lines
 

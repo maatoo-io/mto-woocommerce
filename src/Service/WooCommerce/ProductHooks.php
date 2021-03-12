@@ -1,34 +1,57 @@
 <?php
 
-
 namespace Maatoo\WooCommerce\Service\WooCommerce;
-
 
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 
+/**
+ * Class ProductHooks
+ *
+ * @package Maatoo\WooCommerce\Service\WooCommerce
+ */
 class ProductHooks
 {
+    /**
+     * Connector.
+     *
+     * @var MtoConnector|null
+     */
     private static ?MtoConnector $connector = null;
 
-    protected static function getConnector(){
-        if(is_null(self::$connector)){
+    /**
+     * ProductHooks constructor.
+     */
+    public function __construct()
+    {
+        add_action('save_post', [$this, 'saveProduct']);
+        add_action('before_delete_post', [$this, 'removeProduct']);
+    }
+
+    /**
+     * Get Connector.
+     *
+     * @return MtoConnector|null
+     */
+    protected static function getConnector()
+    {
+        if (is_null(self::$connector)) {
             self::$connector = new MtoConnector(new MtoUser());
         }
 
         return self::$connector;
     }
 
-    public function __construct()
-    {
-        add_action('save_post', [$this, 'saveProduct']);
-    }
-
+    /**
+     * Save Product.
+     *
+     * @param $postId
+     */
     public function saveProduct($postId)
     {
         // Check to see if we are autosaving
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($postId) === 'trash') {
             return;
         }
 
@@ -37,14 +60,32 @@ class ProductHooks
             return;
         }
 
-        if(!$product->getLastSyncDate()){
+        if (!$product->getLastSyncDate()) {
             $endpoint = MtoConnector::getApiEndPoint('product')->create;
         } else {
             $endpoint = MtoConnector::getApiEndPoint('product')->edit;
         }
         $state = self::getConnector()->sendProducts([$postId], $endpoint);
 
-        if(!$state){
+        if (!$state) {
+            //TODO put to log
+        }
+    }
+
+    /**
+     * Remove Product.
+     *
+     * @param $postId
+     */
+    public function removeProduct($postId)
+    {
+        $product = new MtoProduct($postId);
+        if (!$product || !$product->getId()) {
+            return;
+        }
+        $state = self::getConnector()->sendProducts([$postId], MtoConnector::getApiEndPoint('product')->delete);
+
+        if (!$state) {
             //TODO put to log
         }
     }

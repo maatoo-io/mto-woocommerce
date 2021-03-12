@@ -218,7 +218,7 @@ class MtoConnector
     }
 
     /**
-     * Create Orders.
+     * Update Orders on maatoo service.
      *
      * @param array $orders
      *

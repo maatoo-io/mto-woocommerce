@@ -6,6 +6,7 @@ use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\Ajax\AjaxResponse;
 use Maatoo\WooCommerce\Service\Maatoo\API\Auth;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
+use Maatoo\WooCommerce\Service\Maatoo\MtoSync;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 /**
@@ -21,7 +22,7 @@ class PluginOptions
     public function __construct()
     {
         $this->response = new AjaxResponse();
-        $this->mtoOptions = get_option('mto') ?: [];
+        $this->mtoOptions = get_option('mto') ? : [];
     }
 
     public function __invoke()
@@ -38,7 +39,7 @@ class PluginOptions
                 filter_var(rtrim($_POST['url'], '/'), FILTER_SANITIZE_URL)
             );
 
-            $provider = new MtoConnector($mtoUser);
+            $provider = MtoConnector::getInstance($mtoUser);
 
             if ($provider->healthCheck()) {
                 $this->mtoOptions['username'] = $mtoUser->getUsername();
@@ -48,14 +49,13 @@ class PluginOptions
                 update_option('mto', $this->mtoOptions);
                 //register store if not exist and get status message
                 $msg[] = $this->registerStore($provider);
-                $this->response->setResponseBody(implode('. ', $msg))
-                               ->send();
+                $this->response->setResponseBody(implode('. ', $msg));
+                //wp_clear_scheduled_hook( 'mto_sync' );
+                new MtoSync();
             } else {
                 $this->response->setResponseBody(__('Credentials are invalid', 'mto'))
-                               ->setIsError(true)
-                               ->send();
+                               ->setIsError(true);
             }
-
             $this->response->send();
         } catch (\Exception $ex) {
             $this->response->setResponseBody($ex->getMessage())

@@ -2,10 +2,12 @@
 
 namespace Maatoo\WooCommerce\Service\Admin;
 
+use Automattic\WooCommerce\Admin\Overrides\Order;
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\Ajax\AbstractAjaxCallback;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
+use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
 
 /**
  * Class MtoOrderSync
@@ -16,11 +18,11 @@ class MtoOrderSync extends AbstractAjaxCallback
 {
     protected function responseCallback()
     {
-        $provider = new MtoConnector(new MtoUser());
+        $provider = MtoConnector::getInstance(new MtoUser());
 
         $orders = MtoStoreManger::getAllOrders();
         //create orders
-        $status = $provider->sendOrders($orders);
+        $status = OrderHooks::isOrderSynced($orders);
 
         //update order lines
 

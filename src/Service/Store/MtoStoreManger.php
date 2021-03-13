@@ -63,9 +63,9 @@ class MtoStoreManger
      *
      * @return array|int[]
      */
-    public static function getAllProducts(): array
+    public static function getAllProducts($newOnly = true): array
     {
-        return self::getAllItemsByCPT('product');
+        return self::getAllItemsByCPT('product', $newOnly);
     }
 
     /**
@@ -73,9 +73,9 @@ class MtoStoreManger
      *
      * @return array|int[]
      */
-    public static function getAllOrders(): array
+    public static function getAllOrders($newOnly = true): array
     {
-        return self::getAllItemsByCPT('shop_order');
+        return self::getAllItemsByCPT('shop_order', $newOnly);
     }
 
     /**

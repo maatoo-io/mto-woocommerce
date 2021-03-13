@@ -37,7 +37,7 @@ class ProductHooks
     protected static function getConnector()
     {
         if (is_null(self::$connector)) {
-            self::$connector = new MtoConnector(new MtoUser());
+            self::$connector = MtoConnector::getInstance(new MtoUser());
         }
 
         return self::$connector;
@@ -51,12 +51,12 @@ class ProductHooks
     public function saveProduct($postId)
     {
         // Check to see if we are autosaving
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($postId) === 'trash') {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($postId) === 'trash' || is_null(self::$connector) ) {
             return;
         }
 
         $product = new MtoProduct($postId);
-        if (!$product) {
+        if (is_null($product)) {
             return;
         }
 
@@ -65,6 +65,7 @@ class ProductHooks
         } else {
             $endpoint = MtoConnector::getApiEndPoint('product')->edit;
         }
+
         $state = self::getConnector()->sendProducts([$postId], $endpoint);
 
         if (!$state) {

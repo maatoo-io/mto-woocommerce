@@ -14,9 +14,12 @@ use Maatoo\WooCommerce\Service\Ajax\AjaxHooks;
 use Maatoo\WooCommerce\Registry\FrontAssets;
 use Maatoo\WooCommerce\Registry\Options;
 use Maatoo\WooCommerce\Service\Front\MtoConversion;
+use Maatoo\WooCommerce\Service\Maatoo\MtoSync;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
+
+use function Sodium\add;
 
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
@@ -66,6 +69,9 @@ class MtoWoocommerce
         $this->registerAjaxHooks();
         $this->conversionTracker();
         $this->registerWcHooks();
+        wp_schedule_single_event(time(), 'mto_sync');
+
+        add_action('mto_sync', [$this, 'mtoHooks']);
     }
 
     private function registerAssets()
@@ -92,9 +98,14 @@ class MtoWoocommerce
         add_action('wp', new MtoConversion());
     }
 
-    private function registerWcHooks(){
+    private function registerWcHooks()
+    {
         add_action('wp', new OrderHooks());
-        //add_action('wp', new ProductHooks());
         $productHooks = new ProductHooks();
+    }
+
+    public function mtoHooks()
+    {
+        new MtoSync();
     }
 }

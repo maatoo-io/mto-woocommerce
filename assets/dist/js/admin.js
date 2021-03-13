@@ -43,28 +43,4 @@ jQuery(function ($) {
       errorMsg(response);
     });
   });
-  $('.js-run-sync-products').on('click', function (e) {
-    $(e.currentTarget).attr('disabled', 'disabled');
-    mtoRunSync('mto_run_product_sync');
-  });
-  $('.js-run-sync-orders').on('click', function (e) {
-    $(e.currentTarget).attr('disabled', 'disabled');
-    mtoRunSync('mto_run_order_sync');
-  });
-
-  var mtoRunSync = function mtoRunSync(action) {
-    resetStatusBar();
-    $.ajax({
-      method: 'POST',
-      url: ajaxUrl,
-      data: {
-        action: action
-      },
-      dataType: 'json'
-    }).done(function (response) {
-      successMsg(response);
-    }).fail(function (response) {
-      errorMsg(response);
-    });
-  };
 });

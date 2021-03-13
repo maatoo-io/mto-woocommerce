@@ -2,7 +2,7 @@
 
 namespace Maatoo\WooCommerce\Entity;
 
-class MtoProduct
+class MtoProduct extends AbstractMtoEntity
 {
     private ?int $id = null;
     private string $externalProductId;
@@ -19,8 +19,9 @@ class MtoProduct
         if (!$product) {
             return null;
         }
-
+        parent::__construct($product_id);
         $this->id = get_post_meta($product_id, '_mto_id', true) ?: null;
+        $this->lastSyncDate = get_post_meta($product_id, '_mto_last_sync', true) ?: null;
         $this->sku = $product->get_sku();
         $this->externalProductId = (string)$product_id;
         $this->price = $product->get_price() ? : 0;

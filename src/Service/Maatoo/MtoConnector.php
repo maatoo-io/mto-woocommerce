@@ -11,7 +11,6 @@ use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
-use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 class MtoConnector
 {
@@ -20,7 +19,17 @@ class MtoConnector
     private static ?array $apiEndPionts = null;
     private ?bool $isCredentialsOk = null;
 
-    public function __construct(MtoUser $user)
+    private static $instance = null;
+
+    public static function getInstance(MtoUser $user){
+        if(is_null(self::$instance) && !empty($user->getUrl())){
+            self::$instance = new self($user);
+        }
+
+        return self::$instance;
+    }
+
+    private function __construct(MtoUser $user)
     {
         $this->user = $user;
         $this->client = new Client(
@@ -41,7 +50,7 @@ class MtoConnector
      *
      * @return array|null
      */
-    protected static function getApiEndPoint($option)
+    public static function getApiEndPoint($option)
     {
         if (is_null(static::$apiEndPionts)) {
             clearstatcache();
@@ -175,10 +184,9 @@ class MtoConnector
      *
      * @return string with state
      */
-    public function createProducts(array $products)
+    public function sendProducts(array $products, $endpoint)
     {
         try {
-            $endpoint = static::getApiEndPoint('product')->create ?? null;
             $client = $this->client;
             $requests = function ($products, $endpoint) use ($client) {
                 foreach ($products as $productId) {
@@ -187,7 +195,8 @@ class MtoConnector
                         continue;
                     }
                     yield function () use ($client, $endpoint, $product) {
-                        return $client->postAsync($endpoint->route, ['form_params' => $product->toArray()]);
+                        $route = str_replace('{id}', $product->getId(), $endpoint->route);
+                        return $client->requestAsync($endpoint->method, $route, ['form_params' => $product->toArray()]);
                     };
                 }
             };
@@ -200,7 +209,7 @@ class MtoConnector
                         $id = $responseDecoded['product']['externalProductId'] ?? null;
                         if ($id && !empty($responseDecoded['product']['id'])) {
                             update_post_meta((int)$id, '_mto_id', $responseDecoded['product']['id']);
-                            update_post_meta((int)$id, '_mto_last_sync', $responseDecoded['product']['dateCreated']);
+                            update_post_meta((int)$id, '_mto_last_sync', $responseDecoded['product']['dateUpdated'] ?? $responseDecoded['product']['dateCreated']);
                         }
                     }
                 },
@@ -211,7 +220,6 @@ class MtoConnector
             );
             $promise = $pool->promise();
             $promise->wait();
-
             return $promise->getState();
         } catch (Exception $exception) {
             //TODO Put message into log
@@ -220,16 +228,17 @@ class MtoConnector
     }
 
     /**
-     * Create Orders.
+     * Update Orders on maatoo service.
      *
      * @param array $orders
      *
+     * @param $endpoint
+     *
      * @return string
      */
-    public function createOrders(array $orders)
+    public function sendOrders(array $orders, $endpoint)
     {
         try {
-            $endpoint = static::getApiEndPoint('order')->create ?? null;
             $client = $this->client;
             $requests = function ($orders, $endpoint) use ($client) {
                 foreach ($orders as $orderId) {
@@ -238,7 +247,13 @@ class MtoConnector
                         continue;
                     }
                     yield function () use ($client, $endpoint, $order) {
-                        return $client->postAsync($endpoint->route, ['form_params' => $order->toArray()]);
+                        $route = str_replace('{id}', $order->getId(), $endpoint->route);
+                        if($endpoint->method === 'PATCH'){
+                            $formParam = ['form_params' => $order->toArrayPatch()];
+                        } else {
+                            $formParam = ['form_params' => $order->toArray()];
+                        }
+                        return $client->requestAsync($endpoint->method, $route, $formParam);
                     };
                 }
             };
@@ -251,7 +266,7 @@ class MtoConnector
                         $id = $responseDecoded['order']['externalOrderId'] ?? null;
                         if ($id && !empty($responseDecoded['order']['id'])) {
                             update_post_meta((int)$id, '_mto_id', $responseDecoded['order']['id']);
-                            update_post_meta((int)$id, '_mto_last_sync', $responseDecoded['order']['dateCreated']);
+                            update_post_meta((int)$id, '_mto_last_sync', $responseDecoded['order']['dateUpdated'] ?? $responseDecoded['order']['dateCreated']);
                         }
                     }
                 },

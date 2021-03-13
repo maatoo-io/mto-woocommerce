@@ -7,7 +7,7 @@ namespace Maatoo\WooCommerce\Entity;
  *
  * @package Maatoo\WooCommerce\Entity
  */
-class MtoOrder
+class MtoOrder extends AbstractMtoEntity
 {
     private ?int $id = null;
     private string $externalOrderId = '';
@@ -17,10 +17,11 @@ class MtoOrder
     private string $email;
     private string $firstName;
     private string $lastName;
-    private array $conversion = ['type' => null, 'id' => null]; //TODO replace by real data
+    private ?array $conversion = ['type' => null, 'id' => null]; //TODO replace by real data
 
     public function __construct($orderId)
     {
+        parent::__construct($orderId);
         $order = wc_get_order($orderId);
         if (!$order) {
             return null;
@@ -33,13 +34,12 @@ class MtoOrder
         $this->email = $order->get_billing_email() ?? '';
         $this->firstName = $order->get_billing_first_name() ?? '';
         $this->lastName = $order->get_billing_last_name() ?? '';
-        // TODO clarify with client
-//        if (MTO_CONTACT_ID) {
-//            $this->conversion = [
-//                'type' => 'email',
-//                'id' => MTO_CONTACT_ID,
-//            ];
-//        }
+        if (!empty($_SESSION['mtc_id'])) {
+            $this->conversion = [
+                'type' => 'email',
+                'id' => $_SESSION['mtc_id'],
+            ];
+        }
     }
 
     /**
@@ -95,7 +95,31 @@ class MtoOrder
      */
     public function getStatus(): string
     {
-        return $this->status;
+        switch ($this->status) {
+            case 'on-hold':
+                $mtoPayment = 'open';
+                break;
+            case 'failed':
+                $mtoPayment = 'failed';
+                break;
+            case 'processing':
+                $mtoPayment = 'paid';
+                break;
+            case 'completed':
+                $mtoPayment = 'complete';
+                break;
+            case 'cancelled':
+                $mtoPayment = 'canceled';
+                break;
+            case 'refunded':
+                $mtoPayment = 'refund';
+                break;
+            case 'pending':
+            default:
+                $mtoPayment = 'incomplete';
+                break;
+        }
+        return $mtoPayment;
     }
 
     /**
@@ -115,6 +139,29 @@ class MtoOrder
     }
 
     /**
+     * @param string $status
+     *
+     * @return MtoOrder
+     */
+    public function setStatus(string $status): MtoOrder
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * @param array|null[] $conversion
+     *
+     * @return MtoOrder
+     */
+    public function setConversion(?array $conversion): MtoOrder
+    {
+        $this->conversion = $conversion;
+        return $this;
+    }
+
+
+    /**
      * To Array.
      *
      * @return array
@@ -130,6 +177,14 @@ class MtoOrder
             'email' => $this->getEmail(),
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
+            'conversion' => $this->getConversion(),
+        ];
+    }
+
+    public function toArrayPatch()
+    {
+        return [
+            'status' => $this->getStatus(),
             'conversion' => $this->getConversion(),
         ];
     }

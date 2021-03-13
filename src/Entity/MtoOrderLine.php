@@ -16,6 +16,27 @@ class MtoOrderLine
         }
     }
 
+    /**
+     * @return array|\WC_Order_Item[]
+     */
+    public function getItems()
+    {
+        return $this->items;
+    }
+
+    /**
+     * Get Items Ids.
+     *
+     * @return array|int[]
+     */
+    public function getItemsIds()
+    {
+        if (empty($this->items)) {
+            return [];
+        }
+
+        return array_map(function ($item){return $item->get_product_id(); }, $this->items);
+    }
 
     public function toArray()
     {
@@ -26,7 +47,7 @@ class MtoOrderLine
         foreach ($this->items as $item) {
             $itemLines[] = [
                 'store' => MTO_STORE_ID,
-                'product' => $item->get_id(),
+                'product' => $item->get_product_id(),
                 'order' => $item->get_order_id(),
                 'quantity' => $item->get_quantity(),
             ];

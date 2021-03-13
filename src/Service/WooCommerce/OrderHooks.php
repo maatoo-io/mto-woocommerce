@@ -31,10 +31,10 @@ class OrderHooks
         return self::$connector;
     }
 
-    public function __invoke()
+    public function __construct()
     {
         add_action('woocommerce_thankyou', [$this, 'newOrder']);
-        add_action('save_post', [$this, 'editOrder']);
+        add_action('save_post_shop_order', [$this, 'editOrder']);
     }
 
     public function newOrder($orderId)
@@ -116,7 +116,7 @@ class OrderHooks
     public function editOrder($orderId)
     {
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($orderId) === 'trash' || is_null(
-                self::$connector
+                self::getConnector()
             )) {
             return;
         }

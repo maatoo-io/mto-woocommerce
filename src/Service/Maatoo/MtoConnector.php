@@ -248,7 +248,12 @@ class MtoConnector
                     }
                     yield function () use ($client, $endpoint, $order) {
                         $route = str_replace('{id}', $order->getId(), $endpoint->route);
-                        return $client->requestAsync($endpoint->method, $route, ['form_params' => $order->toArray()]);
+                        if($endpoint->method === 'PATCH'){
+                            $formParam = ['form_params' => $order->toArrayPatch()];
+                        } else {
+                            $formParam = ['form_params' => $order->toArray()];
+                        }
+                        return $client->requestAsync($endpoint->method, $route, $formParam);
                     };
                 }
             };

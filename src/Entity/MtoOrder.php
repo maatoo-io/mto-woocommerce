@@ -17,7 +17,7 @@ class MtoOrder extends AbstractMtoEntity
     private string $email;
     private string $firstName;
     private string $lastName;
-    private array $conversion = ['type' => null, 'id' => null]; //TODO replace by real data
+    private ?array $conversion = ['type' => null, 'id' => null]; //TODO replace by real data
 
     public function __construct($orderId)
     {
@@ -96,21 +96,15 @@ class MtoOrder extends AbstractMtoEntity
     public function getStatus(): string
     {
         switch ($this->status) {
-//            case '':
-//                $mtoPayment = 'incomplete';
-//                break;
-//            case '':
-//                $mtoPayment = 'awaitingcall';
-//                break;
-//            case '':
-//                $mtoPayment = 'draft';
-//                break;
-//            case '':
-//                $mtoPayment = 'declined';
-//                break;
-//            case '':
-//                $mtoPayment = 'paid';
-//                break;
+            case 'on-hold':
+                $mtoPayment = 'open';
+                break;
+            case 'failed':
+                $mtoPayment = 'failed';
+                break;
+            case 'processing':
+                $mtoPayment = 'paid';
+                break;
             case 'completed':
                 $mtoPayment = 'complete';
                 break;
@@ -120,11 +114,9 @@ class MtoOrder extends AbstractMtoEntity
             case 'refunded':
                 $mtoPayment = 'refund';
                 break;
-            case 'on-hold':
-            case 'processing':
             case 'pending':
             default:
-                $mtoPayment = 'open';
+                $mtoPayment = 'incomplete';
                 break;
         }
         return $mtoPayment;
@@ -147,6 +139,29 @@ class MtoOrder extends AbstractMtoEntity
     }
 
     /**
+     * @param string $status
+     *
+     * @return MtoOrder
+     */
+    public function setStatus(string $status): MtoOrder
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * @param array|null[] $conversion
+     *
+     * @return MtoOrder
+     */
+    public function setConversion(?array $conversion): MtoOrder
+    {
+        $this->conversion = $conversion;
+        return $this;
+    }
+
+
+    /**
      * To Array.
      *
      * @return array
@@ -162,6 +177,14 @@ class MtoOrder extends AbstractMtoEntity
             'email' => $this->getEmail(),
             'firstName' => $this->getFirstName(),
             'lastName' => $this->getLastName(),
+            'conversion' => $this->getConversion(),
+        ];
+    }
+
+    public function toArrayPatch()
+    {
+        return [
+            'status' => $this->getStatus(),
             'conversion' => $this->getConversion(),
         ];
     }

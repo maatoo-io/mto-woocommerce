@@ -98,7 +98,7 @@ class MtoWoocommerce
 
     private function registerWcHooks()
     {
-        add_action('wp', new OrderHooks());
+        $orderHooks = new OrderHooks();
         $productHooks = new ProductHooks();
     }
 

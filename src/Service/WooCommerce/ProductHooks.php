@@ -25,7 +25,7 @@ class ProductHooks
      */
     public function __construct()
     {
-        add_action('save_post', [$this, 'saveProduct']);
+        add_action('save_post_product', [$this, 'saveProduct']);
         add_action('before_delete_post', [$this, 'removeProduct']);
     }
 
@@ -51,7 +51,7 @@ class ProductHooks
     public function saveProduct($postId)
     {
         // Check to see if we are autosaving
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($postId) === 'trash' || is_null(self::$connector) ) {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($postId) === 'trash' || is_null(self::getConnector()) ) {
             return;
         }
 

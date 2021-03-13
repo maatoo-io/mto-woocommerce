@@ -25,7 +25,7 @@ class OrderHooks
     protected static function getConnector()
     {
         if (is_null(self::$connector)) {
-            self::$connector =  MtoConnector::getInstance(new MtoUser());
+            self::$connector = MtoConnector::getInstance(new MtoUser());
         }
 
         return self::$connector;
@@ -34,17 +34,18 @@ class OrderHooks
     public function __invoke()
     {
         add_action('woocommerce_thankyou', [$this, 'newOrder']);
+        add_action('save_post', [$this, 'editOrder']);
     }
 
     public function newOrder($orderId)
     {
-        if(!self::getConnector()){
+        if (!self::getConnector()) {
             return;
         }
         $orderLines = new MtoOrderLine($orderId);
         $isReadyToSync = ProductHooks::isProductsSynced($orderLines->getItemsIds());
 
-        if(!$isReadyToSync){
+        if (!$isReadyToSync) {
             //TODO put message to log
             return;
         }
@@ -110,6 +111,20 @@ class OrderHooks
         }
 
         return false;
+    }
+
+    public function editOrder($orderId)
+    {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($orderId) === 'trash' || is_null(
+                self::$connector
+            )) {
+            return;
+        }
+        $f = self::isOrderSynced([$orderId]);
+
+        if(!$f){
+            //TODO put data to log
+        }
     }
 
 }

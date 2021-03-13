@@ -95,7 +95,39 @@ class MtoOrder extends AbstractMtoEntity
      */
     public function getStatus(): string
     {
-        return $this->status;
+        switch ($this->status) {
+//            case '':
+//                $mtoPayment = 'incomplete';
+//                break;
+//            case '':
+//                $mtoPayment = 'awaitingcall';
+//                break;
+//            case '':
+//                $mtoPayment = 'draft';
+//                break;
+//            case '':
+//                $mtoPayment = 'declined';
+//                break;
+//            case '':
+//                $mtoPayment = 'paid';
+//                break;
+            case 'completed':
+                $mtoPayment = 'complete';
+                break;
+            case 'cancelled':
+                $mtoPayment = 'canceled';
+                break;
+            case 'refunded':
+                $mtoPayment = 'refund';
+                break;
+            case 'on-hold':
+            case 'processing':
+            case 'pending':
+            default:
+                $mtoPayment = 'open';
+                break;
+        }
+        return $mtoPayment;
     }
 
     /**

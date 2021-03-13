@@ -100,10 +100,11 @@ class OrderHooks
             $isDelStatus = $mtoConnector->sendOrders($toDelete, MtoConnector::getApiEndPoint('order')->delete);
         }
 
-        if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus) {
+        $statusOrderLines = $mtoConnector->batchOrderLines(MtoStoreManger::getOrdersLines($orderIds));
+
+        if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus && $statusOrderLines) {
             return true;
         }
-        $statusOrderLines = $mtoConnector->batchOrderLines(MtoStoreManger::getOrdersLines($orderIds));
 
         return false;
     }

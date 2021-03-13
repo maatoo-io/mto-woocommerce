@@ -106,10 +106,6 @@ $mtoUser = new MtoUser();
         <div class="status-bar js-status-bar">
             <?php if(MTO_STORE_ID) : ?>
                 <span class="success dashicons-before"><?php _e('Your credentials are valid', 'mto'); ?></span>
-                <div class="run-sync">
-                    <button class="js-run-sync-products"><?php _e('Run products sync', 'mto'); ?></button>
-                    <button class="js-run-sync-orders"><?php _e('Run orders sync', 'mto'); ?></button>
-                </div>
             <?php else : ?>
                 <span class="success hidden dashicons-before"></span>
             <?php endif; ?>
@@ -126,7 +122,7 @@ $mtoUser = new MtoUser();
 
         <label for="password"><?php
             _e('Password', 'mto'); ?>
-            <input type="password" name="password" id="password" value="<?php echo $mtoUser->getPassword() ?? ''; ?> " required/>
+            <input type="password" name="password" id="password" value="<?php echo $mtoUser->getPassword() ?? ''; ?>" required/>
         </label>
         <input type="submit" name="save" value="<?php
         _e('Save Credentials', 'mto'); ?>">

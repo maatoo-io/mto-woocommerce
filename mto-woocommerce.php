@@ -69,8 +69,6 @@ class MtoWoocommerce
         $this->registerAjaxHooks();
         $this->conversionTracker();
         $this->registerWcHooks();
-        wp_schedule_single_event(time(), 'mto_sync');
-
         add_action('mto_sync', [$this, 'mtoHooks']);
     }
 

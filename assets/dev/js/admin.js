@@ -41,32 +41,4 @@ jQuery(($) => {
         errorMsg(response)
       })
   })
-
-  $('.js-run-sync-products').on('click', (e) => {
-    $(e.currentTarget).attr('disabled', 'disabled')
-    mtoRunSync('mto_run_product_sync')
-  })
-
-  $('.js-run-sync-orders').on('click', (e) => {
-    $(e.currentTarget).attr('disabled', 'disabled')
-    mtoRunSync('mto_run_order_sync')
-  })
-
-  const mtoRunSync = (action) => {
-    resetStatusBar()
-    $.ajax({
-      method: 'POST',
-      url: ajaxUrl,
-      data: {
-        action: action
-      },
-      dataType: 'json'
-    })
-      .done(function (response) {
-        successMsg(response)
-      })
-      .fail(function (response) {
-        errorMsg(response)
-      })
-  }
 })

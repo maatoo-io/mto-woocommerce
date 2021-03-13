@@ -38,6 +38,9 @@ class OrderHooks
 
     public function newOrder($orderId)
     {
+        if(!self::getConnector()){
+            return;
+        }
         $orderLines = new MtoOrderLine($orderId);
         $isReadyToSync = ProductHooks::isProductsSynced($orderLines->getItemsIds());
 
@@ -53,7 +56,7 @@ class OrderHooks
 
     public static function isOrderSynced(array $orderIds): bool
     {
-        if (empty($orderIds)) {
+        if (empty($orderIds) || !self::getConnector()) {
             return true;
         }
         $toUpdate = [];

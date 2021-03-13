@@ -41,7 +41,7 @@ class PluginOptions
 
             $provider = MtoConnector::getInstance($mtoUser);
 
-            if ($provider->healthCheck()) {
+            if ($provider && $provider->healthCheck()) {
                 $this->mtoOptions['username'] = $mtoUser->getUsername();
                 $this->mtoOptions['password'] = $mtoUser->getPassword();
                 $this->mtoOptions['url'] = $mtoUser->getUrl();
@@ -50,8 +50,9 @@ class PluginOptions
                 //register store if not exist and get status message
                 $msg[] = $this->registerStore($provider);
                 $this->response->setResponseBody(implode('. ', $msg));
-                //wp_clear_scheduled_hook( 'mto_sync' );
-                new MtoSync();
+                if(!wp_next_scheduled('mto_sync')){
+                    wp_schedule_single_event( time() - 1, 'mto_sync' );
+                }
             } else {
                 $this->response->setResponseBody(__('Credentials are invalid', 'mto'))
                                ->setIsError(true);

@@ -294,7 +294,7 @@ class MtoConnector
 
     public function sendOrderLines(array $orderLines, $endpoint)
     {
-        if(empty($orderLines)){
+        if (empty($orderLines)) {
             return 'Nothing to update';
         }
         try {
@@ -318,12 +318,12 @@ class MtoConnector
         }
     }
 
-    public function saveSubscription($contact, $orderId)
+    public function saveConversion($contact, $emailId)
     {
         try {
             $endpoint = self::getApiEndPoint('conversion');
-            $route = str_replace('{id1}', $contact, $endpoint->route);
-            $route = str_replace('{id2}', $orderId, $route);
+            $route = str_replace('{id1}', $emailId, $endpoint->route);
+            $route = str_replace('{id2}', $contact, $route);
             $promise = $this->client->requestAsync($endpoint->method, $route);
 
             $promise->then(
@@ -334,8 +334,24 @@ class MtoConnector
                     LogData::writeTechErrors($e->getMessage());
                 }
             );
-        } catch (\Exception$exception) {
+        } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
         }
+    }
+
+    public function createSubscriptionEvent($contact)
+    {
+        //todo clarify with client
+//        try {
+//            $event = [
+//                'lead' => $contact,
+//                'category' => 'Subscription',
+//                'action' => 'accepted',
+//                'value' => '1'
+//
+//            ];
+//        } catch (\Exception $exception) {
+//            LogData::writeTechErrors($exception->getMessage());
+//        }
     }
 }

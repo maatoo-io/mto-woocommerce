@@ -3,6 +3,8 @@
 namespace Maatoo\WooCommerce\Service\Front;
 
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
+use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 
 class MtoConversion
 {
@@ -37,8 +39,21 @@ class MtoConversion
 
     public function retrieveUserData()
     {
-        if (isset($_GET['ct'])) {;
-            wc_setcookie('mto_conversion', $_GET['ct']);
+        try {
+            if (isset($_GET['ct'])) {;
+                wc_setcookie('mto_conversion', $_GET['ct']);
+
+                $mtoConnector = MtoConnector::getInstance(new MtoUser());
+                if(!$mtoConnector){
+                    return;
+                }
+                $data = unserialize(base64_decode($_COOKIE['mto_conversion']));
+                $mtoConnector->saveConversion($data['lead'], $data['email']);
+            }
         }
+        catch (\Exception $exception){
+            LogData::writeTechErrors($exception->getMessage());
+        }
+
     }
 }

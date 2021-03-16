@@ -109,7 +109,8 @@ class OrderHooks
             $contact = $_COOKIE['mtc_id'];
 
             if ($isSubscribed) {
-                self::getConnector()->saveSubscription($contact, $orderId);
+                //TODO create Event
+                //self::getConnector()->createSubscriptionEvent($contact);
             }
 
             $f = self::isOrderSynced([$orderId]);

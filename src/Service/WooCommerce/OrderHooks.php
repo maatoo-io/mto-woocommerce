@@ -33,11 +33,11 @@ class OrderHooks
 
     public function __construct()
     {
-        add_action('woocommerce_thankyou', [$this, 'newOrder']);
-        add_action('save_post_shop_order', [$this, 'editOrder']);
+        add_action('woocommerce_thankyou', [$this, 'orderPublished']);
+        add_action('save_post_shop_order', [$this, 'saveOrder']);
     }
 
-    public function newOrder($orderId)
+    public function orderPublished($orderId)
     {
         if (!self::getConnector()) {
             return;
@@ -51,8 +51,7 @@ class OrderHooks
         }
 
         $mtoConnector = self::getConnector();
-        $status = $mtoConnector->sendOrders([$orderId], MtoConnector::getApiEndPoint('order')->create);
-        $statusOrderLines = $mtoConnector->batchOrderLines($orderLines->toArray());
+        $status = $mtoConnector->batchOrderLines($orderLines->toArray());
     }
 
     public static function isOrderSynced(array $orderIds): bool
@@ -91,7 +90,7 @@ class OrderHooks
         }
 
         $mtoConnector = self::getConnector();
-        $isCreatedStatus = $isUpdatedStatus = $isDelStatus = true;
+        $isCreatedStatus = $isUpdatedStatus = $isDelStatus = $statusOrderLines = true;
         if (!empty($toCreate)) {
             $isCreatedStatus = $mtoConnector->sendOrders($toCreate, MtoConnector::getApiEndPoint('order')->create);
         }
@@ -104,7 +103,10 @@ class OrderHooks
             $isDelStatus = $mtoConnector->sendOrders($toDelete, MtoConnector::getApiEndPoint('order')->delete);
         }
 
-        $statusOrderLines = $mtoConnector->batchOrderLines(MtoStoreManger::getOrdersLines($orderIds));
+        $orderLines = MtoStoreManger::getOrdersLines($orderIds);
+        if(!empty($orderLines)){
+            $statusOrderLines = $mtoConnector->batchOrderLines();
+        }
 
         if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus && $statusOrderLines) {
             return true;
@@ -113,13 +115,21 @@ class OrderHooks
         return false;
     }
 
-    public function editOrder($orderId)
+    public function saveOrder($orderId)
     {
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($orderId) === 'trash' || is_null(
                 self::getConnector()
             )) {
             return;
         }
+
+        $isSubscribed = (bool)$_POST['mto_email_subscription'] ?? false;
+        $contact = $_COOKIE['mtc_id'];
+
+        if($isSubscribed){
+            self::getConnector()->saveSubscription($contact, $orderId);
+        }
+
         $f = self::isOrderSynced([$orderId]);
 
         if(!$f){

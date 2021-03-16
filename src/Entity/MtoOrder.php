@@ -26,18 +26,19 @@ class MtoOrder extends AbstractMtoEntity
         if (!$order) {
             return null;
         }
+        global $woocommerce;
         $this->id = get_post_meta($orderId, '_mto_id', true) ? : null;
         $this->externalOrderId = (string)$orderId;
-        $this->value = $order->get_total();
+        $this->value = floatval($order->get_total() ?: ($woocommerce->cart->get_totals()['total'] ?? 0));
         $this->url = $order->get_view_order_url();
         $this->status = $order->get_status();
-        $this->email = $order->get_billing_email() ?? '';
-        $this->firstName = $order->get_billing_first_name() ?? '';
-        $this->lastName = $order->get_billing_last_name() ?? '';
-        if (!empty($_SESSION['mtc_id'])) {
+        $this->email = $order->get_billing_email() ?: ($_POST['billing_email'] ?? '');
+        $this->firstName = $order->get_billing_first_name() ?: ($_POST['billing_first_name'] ?? '');
+        $this->lastName = $order->get_billing_last_name() ?: ($_POST['billing_last_name'] ?? '');
+        if (!empty($_COOKIE['mtc_id'])) {
             $this->conversion = [
                 'type' => 'email',
-                'id' => $_SESSION['mtc_id'],
+                'id' => $_COOKIE['mtc_id'],
             ];
         }
     }
@@ -63,6 +64,12 @@ class MtoOrder extends AbstractMtoEntity
      */
     public function getConversion()
     {
+        if (!empty($_COOKIE['mto_conversion'])) {
+            $src = unserialize(base64_decode($_COOKIE['mto_conversion']));
+            if ($src['source']) {
+                return $src['source'];
+            }
+        }
         return $this->conversion;
     }
 

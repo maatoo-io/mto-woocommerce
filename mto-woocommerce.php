@@ -14,6 +14,7 @@ use Maatoo\WooCommerce\Service\Ajax\AjaxHooks;
 use Maatoo\WooCommerce\Registry\FrontAssets;
 use Maatoo\WooCommerce\Registry\Options;
 use Maatoo\WooCommerce\Service\Front\MtoConversion;
+use Maatoo\WooCommerce\Service\Front\WooHooks;
 use Maatoo\WooCommerce\Service\Maatoo\MtoSync;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
@@ -100,6 +101,7 @@ class MtoWoocommerce
     {
         $orderHooks = new OrderHooks();
         $productHooks = new ProductHooks();
+        $frontEndHooks = new WooHooks();
     }
 
     public function mtoHooks()

@@ -294,4 +294,26 @@ class MtoConnector
             //TODO Put message into log
         }
     }
+
+    public function saveSubscription($contact, $orderId){
+        try {
+            $endpoint = self::getApiEndPoint('conversion');
+            $route = str_replace('{id1}', $contact, $endpoint->route);
+            $route = str_replace('{id2}', $orderId, $route);
+            $promise = $this->client->requestAsync($endpoint->method, $route);
+
+            $promise->then(
+                function (Response $res) {
+                    $status = $res->getStatusCode() . "\n";
+                },
+                function (RequestException $e) {
+                    //TODO put to log
+                    $reason = $e->getMessage();
+                }
+            );
+        } catch (\Exception$exception){
+            //TODO put to log
+        }
+
+    }
 }

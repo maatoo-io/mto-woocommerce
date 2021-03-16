@@ -7,6 +7,7 @@ use Maatoo\WooCommerce\Entity\MtoOrderLine;
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
+use mysql_xdevapi\Exception;
 
 class OrderHooks
 {
@@ -83,7 +84,10 @@ class OrderHooks
 
 
         $orderLines = MtoStoreManger::getOrdersLines($orderIds);
-        $statusOrderLines = $mtoConnector->sendOrderLines($orderLines, MtoConnector::getApiEndPoint('orderLine')->batch);
+        $statusOrderLines = $mtoConnector->sendOrderLines(
+            $orderLines,
+            MtoConnector::getApiEndPoint('orderLine')->batch
+        );
 
         if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus && $statusOrderLines) {
             return true;
@@ -99,18 +103,21 @@ class OrderHooks
             )) {
             return;
         }
+        try {
+            $isSubscribed = (bool)$_POST['mto_email_subscription'] ?? false;
+            $contact = $_COOKIE['mtc_id'];
 
-        $isSubscribed = (bool)$_POST['mto_email_subscription'] ?? false;
-        $contact = $_COOKIE['mtc_id'];
+            if ($isSubscribed) {
+                self::getConnector()->saveSubscription($contact, $orderId);
+            }
 
-        if($isSubscribed){
-            self::getConnector()->saveSubscription($contact, $orderId);
-        }
+            $f = self::isOrderSynced([$orderId]);
 
-        $f = self::isOrderSynced([$orderId]);
-
-        if(!$f){
-            //TODO put data to log
+            if (!$f) {
+                //TODO put data to log
+            }
+        } catch (\Exception $ex) {
+            //todo put to log
         }
     }
 

@@ -60,26 +60,30 @@ class ProductHooks
             return;
         }
 
-        $product = new MtoProduct($postId);
+        try {
+            $product = new MtoProduct($postId);
 
-        if ($product->getLastModifiedDate()) {
-            if (is_null($product)) {
-                return;
+            if ($product->getLastModifiedDate()) {
+                if (is_null($product)) {
+                    return;
+                }
             }
-        }
 
-        if (!$product->getLastSyncDate()) {
-            $endpoint = MtoConnector::getApiEndPoint('product')->create;
-        } else {
-            $endpoint = MtoConnector::getApiEndPoint('product')->edit;
-        }
+            if (!$product->getLastSyncDate()) {
+                $endpoint = MtoConnector::getApiEndPoint('product')->create;
+            } else {
+                $endpoint = MtoConnector::getApiEndPoint('product')->edit;
+            }
 
-        $state = self::getConnector()->sendProducts([$postId], $endpoint);
+            $state = self::getConnector()->sendProducts([$postId], $endpoint);
 
-        if (!$state) {
-            //TODO put to log
+            if (!$state) {
+                //TODO put to log
+            }
+            remove_action('woocommerce_update_product', [$this, 'saveProduct']);
+        } catch (\Exception $exception) {
+            //TODO put to the log file data
         }
-        remove_action('woocommerce_update_product', [$this, 'saveProduct']);
     }
 
     /**
@@ -89,13 +93,17 @@ class ProductHooks
      */
     public function removeProduct($postId)
     {
-        $product = new MtoProduct($postId);
-        if (!$product || !$product->getId()) {
-            return;
-        }
-        $state = self::getConnector()->sendProducts([$postId], MtoConnector::getApiEndPoint('product')->delete);
+        try {
+            $product = new MtoProduct($postId);
+            if (!$product || !$product->getId()) {
+                return;
+            }
+            $state = self::getConnector()->sendProducts([$postId], MtoConnector::getApiEndPoint('product')->delete);
 
-        if (!$state) {
+            if (!$state) {
+                //TODO put to log
+            }
+        } catch (\Exception $exception) {
             //TODO put to log
         }
     }

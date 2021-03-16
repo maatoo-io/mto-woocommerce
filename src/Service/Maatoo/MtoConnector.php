@@ -11,6 +11,7 @@ use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 
 class MtoConnector
 {
@@ -113,9 +114,8 @@ class MtoConnector
                 ['form_params' => $args]
             );
             $responseData = (array)json_decode($response->getBody()->getContents(), 'true');
-        } catch (Exception $exception) {
-            //TODO Add to log
-            return null;
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
         }
 
         return $responseData;
@@ -219,16 +219,15 @@ class MtoConnector
                                }
                            },
                            'rejected' => function (RequestException $reason, $index) {
-                               //TODO Put message into log
+                               LogData::writeApiErrors($reason->getMessage());
                            },
                        ]
             );
             $promise = $pool->promise();
             $promise->wait();
             return $promise->getState();
-        } catch (Exception $exception) {
-            //TODO Put message into log
-            return $exception->getMessage();
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 
@@ -280,8 +279,7 @@ class MtoConnector
                                }
                            },
                            'rejected' => function (RequestException $reason, $index) {
-                               //TODO Put message into log
-                               $msg = $reason->getMessage();
+                               LogData::writeApiErrors($reason->getMessage());
                            },
                        ]
             );
@@ -290,7 +288,7 @@ class MtoConnector
 
             return $promise->getState();
         } catch (Exception $exception) {
-            //TODO Put message into log
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 
@@ -311,13 +309,12 @@ class MtoConnector
                     $status = $res->getStatusCode() . "\n";
                 },
                 function (RequestException $e) {
-                    //TODO put to log
-                    $reason = $e->getMessage();
+                    LogData::writeApiErrors($e->getMessage());
                 }
             );
             return $promise->getState();
-        } catch (Exception $exception) {
-            //TODO Put message into log
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 
@@ -334,12 +331,11 @@ class MtoConnector
                     $status = $res->getStatusCode() . "\n";
                 },
                 function (RequestException $e) {
-                    //TODO put to log
-                    $reason = $e->getMessage();
+                    LogData::writeTechErrors($e->getMessage());
                 }
             );
         } catch (\Exception$exception) {
-            //TODO put to log
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 }

@@ -18,7 +18,7 @@ class MtoOrder extends AbstractMtoEntity
     private string $firstName;
     private string $lastName;
     private ?string $lead = '';
-    private ?array $conversion = ['type' => null, 'id' => null]; //TODO replace by real data
+    private ?array $conversion = ['type' => null, 'id' => null];
 
     public function __construct($orderId)
     {

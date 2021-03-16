@@ -5,6 +5,7 @@ namespace Maatoo\WooCommerce\Service\WooCommerce;
 use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoOrderLine;
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use mysql_xdevapi\Exception;
@@ -114,10 +115,10 @@ class OrderHooks
             $f = self::isOrderSynced([$orderId]);
 
             if (!$f) {
-                //TODO put data to log
+                LogData::writeApiErrors($f);
             }
-        } catch (\Exception $ex) {
-            //todo put to log
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 

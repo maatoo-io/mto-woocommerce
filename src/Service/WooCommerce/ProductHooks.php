@@ -4,6 +4,7 @@ namespace Maatoo\WooCommerce\Service\WooCommerce;
 
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 
 /**
@@ -78,11 +79,11 @@ class ProductHooks
             $state = self::getConnector()->sendProducts([$postId], $endpoint);
 
             if (!$state) {
-                //TODO put to log
+                LogData::writeApiErrors($state);
             }
             remove_action('woocommerce_update_product', [$this, 'saveProduct']);
         } catch (\Exception $exception) {
-            //TODO put to the log file data
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 
@@ -101,10 +102,10 @@ class ProductHooks
             $state = self::getConnector()->sendProducts([$postId], MtoConnector::getApiEndPoint('product')->delete);
 
             if (!$state) {
-                //TODO put to log
+                LogData::writeApiErrors('Product sync was failed: ' . $state);
             }
         } catch (\Exception $exception) {
-            //TODO put to log
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 

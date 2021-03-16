@@ -32,7 +32,16 @@ class MtoOrderLine
     public function getItemsIds()
     {
         if (empty($this->items)) {
-            return [];
+            global $woocommerce;
+            $productsIds = [];
+            $orderData = $woocommerce->cart->get_cart_contents();
+            foreach ($orderData as $item){
+                $productId = $item['data']->get_id() ?? null;
+                if($productId){
+                    $productsIds[] = $productId;
+                }
+            }
+            return $productsIds;
         }
 
         return array_map(function ($item){return $item->get_product_id(); }, $this->items);

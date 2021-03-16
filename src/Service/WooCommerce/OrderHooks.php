@@ -104,9 +104,7 @@ class OrderHooks
         }
 
         $orderLines = MtoStoreManger::getOrdersLines($orderIds);
-        if(!empty($orderLines)){
-            $statusOrderLines = $mtoConnector->batchOrderLines();
-        }
+        $statusOrderLines = $mtoConnector->batchOrderLines($orderLines);
 
         if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus && $statusOrderLines) {
             return true;

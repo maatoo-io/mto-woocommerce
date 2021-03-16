@@ -28,14 +28,14 @@ class MtoOrder extends AbstractMtoEntity
             return null;
         }
         global $woocommerce;
-        $this->id = get_post_meta($orderId, '_mto_id', true) ? : null;
+        $this->id = get_post_meta($orderId, '_mto_id', true) ?: null;
         $this->externalOrderId = (string)$orderId;
-        $this->value = floatval($order->get_total() ? : ($woocommerce->cart->get_totals()['total'] ?? 0));
+        $this->value = floatval($order->get_total() ?: ($woocommerce->cart->get_totals()['total'] ?? 0));
         $this->url = $order->get_view_order_url();
         $this->status = $order->get_status();
-        $this->email = $order->get_billing_email() ? : ($_POST['billing_email'] ?? '');
-        $this->firstName = $order->get_billing_first_name() ? : ($_POST['billing_first_name'] ?? '');
-        $this->lastName = $order->get_billing_last_name() ? : ($_POST['billing_last_name'] ?? '');
+        $this->email = $order->get_billing_email() ?: ($_POST['billing_email'] ?? '');
+        $this->firstName = $order->get_billing_first_name() ?: ($_POST['billing_first_name'] ?? '');
+        $this->lastName = $order->get_billing_last_name() ?: ($_POST['billing_last_name'] ?? '');
         if (!empty($_COOKIE['mtc_id'])) {
             $this->lead = $_COOKIE['mtc_id'];
         }

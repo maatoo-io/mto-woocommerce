@@ -33,25 +33,7 @@ class OrderHooks
 
     public function __construct()
     {
-        add_action('woocommerce_thankyou', [$this, 'orderPublished']);
         add_action('save_post_shop_order', [$this, 'saveOrder']);
-    }
-
-    public function orderPublished($orderId)
-    {
-        if (!self::getConnector()) {
-            return;
-        }
-        $orderLines = new MtoOrderLine($orderId);
-        $isReadyToSync = ProductHooks::isProductsSynced($orderLines->getItemsIds());
-
-        if (!$isReadyToSync) {
-            //TODO put message to log
-            return;
-        }
-
-        $mtoConnector = self::getConnector();
-        $status = $mtoConnector->batchOrderLines($orderLines->toArray());
     }
 
     public static function isOrderSynced(array $orderIds): bool
@@ -62,6 +44,7 @@ class OrderHooks
         $toUpdate = [];
         $toCreate = [];
         $toDelete = [];
+        $orderLines = [];
         $f = false;
 
         foreach ($orderIds as $orderId) {
@@ -70,15 +53,11 @@ class OrderHooks
                 $toDelete[] = $orderId;
                 $f = true;
                 continue;
-            }
-
-            if (!$order->getLastSyncDate()) {
+            } elseif (!$order->getLastSyncDate()) {
                 $toCreate[] = $orderId;
                 $f = true;
                 continue;
-            }
-
-            if ($order->isSyncRequired()) {
+            } elseif ($order->isSyncRequired()) {
                 $toUpdate[] = $orderId;
                 $f = true;
                 continue;
@@ -88,7 +67,6 @@ class OrderHooks
         if (!$f) {
             return true;
         }
-
         $mtoConnector = self::getConnector();
         $isCreatedStatus = $isUpdatedStatus = $isDelStatus = $statusOrderLines = true;
         if (!empty($toCreate)) {
@@ -99,12 +77,13 @@ class OrderHooks
             $isUpdatedStatus = $mtoConnector->sendOrders($toUpdate, MtoConnector::getApiEndPoint('order')->edit);
         }
 
-        if (!empty($toUpdate)) {
+        if (!empty($toDelete)) {
             $isDelStatus = $mtoConnector->sendOrders($toDelete, MtoConnector::getApiEndPoint('order')->delete);
         }
 
+
         $orderLines = MtoStoreManger::getOrdersLines($orderIds);
-        $statusOrderLines = $mtoConnector->batchOrderLines($orderLines);
+        $statusOrderLines = $mtoConnector->sendOrderLines($orderLines, MtoConnector::getApiEndPoint('orderLine')->batch);
 
         if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus && $statusOrderLines) {
             return true;

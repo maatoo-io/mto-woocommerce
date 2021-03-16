@@ -24,11 +24,11 @@ class MtoProduct extends AbstractMtoEntity
         $this->lastSyncDate = get_post_meta($product_id, '_mto_last_sync', true) ?: null;
         $this->sku = $product->get_sku();
         $this->externalProductId = (string)$product_id;
-        $this->price = $product->get_price() ? : 0;
+        $this->price = $product->get_price() ?: 0;
         $this->url = $product->get_permalink();
-        $this->title = $product->get_title() ? : 'untitled';
-        $this->description = $product->get_description() ? : '';
-        $this->imageUrl = wp_get_attachment_image_url($product->get_image_id()) ? : '';
+        $this->title = $product->get_title() ?: 'not set';
+        $this->description = $product->get_description() ?: 'not set';
+        $this->imageUrl = wp_get_attachment_image_url($product->get_image_id()) ?: '';
     }
 
     /**

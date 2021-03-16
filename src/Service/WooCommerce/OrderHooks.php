@@ -5,8 +5,10 @@ namespace Maatoo\WooCommerce\Service\WooCommerce;
 use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoOrderLine;
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
+use mysql_xdevapi\Exception;
 
 class OrderHooks
 {
@@ -33,26 +35,7 @@ class OrderHooks
 
     public function __construct()
     {
-        add_action('woocommerce_thankyou', [$this, 'newOrder']);
-        add_action('save_post_shop_order', [$this, 'editOrder']);
-    }
-
-    public function newOrder($orderId)
-    {
-        if (!self::getConnector()) {
-            return;
-        }
-        $orderLines = new MtoOrderLine($orderId);
-        $isReadyToSync = ProductHooks::isProductsSynced($orderLines->getItemsIds());
-
-        if (!$isReadyToSync) {
-            //TODO put message to log
-            return;
-        }
-
-        $mtoConnector = self::getConnector();
-        $status = $mtoConnector->sendOrders([$orderId], MtoConnector::getApiEndPoint('order')->create);
-        $statusOrderLines = $mtoConnector->batchOrderLines($orderLines->toArray());
+        add_action('save_post_shop_order', [$this, 'saveOrder']);
     }
 
     public static function isOrderSynced(array $orderIds): bool
@@ -63,6 +46,7 @@ class OrderHooks
         $toUpdate = [];
         $toCreate = [];
         $toDelete = [];
+        $orderLines = [];
         $f = false;
 
         foreach ($orderIds as $orderId) {
@@ -71,15 +55,11 @@ class OrderHooks
                 $toDelete[] = $orderId;
                 $f = true;
                 continue;
-            }
-
-            if (!$order->getLastSyncDate()) {
+            } elseif (!$order->getLastSyncDate()) {
                 $toCreate[] = $orderId;
                 $f = true;
                 continue;
-            }
-
-            if ($order->isSyncRequired()) {
+            } elseif ($order->isSyncRequired()) {
                 $toUpdate[] = $orderId;
                 $f = true;
                 continue;
@@ -89,9 +69,8 @@ class OrderHooks
         if (!$f) {
             return true;
         }
-
         $mtoConnector = self::getConnector();
-        $isCreatedStatus = $isUpdatedStatus = $isDelStatus = true;
+        $isCreatedStatus = $isUpdatedStatus = $isDelStatus = $statusOrderLines = true;
         if (!empty($toCreate)) {
             $isCreatedStatus = $mtoConnector->sendOrders($toCreate, MtoConnector::getApiEndPoint('order')->create);
         }
@@ -100,11 +79,16 @@ class OrderHooks
             $isUpdatedStatus = $mtoConnector->sendOrders($toUpdate, MtoConnector::getApiEndPoint('order')->edit);
         }
 
-        if (!empty($toUpdate)) {
+        if (!empty($toDelete)) {
             $isDelStatus = $mtoConnector->sendOrders($toDelete, MtoConnector::getApiEndPoint('order')->delete);
         }
 
-        $statusOrderLines = $mtoConnector->batchOrderLines(MtoStoreManger::getOrdersLines($orderIds));
+
+        $orderLines = MtoStoreManger::getOrdersLines($orderIds);
+        $statusOrderLines = $mtoConnector->sendOrderLines(
+            $orderLines,
+            MtoConnector::getApiEndPoint('orderLine')->batch
+        );
 
         if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus && $statusOrderLines) {
             return true;
@@ -113,17 +97,29 @@ class OrderHooks
         return false;
     }
 
-    public function editOrder($orderId)
+    public function saveOrder($orderId)
     {
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($orderId) === 'trash' || is_null(
                 self::getConnector()
             )) {
             return;
         }
-        $f = self::isOrderSynced([$orderId]);
+        try {
+            $isSubscribed = (bool)$_POST['mto_email_subscription'] ?? false;
+            $contact = $_COOKIE['mtc_id'];
 
-        if(!$f){
-            //TODO put data to log
+            if ($isSubscribed) {
+                //TODO create Event
+                //self::getConnector()->createSubscriptionEvent($contact);
+            }
+
+            $f = self::isOrderSynced([$orderId]);
+
+            if (!$f) {
+                LogData::writeApiErrors($f);
+            }
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 

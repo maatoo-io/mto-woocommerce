@@ -36,14 +36,14 @@ class MtoStoreManger
         }
 
         if (empty($storeOption['store'])) {
-            $name = get_bloginfo('name') ? : 'Untitled Store';
+            $name = get_bloginfo('name') ?: 'Untitled Store';
             $shortName = str_replace(
                     '-',
                     '',
                     explode('.', parse_url($storeOption['url'])['host'])[0]
                 ) ?? 'untitledstore';
             $externalId = substr(sha1(rand()), 0, 6);
-            $currency = get_option('woocommerce_currency') ? : 'USD';
+            $currency = get_option('woocommerce_currency') ?: 'USD';
             $domain = get_home_url();
             $id = null;
         } else {

@@ -86,5 +86,9 @@
       "route": "api\/orderLines\/{id}\/delete",
       "method": "DEL"
     }
+  },
+  "conversion": {
+    "route": "api\/emails\/{id1}\/contact\/{id2}\/convert",
+    "method": "POST"
   }
 }

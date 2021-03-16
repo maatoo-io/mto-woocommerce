@@ -4,6 +4,7 @@ namespace Maatoo\WooCommerce\Service\WooCommerce;
 
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 
 /**
@@ -25,7 +26,7 @@ class ProductHooks
      */
     public function __construct()
     {
-        add_action('save_post_product', [$this, 'saveProduct']);
+        add_action('woocommerce_update_product', [$this, 'saveProduct']);
         add_action('before_delete_post', [$this, 'removeProduct']);
     }
 
@@ -51,25 +52,38 @@ class ProductHooks
     public function saveProduct($postId)
     {
         // Check to see if we are autosaving
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($postId) === 'trash' || is_null(self::getConnector()) ) {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($postId) !== 'publish' || is_null(
+                self::getConnector()
+            )) {
+            return;
+        }
+        if (wp_is_post_revision($postId) || wp_is_post_autosave($postId)) {
             return;
         }
 
-        $product = new MtoProduct($postId);
-        if (is_null($product)) {
-            return;
-        }
+        try {
+            $product = new MtoProduct($postId);
 
-        if (!$product->getLastSyncDate()) {
-            $endpoint = MtoConnector::getApiEndPoint('product')->create;
-        } else {
-            $endpoint = MtoConnector::getApiEndPoint('product')->edit;
-        }
+            if ($product->getLastModifiedDate()) {
+                if (is_null($product)) {
+                    return;
+                }
+            }
 
-        $state = self::getConnector()->sendProducts([$postId], $endpoint);
+            if (!$product->getLastSyncDate()) {
+                $endpoint = MtoConnector::getApiEndPoint('product')->create;
+            } else {
+                $endpoint = MtoConnector::getApiEndPoint('product')->edit;
+            }
 
-        if (!$state) {
-            //TODO put to log
+            $state = self::getConnector()->sendProducts([$postId], $endpoint);
+
+            if (!$state) {
+                LogData::writeApiErrors($state);
+            }
+            remove_action('woocommerce_update_product', [$this, 'saveProduct']);
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 
@@ -80,14 +94,18 @@ class ProductHooks
      */
     public function removeProduct($postId)
     {
-        $product = new MtoProduct($postId);
-        if (!$product || !$product->getId()) {
-            return;
-        }
-        $state = self::getConnector()->sendProducts([$postId], MtoConnector::getApiEndPoint('product')->delete);
+        try {
+            $product = new MtoProduct($postId);
+            if (!$product || !$product->getId()) {
+                return;
+            }
+            $state = self::getConnector()->sendProducts([$postId], MtoConnector::getApiEndPoint('product')->delete);
 
-        if (!$state) {
-            //TODO put to log
+            if (!$state) {
+                LogData::writeApiErrors('Product sync was failed: ' . $state);
+            }
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 

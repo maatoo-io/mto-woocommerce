@@ -17,7 +17,8 @@ class MtoOrder extends AbstractMtoEntity
     private string $email;
     private string $firstName;
     private string $lastName;
-    private ?array $conversion = ['type' => null, 'id' => null]; //TODO replace by real data
+    private ?string $lead = '';
+    private ?array $conversion = ['type' => null, 'id' => null];
 
     public function __construct($orderId)
     {
@@ -26,19 +27,17 @@ class MtoOrder extends AbstractMtoEntity
         if (!$order) {
             return null;
         }
-        $this->id = get_post_meta($orderId, '_mto_id', true) ? : null;
+        global $woocommerce;
+        $this->id = get_post_meta($orderId, '_mto_id', true) ?: null;
         $this->externalOrderId = (string)$orderId;
-        $this->value = $order->get_total();
+        $this->value = floatval($order->get_total() ?: ($woocommerce->cart->get_totals()['total'] ?? 0));
         $this->url = $order->get_view_order_url();
         $this->status = $order->get_status();
-        $this->email = $order->get_billing_email() ?? '';
-        $this->firstName = $order->get_billing_first_name() ?? '';
-        $this->lastName = $order->get_billing_last_name() ?? '';
-        if (!empty($_SESSION['mtc_id'])) {
-            $this->conversion = [
-                'type' => 'email',
-                'id' => $_SESSION['mtc_id'],
-            ];
+        $this->email = $order->get_billing_email() ?: ($_POST['billing_email'] ?? '');
+        $this->firstName = $order->get_billing_first_name() ?: ($_POST['billing_first_name'] ?? '');
+        $this->lastName = $order->get_billing_last_name() ?: ($_POST['billing_last_name'] ?? '');
+        if (!empty($_COOKIE['mtc_id'])) {
+            $this->lead = $_COOKIE['mtc_id'];
         }
     }
 
@@ -63,7 +62,22 @@ class MtoOrder extends AbstractMtoEntity
      */
     public function getConversion()
     {
+        $data = $this->getConversionArray();
+        if (!empty($data['source'])) {
+            return $data['source'];
+        }
         return $this->conversion;
+    }
+
+    protected function getConversionArray()
+    {
+        if (!empty($_COOKIE['mto_conversion'])) {
+            $src = unserialize(base64_decode($_COOKIE['mto_conversion']));
+            if ($src['source']) {
+                return $src['source'];
+            }
+        }
+        return [];
     }
 
     /**
@@ -160,6 +174,18 @@ class MtoOrder extends AbstractMtoEntity
         return $this;
     }
 
+    /**
+     * @return mixed|string
+     */
+    public function getLead()
+    {
+        $data = $this->getConversionArray();
+        if (!empty($data['lead'])) {
+            return $data['lead'];
+        }
+
+        return $this->lead;
+    }
 
     /**
      * To Array.
@@ -168,7 +194,7 @@ class MtoOrder extends AbstractMtoEntity
      */
     public function toArray()
     {
-        return [
+        $arr = [
             'store' => MTO_STORE_ID,
             'externalOrderId' => $this->getExternalOrderId(),
             'value' => $this->getValue(),
@@ -179,6 +205,11 @@ class MtoOrder extends AbstractMtoEntity
             'lastName' => $this->getLastName(),
             'conversion' => $this->getConversion(),
         ];
+
+        if ($this->getLead()) {
+            $arr['lead'] = $this->getLead();
+        }
+        return $arr;
     }
 
     public function toArrayPatch()

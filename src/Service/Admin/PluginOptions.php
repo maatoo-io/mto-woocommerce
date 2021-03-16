@@ -22,7 +22,7 @@ class PluginOptions
     public function __construct()
     {
         $this->response = new AjaxResponse();
-        $this->mtoOptions = get_option('mto') ? : [];
+        $this->mtoOptions = get_option('mto') ?: [];
     }
 
     public function __invoke()

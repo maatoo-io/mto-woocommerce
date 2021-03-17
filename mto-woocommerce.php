@@ -1,10 +1,14 @@
 <?php
-/***
+/**
  * Plugin Name: Maatoo
  * Plugin URI:  https://github.com/maatoo-io/mto-woocommerce/
- * Description: Maatoo is a swiss-based SaaS that helps online shops to drive more revenue through targeted marketing
- * messages over email and other channels. Version:     1.0.0 Requires at least: 5.0 Requires PHP: 7.4 Author: Alina
- * Valovenko Text Domain: mto Domain Path: /languages
+ * Description: Maatoo is a swiss-based SaaS that helps online shops to drive more revenue through targeted marketing messages over email and other channels.
+ * Version:     1.0.0
+ * Requires at least: 5.0
+ * Requires PHP: 7.4
+ * Author: Alina Valovenko
+ * Text Domain: mto
+ * Domain Path: /languages
  */
 
 namespace Maatoo\WooCommerce;
@@ -20,7 +24,6 @@ use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
 
-use function Sodium\add;
 
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 

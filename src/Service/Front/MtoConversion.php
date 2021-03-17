@@ -54,6 +54,5 @@ class MtoConversion
         catch (\Exception $exception){
             LogData::writeTechErrors($exception->getMessage());
         }
-
     }
 }

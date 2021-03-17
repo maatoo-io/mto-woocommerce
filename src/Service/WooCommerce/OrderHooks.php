@@ -108,9 +108,16 @@ class OrderHooks
             $isSubscribed = (bool)$_POST['mto_email_subscription'] ?? false;
             $contact = $_COOKIE['mtc_id'];
 
-            if ($isSubscribed) {
-                //TODO create Event
-                //self::getConnector()->createSubscriptionEvent($contact);
+            if ($isSubscribed && !empty($_POST['billing_email'])) {
+                self::getConnector()->createSubscriptionEvent($contact);
+                self::getConnector()->updateContact(
+                    $contact,
+                    [
+                        'firstname' => $_POST['billing_first_name'] ?? 'not set',
+                        'lastname' =>$_POST['billing_last_name'] ?? 'not set',
+                        'email' => $_POST['billing_email'],
+                    ]
+                );
             }
 
             $f = self::isOrderSynced([$orderId]);

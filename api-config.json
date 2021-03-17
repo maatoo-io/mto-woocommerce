@@ -90,5 +90,17 @@
   "conversion": {
     "route": "api\/emails\/{id1}\/contact\/{id2}\/convert",
     "method": "POST"
+  },
+  "tag": {
+    "create": {
+      "route": "api\/tags\/new",
+      "method": "POST"
+    }
+  },
+  "contact": {
+    "update": {
+      "route": "api\/contacts\/{id}\/edit",
+      "method": "PUT"
+    }
   }
 }

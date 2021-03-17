@@ -24,7 +24,6 @@ use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
 
-use function Sodium\add;
 
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 

@@ -12,6 +12,7 @@ use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\LogErrors\LogData;
+use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 class MtoConnector
 {
@@ -341,17 +342,39 @@ class MtoConnector
 
     public function createSubscriptionEvent($contact)
     {
-        //todo clarify with client
-//        try {
-//            $event = [
-//                'lead' => $contact,
-//                'category' => 'Subscription',
-//                'action' => 'accepted',
-//                'value' => '1'
-//
-//            ];
-//        } catch (\Exception $exception) {
-//            LogData::writeTechErrors($exception->getMessage());
-//        }
+        try {
+            $store = MtoStoreManger::getStoreData();
+            if (!$store || empty($store->getShortName())) {
+                return;
+            }
+            $resp = $this->getResponseData(
+                self::getApiEndPoint('tag')->create,
+                [
+                    'tag' => sprintf('%s-pending', $store->getShortName()),
+                ]
+            );
+            if (!$resp) {
+                LogData::writeApiErrors('Can\'t create tag: ' . $resp);
+            }
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
+        }
+    }
+
+    public function updateContact($contact, $data)
+    {
+        if (!$contact) {
+            return false;
+        }
+        try {
+            $endpoint = self::getApiEndPoint('contact')->update;
+            $endpoint->route = str_replace('{id}', $contact, $endpoint->route);
+            $resp = $this->getResponseData($endpoint, $data);
+            if (!$resp) {
+                LogData::writeApiErrors('Can\'t create tag: ' . $resp);
+            }
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
+        }
     }
 }

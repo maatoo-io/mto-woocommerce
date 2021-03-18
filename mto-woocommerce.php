@@ -28,7 +28,7 @@ use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 if (!is_plugin_active('woocommerce/woocommerce.php')) {
-    die('WooCommerce plugin is disabled. WooCommerce plugin needs to be activated to keep using Maatoo.');
+    die(__('WooCommerce plugin is disabled. WooCommerce plugin needs to be activated to keep using Maatoo.', 'mto'));
 }
 
 $composer_path = __DIR__ . '/vendor/autoload.php';

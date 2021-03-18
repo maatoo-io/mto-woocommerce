@@ -1,8 +1,10 @@
 <?php
 
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 
 $mtoUser = new MtoUser();
+$logs = LogData::downloadLogLinks();
 ?>
     <div class="mto-dashboard">
         <svg version="1.1" id="MAATOO" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -149,11 +151,16 @@ $mtoUser = new MtoUser();
             <input type="submit" name="save" value="<?php
             _e('Save Credentials', 'mto'); ?>">
         </form>
-        <?php if(MTO_STORE_ID): ?>
+        <?php
+        if (MTO_STORE_ID): ?>
             <div class="sync-info-next dashicons-before">
                 <?php
                 printf(__('Next synchronization is scheduled for <br/>%s', 'mto'), $nextEvent); ?>
             </div>
-        <?php endif; ?>
+        <?php
+        endif;
+        if (!empty($logs)) :
+            echo $logs;
+        endif; ?>
     </div>
 <?php

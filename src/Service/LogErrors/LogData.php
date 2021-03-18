@@ -61,4 +61,21 @@ class LogData
             file_put_contents($fileTech, '');
         }
     }
+
+    public static function downloadLogLinks(){
+        $html = '<div class="download-logs">';
+        $fileApi = plugin_dir_url(__FILE__) . 'api-errors.txt';
+        $fileTech = plugin_dir_url(__FILE__) . 'technical-errors.txt';
+        $tech = file_get_contents($fileTech);
+        if(!empty($tech)){
+            $label = __('Failed  plugin tasks', 'mto');
+            $html .= "<a href='{$fileTech}' download/>{$label}</a>";
+        }
+        $api = file_get_contents($fileApi);
+        if(!empty($api)){
+            $label = __('Failed API requests', 'mto');
+            $html .= "<a href='{$fileApi}' download/>{$label}</a>";
+        }
+        return $html . '</div>';
+    }
 }

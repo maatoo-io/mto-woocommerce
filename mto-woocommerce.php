@@ -143,6 +143,7 @@ class MtoWoocommerce
         );
 
         delete_option('_mto_last_sync');
+        delete_option('_mto_tag_id');
         wp_clear_scheduled_hook('mto_sync');
     }
 }

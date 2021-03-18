@@ -29,7 +29,7 @@
     margin: 15px;
     width: auto;
 
-    &:disabled{
+    &:disabled {
       background-color: grey;
       color: white;
     }
@@ -49,7 +49,7 @@
       display: block;
       padding: 20px;
 
-      &:before{
+      &:before {
         margin-right: 10px;
       }
     }
@@ -71,5 +71,28 @@
         content: "\f153";
       }
     }
+  }
+}
+
+.sync-info {
+  text-align: center;
+  margin: 15px auto;
+
+  &_value {
+    &:before {
+      content: "\f15e";
+    }
+  }
+}
+
+.sync-info-next {
+  text-align: center;
+  background-color: #aed2ea;
+  padding: 20px 25px;
+  color: #000;
+  font-weight: 600;
+
+  &:before {
+    content: "\f508";
   }
 }

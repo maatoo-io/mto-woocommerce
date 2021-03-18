@@ -79,6 +79,8 @@ class PluginOptions
                 $this->mtoOptions['store'] = $store->toArray();
                 $this->mtoOptions['store']['id'] = $store->getId();
                 update_option('mto', $this->mtoOptions);
+                update_option('_mto_last_sync', null);
+
             }
         }
         return $msg;

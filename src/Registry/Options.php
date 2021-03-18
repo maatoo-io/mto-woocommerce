@@ -21,6 +21,23 @@ class Options
             include MTO_PLUGIN_TEMPLATES . 'admin/access-denied.php';
             return;
         }
+
+        $lastFullSync = get_option('_mto_last_sync');
+
+        $hook = 'mto_sync';
+        $crons = get_option('cron');
+        $event = [];
+        $startTimestamp = time();
+        foreach ( $crons as $timestamp => $cron ) {
+             if(isset( $cron[$hook])) {
+                 $event = $cron[$hook];
+                 $startTimestamp = $timestamp;
+                 break;
+             }
+        }
+        $key = array_keys($event)[0] ?? false;
+        $event = $event[$key];
+        $nextEvent = date('m/d/Y H:i:s', $lastFullSync ? $lastFullSync + $event['interval'] : $startTimestamp + $event['interval']);
         include MTO_PLUGIN_TEMPLATES . 'admin/dashboard.php';
     }
 }

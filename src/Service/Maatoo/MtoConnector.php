@@ -148,6 +148,8 @@ class MtoConnector
         $response = $this->getResponseData($endpoint, $formData);
 
         if (!empty($response['store'])) {
+            $this->createTag($response['store']['shortName'] ?? null);
+
             return $store->setId($response['store']['id'] ?? null);
         }
 
@@ -343,21 +345,22 @@ class MtoConnector
         }
     }
 
-    public function createSubscriptionEvent($contact)
+    public function createTag($shortName)
     {
         try {
-            $store = MtoStoreManger::getStoreData();
-            if (!$store || empty($store->getShortName())) {
+            if (empty($shortName)) {
                 return;
             }
             $resp = $this->getResponseData(
                 self::getApiEndPoint('tag')->create,
                 [
-                    'tag' => sprintf('%s-pending', $store->getShortName()),
+                    'tag' => sprintf('%s-pending', $shortName),
                 ]
             );
             if (!$resp) {
                 LogData::writeApiErrors('Can\'t create tag: ' . $resp);
+            } else{
+                update_option('_mto_tag_id', $resp['tag']['id'] ?? null);
             }
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());

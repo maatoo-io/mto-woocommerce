@@ -111,13 +111,13 @@ class OrderHooks
             $contact = $_COOKIE['mtc_id'];
 
             if ($isSubscribed && !empty($_POST['billing_email'])) {
-                self::getConnector()->createSubscriptionEvent($contact);
                 self::getConnector()->updateContact(
                     $contact,
                     [
                         'firstname' => $_POST['billing_first_name'] ?? 'not set',
                         'lastname' =>$_POST['billing_last_name'] ?? 'not set',
                         'email' => $_POST['billing_email'],
+                        'tags'=>[MTO_STORE_TAG_ID]
                     ]
                 );
             }

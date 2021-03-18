@@ -59,6 +59,10 @@ if (!defined('MTO_STORE_ID')) {
     define('MTO_STORE_ID', $store ? $store->getId() : null);
 }
 
+if (!defined('MTO_STORE_TAG_ID')) {
+      define('MTO_STORE_TAG_ID', get_option('_mto_tag_id') ?: null);
+}
+
 add_action('init', new MtoWoocommerce());
 register_uninstall_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'uninstall']);
 register_activation_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'activate']);

@@ -46,7 +46,6 @@ class OrderHooks
         $toUpdate = [];
         $toCreate = [];
         $toDelete = [];
-        $orderLines = [];
         $f = false;
         $mtoConnector = self::getConnector();
         $remoteOrders = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('order'));
@@ -124,6 +123,11 @@ class OrderHooks
 
             $f = self::isOrderSynced([$orderId]);
 
+            // clear conversion data
+            if(!empty($_COOKIE['mto_conversion'])){
+                wc_setcookie('mto_conversion', null);
+            }
+
             if (!$f) {
                 LogData::writeApiErrors($f);
             }
@@ -131,5 +135,4 @@ class OrderHooks
             LogData::writeTechErrors($exception->getMessage());
         }
     }
-
 }

@@ -91,7 +91,7 @@ class MtoStoreManger
             'post_type' => $cpt,
             'posts_per_page' => -1,
             'fields' => 'ids',
-            'post_status' => 'any',
+            'post_status' => 'publish',
         ];
 
         if ($newOnly) {

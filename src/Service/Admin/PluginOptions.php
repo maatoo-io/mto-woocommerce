@@ -22,7 +22,7 @@ class PluginOptions
     public function __construct()
     {
         $this->response = new AjaxResponse();
-        $this->mtoOptions = get_option('mto') ?: [];
+        $this->mtoOptions = get_option('mto') ? : [];
     }
 
     public function __invoke()
@@ -45,13 +45,15 @@ class PluginOptions
                 $this->mtoOptions['username'] = $mtoUser->getUsername();
                 $this->mtoOptions['password'] = $mtoUser->getPassword();
                 $this->mtoOptions['url'] = $mtoUser->getUrl();
+                $this->mtoOptions['store'] = null;
                 $msg[] = __('Credentials are valid and saved', 'mto');
                 update_option('mto', $this->mtoOptions);
                 //register store if not exist and get status message
                 $msg[] = $this->registerStore($provider);
                 $this->response->setResponseBody(implode('. ', $msg));
                 if(!wp_next_scheduled('mto_sync')){
-                    wp_schedule_single_event( time() - 1, 'mto_sync' );
+                    wp_clear_scheduled_hook('mto_sync');
+                    wp_schedule_single_event(time() + 5, 'mto_sync');
                 }
             } else {
                 $this->response->setResponseBody(__('Credentials are invalid', 'mto'))
@@ -67,10 +69,12 @@ class PluginOptions
 
     private function registerStore(MtoConnector $provider)
     {
+        $msg = __('Store exist on Maatoo', 'mto');
+
         //create store if not exist
-        $msg = __('Can\'t create Store on Maatoo', 'mto');
         $store = MtoStoreManger::getStoreData();
         if (is_null($store->getId())) {
+            $msg = __('Can\'t create Store on Maatoo', 'mto');
             $store = $provider->registerStore($store);
             if (!$store) {
                 $this->response->setIsError(true);

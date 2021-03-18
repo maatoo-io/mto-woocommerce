@@ -18,6 +18,7 @@ class MtoSync
     {
         $this->runProductSync();
         $this->runOrderSync();
+        $this->updateLastSyncDate();
     }
 
     protected function runProductSync()
@@ -31,5 +32,9 @@ class MtoSync
     {
         $orders = MtoStoreManger::getAllOrders(false);
         $statusOrder = OrderHooks::isOrderSynced($orders);
+    }
+
+    protected function updateLastSyncDate(){
+        update_option('_mto_last_sync', date(DATE_W3C));
     }
 }

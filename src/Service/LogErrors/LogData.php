@@ -26,11 +26,8 @@ class LogData
         $text = date('Y-m-d H:i:s') . PHP_EOL;
         $text .= $textLog;
         $text .= PHP_EOL;
-        $fOpen = fopen($file, 'a+');
-        if ($fOpen) {
-            fwrite($fOpen, $text);
-            fclose($fOpen);
-        } else {
+        $f = file_put_contents($file, $text, FILE_APPEND | LOCK_EX);
+        if (!$f) {
             echo 'Wrong open log-file.';
         }
     }

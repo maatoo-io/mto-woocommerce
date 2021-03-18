@@ -108,6 +108,7 @@ class MtoConnector
         if (empty($endpointConfig)) {
             return [];
         }
+        $responseData = false;
         try {
             $response = $this->client->request(
                 $endpointConfig->method,
@@ -116,7 +117,7 @@ class MtoConnector
             );
             $responseData = (array)json_decode($response->getBody()->getContents(), 'true');
         } catch (\Exception $exception) {
-            LogData::writeTechErrors($exception->getMessage());
+            LogData::writeApiErrors($exception->getMessage());
         }
 
         return $responseData;

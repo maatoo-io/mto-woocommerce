@@ -360,7 +360,7 @@ class MtoConnector
             if (!$resp) {
                 LogData::writeApiErrors('Can\'t create tag: ' . $resp);
             } else{
-                update_option('_mto_tag_id', $resp['tag']['id'] ?? null);
+                update_option('_mto_tag_id', $resp['tag']['tag'] ?? null);
             }
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());

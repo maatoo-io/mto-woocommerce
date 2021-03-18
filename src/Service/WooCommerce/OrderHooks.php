@@ -116,7 +116,7 @@ class OrderHooks
                         'firstname' => $_POST['billing_first_name'] ?? 'not set',
                         'lastname' =>$_POST['billing_last_name'] ?? 'not set',
                         'email' => $_POST['billing_email'],
-                        'tags'=>[MTO_STORE_TAG_ID]
+                        'tags'=>[['tag' => MTO_STORE_TAG_ID]]
                     ]
                 );
             }

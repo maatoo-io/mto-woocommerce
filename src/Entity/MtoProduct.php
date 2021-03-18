@@ -118,7 +118,7 @@ class MtoProduct extends AbstractMtoEntity
             'title' => $this->getTitle(),
             'description' => $this->getDescription(),
             'sku' => $this->getSku() ?: null,
-            'imageUrl' => $this->getImageUrl() ?: null,
+            'imageUrl' => $this->getImageUrl() ?: wc_placeholder_img_src(),
         ];
     }
 }

@@ -15,12 +15,13 @@ use Maatoo\WooCommerce\Registry\FrontAssets;
 use Maatoo\WooCommerce\Registry\Options;
 use Maatoo\WooCommerce\Service\Front\MtoConversion;
 use Maatoo\WooCommerce\Service\Front\WooHooks;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoSync;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
 
-defined( 'ABSPATH' ) OR exit;
+defined('ABSPATH') or exit;
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 if (!is_plugin_active('woocommerce/woocommerce.php')) {
@@ -59,7 +60,9 @@ if (!defined('MTO_STORE_ID')) {
 }
 
 add_action('init', new MtoWoocommerce());
-register_uninstall_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce','uninstall']);
+register_uninstall_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'uninstall']);
+register_activation_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'activate']);
+register_deactivation_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'deactivate']);
 
 class MtoWoocommerce
 {
@@ -70,7 +73,7 @@ class MtoWoocommerce
         $this->registerAjaxHooks();
         $this->conversionTracker();
         $this->registerWcHooks();
-        add_action('mto_sync', [$this, 'mtoHooks']);
+        add_action('mto_sync', [$this, 'mtoHooks'], 20);
     }
 
     private function registerAssets()
@@ -106,17 +109,36 @@ class MtoWoocommerce
 
     public function mtoHooks()
     {
+        //clear log files
+        LogData::clearLogFiles();
+
+        //execute sync
         new MtoSync();
     }
 
-    public static function uninstall(){
+    public static function activate()
+    {
+        if (!wp_next_scheduled('mto_sync')) {
+            wp_schedule_event(time(), 'daily', 'mto_sync');
+        }
+    }
+
+    public static function deactivate()
+    {
+        wp_clear_scheduled_hook('mto_sync');
+    }
+
+
+    public static function uninstall()
+    {
         global $wpdb;
 
         $wpdb->delete(
             $wpdb->postmeta,
-            ['meta_key' => '_mto_%']
+            ['meta_key' => '_mto_last_sync']
         );
 
         delete_option('_mto_last_sync');
+        wp_clear_scheduled_hook('mto_sync');
     }
 }

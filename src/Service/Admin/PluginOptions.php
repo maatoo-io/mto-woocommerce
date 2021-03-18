@@ -51,10 +51,6 @@ class PluginOptions
                 //register store if not exist and get status message
                 $msg[] = $this->registerStore($provider);
                 $this->response->setResponseBody(implode('. ', $msg));
-                if(!wp_next_scheduled('mto_sync')){
-                    wp_clear_scheduled_hook('mto_sync');
-                    wp_schedule_single_event(time() + 5, 'mto_sync');
-                }
             } else {
                 $this->response->setResponseBody(__('Credentials are invalid', 'mto'))
                                ->setIsError(true);

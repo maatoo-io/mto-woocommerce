@@ -40,7 +40,7 @@ class MtoStoreManger
             $shortName = str_replace(
                     '-',
                     '',
-                    explode('.', parse_url($storeOption['url'])['host'])[0]
+                    explode('.', parse_url(get_home_url())['host'])[0]
                 ) ?? 'untitledstore';
             $externalId = substr(sha1(rand()), 0, 6);
             $currency = get_option('woocommerce_currency') ?: 'USD';
@@ -93,6 +93,10 @@ class MtoStoreManger
             'fields' => 'ids',
             'post_status' => 'publish',
         ];
+
+        if($cpt !== 'product'){
+            $args['post_status']='any';
+        }
 
         if ($newOnly) {
             $args['meta_query'] = [

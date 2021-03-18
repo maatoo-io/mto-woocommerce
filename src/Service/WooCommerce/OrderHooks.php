@@ -48,14 +48,17 @@ class OrderHooks
         $toDelete = [];
         $orderLines = [];
         $f = false;
-
+        $mtoConnector = self::getConnector();
+        $remoteOrders = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('order'));
         foreach ($orderIds as $orderId) {
             $order = new MtoOrder($orderId);
             if (!$order) {
                 $toDelete[] = $orderId;
                 $f = true;
                 continue;
-            } elseif (!$order->getLastSyncDate()) {
+            }
+            $isExistRemote = array_key_exists($order->getId(),$remoteOrders['orders']);
+            if (!$isExistRemote) {
                 $toCreate[] = $orderId;
                 $f = true;
                 continue;
@@ -69,7 +72,6 @@ class OrderHooks
         if (!$f) {
             return true;
         }
-        $mtoConnector = self::getConnector();
         $isCreatedStatus = $isUpdatedStatus = $isDelStatus = $statusOrderLines = true;
         if (!empty($toCreate)) {
             $isCreatedStatus = $mtoConnector->sendOrders($toCreate, MtoConnector::getApiEndPoint('order')->create);

@@ -3,6 +3,7 @@
 namespace Maatoo\WooCommerce\Service\Maatoo;
 
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
@@ -16,9 +17,24 @@ class MtoSync
 {
     public function __construct()
     {
-        $this->runProductSync();
-        $this->runOrderSync();
-        $this->updateLastSyncDate();
+        try {
+            $store = MtoStoreManger::getStoreData();
+
+            if (!$store || !$store->getId()) {
+                return;
+            }
+
+            $connector = MtoConnector::getInstance(new MtoUser());
+            if (!$connector->healthCheck()) {
+                return;
+            }
+
+            $this->runProductSync();
+            $this->runOrderSync();
+            $this->updateLastSyncDate();
+        } catch (\Exception $ex){
+            LogData::writeTechErrors($ex->getMessage());
+        }
     }
 
     protected function runProductSync()
@@ -34,7 +50,8 @@ class MtoSync
         $statusOrder = OrderHooks::isOrderSynced($orders);
     }
 
-    protected function updateLastSyncDate(){
+    protected function updateLastSyncDate()
+    {
         update_option('_mto_last_sync', date(DATE_W3C));
     }
 }

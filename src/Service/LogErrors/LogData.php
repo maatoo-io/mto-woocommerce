@@ -7,7 +7,7 @@ class LogData
 {
     public static function writeApiErrors($data)
     {
-        $file = './api-errors.txt';
+        $file = plugin_dir_path(__FILE__) . 'api-errors.txt';
        if(self::isLogFileWritable($file)){
            self::logFile($data, $file);
        }
@@ -15,7 +15,7 @@ class LogData
 
     public static function writeTechErrors($data)
     {
-        $file = './technical-errors.txt';
+        $file = plugin_dir_path(__FILE__) . 'technical-errors.txt';
         if(self::isLogFileWritable($file)){
             self::logFile($data, $file);
         }
@@ -47,5 +47,18 @@ class LogData
         }
 
         return true;
+    }
+
+    public static function clearLogFiles(){
+        $fileApi = plugin_dir_path(__FILE__) . 'api-errors.txt';
+        $fileTech = plugin_dir_path(__FILE__) . 'technical-errors.txt';
+
+        if(self::isLogFileWritable($fileApi)){
+            file_put_contents($fileApi, '');
+        }
+
+        if(self::isLogFileWritable($fileTech)){
+            file_put_contents($fileTech, '');
+        }
     }
 }

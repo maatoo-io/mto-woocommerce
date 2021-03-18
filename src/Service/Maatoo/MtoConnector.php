@@ -314,6 +314,8 @@ class MtoConnector
                     LogData::writeApiErrors($e->getMessage());
                 }
             );
+
+            $promise->wait();
             return $promise->getState();
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
@@ -376,6 +378,17 @@ class MtoConnector
             }
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
+        }
+    }
+
+    public function getRemoteList($endpoint){
+        if(!isset($endpoint->list)){
+            return false;
+        }
+        try {
+            return $this->getResponseData($endpoint->list);
+        } catch (\Exception $exception){
+            LogData::writeApiErrors($exception->getMessage());
         }
     }
 }

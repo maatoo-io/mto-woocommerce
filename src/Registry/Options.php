@@ -37,7 +37,7 @@ class Options
         }
         $key = array_keys($event)[0] ?? false;
         $event = $event[$key];
-        $nextEvent = date('m/d/Y H:i:s', $lastFullSync ? $lastFullSync + $event['interval'] : $startTimestamp + $event['interval']);
+        $nextEvent = date('m/d/Y H:i:s', $lastFullSync ? $lastFullSync + $event['interval'] : $startTimestamp);
         include MTO_PLUGIN_TEMPLATES . 'admin/dashboard.php';
     }
 }

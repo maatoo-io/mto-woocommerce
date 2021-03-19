@@ -36,6 +36,7 @@ class OrderHooks
     public function __construct()
     {
         add_action('save_post_shop_order', [$this, 'saveOrder']);
+        add_action('before_delete_post', [$this, 'deleteOrder']);
     }
 
     public static function isOrderSynced(array $orderIds): bool
@@ -135,6 +136,28 @@ class OrderHooks
 
             if (!$f) {
                 LogData::writeApiErrors($f);
+            }
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
+        }
+    }
+
+    public function deleteOrder($orderId){
+        global $post;
+
+        if('shop_order' !== $post->post_type){
+            return;
+        }
+
+        try {
+            $order = new MtoOrder($orderId);
+            if (!$order || !$order->getId()) {
+                return;
+            }
+            $state = self::getConnector()->sendOrders([$orderId], MtoConnector::getApiEndPoint('order')->delete);
+
+            if (!$state) {
+                LogData::writeApiErrors('Order '. $orderId .' doesn\'t removed: ' . $state);
             }
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());

@@ -251,7 +251,7 @@ class MtoConnector
             $requests = function ($orders, $endpoint) use ($client) {
                 foreach ($orders as $orderId) {
                     $order = new MtoOrder($orderId);
-                    if (!$order) {
+                    if (!$order || !$order->getValue()) {
                         continue;
                     }
                     yield function () use ($client, $endpoint, $order) {

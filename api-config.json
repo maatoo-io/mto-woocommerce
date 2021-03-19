@@ -35,7 +35,7 @@
       "method": "GET"
     },
     "list": {
-      "route": "api\/products",
+      "route": "api\/products?limit=0&minimal=1",
       "method": "GET"
     },
     "edit": {
@@ -57,7 +57,7 @@
       "method": "GET"
     },
     "list": {
-      "route": "api\/orders",
+      "route": "api\/orders?limit=0&minimal=1",
       "method": "GET"
     },
     "edit": {

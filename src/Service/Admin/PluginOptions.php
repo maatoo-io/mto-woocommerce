@@ -75,12 +75,13 @@ class PluginOptions
             if (!$store) {
                 $this->response->setIsError(true);
             } else {
-                $msg = __('Store on Maatoo created successful', 'mto');
+                $msg = __('Connection with Maatoo is set up. Full sync will be run in 30 seconds', 'mto');
                 $this->mtoOptions['store'] = $store->toArray();
                 $this->mtoOptions['store']['id'] = $store->getId();
                 update_option('mto', $this->mtoOptions);
                 update_option('_mto_last_sync', null);
-
+                //run full sync in 30 seconds
+                wp_schedule_single_event( time()+30, 'mto_sync');
             }
         }
         return $msg;

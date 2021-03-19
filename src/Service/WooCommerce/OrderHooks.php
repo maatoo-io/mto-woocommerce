@@ -49,6 +49,10 @@ class OrderHooks
         $f = false;
         $mtoConnector = self::getConnector();
         $remoteOrders = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('order'));
+        if(!$remoteOrders){
+            LogData::writeApiErrors('Maatoo orders list is not available');
+            $remoteOrders = [];
+        }
         foreach ($orderIds as $orderId) {
             $order = new MtoOrder($orderId);
             if (!$order) {

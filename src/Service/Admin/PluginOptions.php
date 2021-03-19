@@ -4,9 +4,7 @@ namespace Maatoo\WooCommerce\Service\Admin;
 
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\Ajax\AjaxResponse;
-use Maatoo\WooCommerce\Service\Maatoo\API\Auth;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
-use Maatoo\WooCommerce\Service\Maatoo\MtoSync;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 /**

@@ -95,8 +95,7 @@ class ProductHooks
     public function removeProduct($postId)
     {
         try {
-            $product = new MtoProduct($postId);
-            if (!$product || !$product->getId()) {
+            if ('product' !== get_post_type($postId)) {
                 return;
             }
             $state = self::getConnector()->sendProducts([$postId], MtoConnector::getApiEndPoint('product')->delete);

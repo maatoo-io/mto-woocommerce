@@ -20,7 +20,7 @@ class PluginOptions
     public function __construct()
     {
         $this->response = new AjaxResponse();
-        $this->mtoOptions = get_option('mto') ? : [];
+        $this->mtoOptions = get_option('mto') ? : ['username' => null, 'password' => null, 'url' => null];
     }
 
     public function __invoke()
@@ -31,6 +31,7 @@ class PluginOptions
                                ->setIsError(true)
                                ->send();
             }
+
             $mtoUser = MtoUser::toMtoUser(
                 trim($_POST['username']),
                 trim($_POST['pass']),
@@ -40,13 +41,17 @@ class PluginOptions
             $provider = MtoConnector::getInstance($mtoUser);
 
             if ($provider && $provider->healthCheck()) {
-                $this->mtoOptions['username'] = $mtoUser->getUsername();
-                $this->mtoOptions['password'] = $mtoUser->getPassword();
-                $this->mtoOptions['url'] = $mtoUser->getUrl();
-                $this->mtoOptions['store'] = null;
                 $msg[] = __('Credentials are valid and saved', 'mto');
-                update_option('mto', $this->mtoOptions);
-                //register store if not exist and get status message
+                if ($this->mtoOptions['username'] !== $mtoUser->getUsername(
+                    ) || $this->mtoOptions['password'] !== $mtoUser->getPassword(
+                    ) || $this->mtoOptions['url'] !== $mtoUser->getUrl()) {
+                    $this->mtoOptions['username'] = $mtoUser->getUsername();
+                    $this->mtoOptions['password'] = $mtoUser->getPassword();
+                    $this->mtoOptions['url'] = $mtoUser->getUrl();
+                    $this->mtoOptions['store'] = null;
+                    update_option('mto', $this->mtoOptions);
+                    //register store if not exist and get status message
+                }
                 $msg[] = $this->registerStore($provider);
                 $this->response->setResponseBody(implode('. ', $msg));
             } else {
@@ -79,7 +84,9 @@ class PluginOptions
                 update_option('mto', $this->mtoOptions);
                 update_option('_mto_last_sync', null);
                 //run full sync in 30 seconds
-                wp_schedule_single_event( time()+30, 'mto_sync');
+                wp_schedule_single_event(time() - 1, 'mto_sync_clear_log');
+                wp_schedule_single_event(time() + 30, 'mto_sync_products');
+                wp_schedule_single_event(time() + 180, 'mto_sync_orders');
             }
         }
         return $msg;

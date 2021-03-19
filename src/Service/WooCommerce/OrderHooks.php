@@ -79,6 +79,11 @@ class OrderHooks
         $isCreatedStatus = $isUpdatedStatus = $isDelStatus = $statusOrderLines = true;
         if (!empty($toCreate)) {
             $isCreatedStatus = $mtoConnector->sendOrders($toCreate, MtoConnector::getApiEndPoint('order')->create);
+            $orderLines = MtoStoreManger::getOrdersLines($orderIds);
+            $statusOrderLines = $mtoConnector->sendOrderLines(
+                $orderLines,
+                MtoConnector::getApiEndPoint('orderLine')->batch
+            );
         }
 
         if (!empty($toUpdate)) {
@@ -89,12 +94,6 @@ class OrderHooks
             $isDelStatus = $mtoConnector->sendOrders($toDelete, MtoConnector::getApiEndPoint('order')->delete);
         }
 
-
-        $orderLines = MtoStoreManger::getOrdersLines($orderIds);
-        $statusOrderLines = $mtoConnector->sendOrderLines(
-            $orderLines,
-            MtoConnector::getApiEndPoint('orderLine')->batch
-        );
 
         if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus && $statusOrderLines) {
             return true;
@@ -145,15 +144,11 @@ class OrderHooks
     public function deleteOrder($orderId){
         global $post;
 
-        if('shop_order' !== $post->post_type){
+        if('shop_order' !== get_post_type($orderId)){
             return;
         }
 
         try {
-            $order = new MtoOrder($orderId);
-            if (!$order || !$order->getId()) {
-                return;
-            }
             $state = self::getConnector()->sendOrders([$orderId], MtoConnector::getApiEndPoint('order')->delete);
 
             if (!$state) {

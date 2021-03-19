@@ -15,42 +15,60 @@ use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
  */
 class MtoSync
 {
-    public function __construct()
+    protected static function checkConnections()
     {
         try {
             $store = MtoStoreManger::getStoreData();
 
             if (!$store || !$store->getId()) {
-                return;
+                return false;
             }
 
             $connector = MtoConnector::getInstance(new MtoUser());
-            if (!$connector->healthCheck()) {
-                return;
-            }
 
-            $this->runProductSync();
-            $this->runOrderSync();
-            $this->updateLastSyncDate();
-        } catch (\Exception $ex){
+            if (!$connector->healthCheck()) {
+                return false;
+            }
+        } catch (\Exception $ex) {
             LogData::writeTechErrors($ex->getMessage());
         }
+        return true;
     }
 
-    protected function runProductSync()
+    public static function runProductSync()
     {
-        $products = MtoStoreManger::getAllProducts(false);
-        $statusProduct = ProductHooks::isProductsSynced($products);
+        try {
+            $state = self::checkConnections();
+            if(!$state){
+                update_option('_mto_sync_status_product', 'failed');
+            }
+            $products = MtoStoreManger::getAllProducts(false);
+            $statusProduct = ProductHooks::isProductsSynced($products);
+            update_option('_mto_last_sync_products', $statusProduct);
+        } catch (\Exception $ex) {
+            LogData::writeApiErrors($ex->getMessage());
+        }
+        self::updateLastSyncDate();
     }
 
 
-    protected function runOrderSync()
+    public static function runOrderSync()
     {
-        $orders = MtoStoreManger::getAllOrders(false);
-        $statusOrder = OrderHooks::isOrderSynced($orders);
+        try {
+            $state = self::checkConnections();
+            if(!$state){
+                update_option('_mto_sync_status_order', 'failed');
+            }
+            $orders = MtoStoreManger::getAllOrders(false);
+            $statusOrder = OrderHooks::isOrderSynced($orders);
+            update_option('_mto_sync_status_order', $statusOrder);
+        } catch (\Exception $ex) {
+            LogData::writeApiErrors($ex->getMessage());
+        }
+        self::updateLastSyncDate();
     }
 
-    protected function updateLastSyncDate()
+    protected static function updateLastSyncDate()
     {
         update_option('_mto_last_sync', date(DATE_W3C));
     }

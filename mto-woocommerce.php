@@ -19,8 +19,6 @@ use Maatoo\WooCommerce\Registry\FrontAssets;
 use Maatoo\WooCommerce\Registry\Options;
 use Maatoo\WooCommerce\Service\Front\MtoConversion;
 use Maatoo\WooCommerce\Service\Front\WooHooks;
-use Maatoo\WooCommerce\Service\LogErrors\LogData;
-use Maatoo\WooCommerce\Service\Maatoo\MtoSync;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
@@ -81,8 +79,11 @@ class MtoWoocommerce
         $this->registerAjaxHooks();
         $this->conversionTracker();
         $this->registerWcHooks();
-        add_action('mto_sync', [$this, 'mtoHooks'], 20);
+        add_action('mto_sync_clear_log', ['\Maatoo\WooCommerce\Service\LogErrors\LogData', 'clearLogFiles']);
+        add_action('mto_sync_products', ['\Maatoo\WooCommerce\Service\Maatoo\MtoSync', 'runProductSync']);
+        add_action('mto_sync_orders', ['\Maatoo\WooCommerce\Service\Maatoo\MtoSync', 'runOrderSync']);
     }
+
 
     private function registerAssets()
     {
@@ -115,25 +116,26 @@ class MtoWoocommerce
         $frontEndHooks = new WooHooks();
     }
 
-    public function mtoHooks()
-    {
-        //clear log files
-        LogData::clearLogFiles();
-
-        //execute sync
-        new MtoSync();
-    }
-
     public static function activate()
     {
-        if (!wp_next_scheduled('mto_sync')) {
-            wp_schedule_event(time(), 'daily', 'mto_sync');
+        if (!wp_next_scheduled('mto_sync_clear_log')) {
+            wp_schedule_event(time() + 30, 'daily', 'mto_sync_clear_log');
+        }
+
+        if (!wp_next_scheduled('mto_sync_products')) {
+            wp_schedule_event(time() + 120, 'daily', 'mto_sync_products');
+        }
+
+        if (!wp_next_scheduled('mto_sync_orders')) {
+            wp_schedule_event(time() + 360, 'daily', 'mto_sync_orders');
         }
     }
 
     public static function deactivate()
     {
-        wp_clear_scheduled_hook('mto_sync');
+        wp_clear_scheduled_hook('mto_sync_clear_log');
+        wp_clear_scheduled_hook('mto_sync_products');
+        wp_clear_scheduled_hook('mto_sync_orders');
     }
 
 
@@ -148,6 +150,9 @@ class MtoWoocommerce
 
         delete_option('_mto_last_sync');
         delete_option('_mto_tag_id');
-        wp_clear_scheduled_hook('mto_sync');
+
+        wp_clear_scheduled_hook('mto_sync_clear_log');
+        wp_clear_scheduled_hook('mto_sync_products');
+        wp_clear_scheduled_hook('mto_sync_orders');
     }
 }

@@ -30,7 +30,7 @@ class MtoOrder extends AbstractMtoEntity
         global $woocommerce;
         $this->id = get_post_meta($orderId, '_mto_id', true) ?: null;
         $this->externalOrderId = (string)$orderId;
-        $this->value = floatval($order->get_total() ?: ($woocommerce->cart->get_totals()['total'] ?? 0));
+        $this->value = floatval($order->get_total() ?: get_post_meta($orderId, '_order_total', true) ?: 0);
         $this->url = $order->get_view_order_url();
         $this->status = $order->get_status();
         $this->email = $order->get_billing_email() ?: ($_POST['billing_email'] ?? '');
@@ -109,6 +109,10 @@ class MtoOrder extends AbstractMtoEntity
      */
     public function getStatus(): string
     {
+        if(!empty($_POST['order_status'])){
+            $this->setStatus($_POST['order_status']);
+        }
+
         switch ($this->status) {
             case 'on-hold':
                 $mtoPayment = 'open';
@@ -159,7 +163,7 @@ class MtoOrder extends AbstractMtoEntity
      */
     public function setStatus(string $status): MtoOrder
     {
-        $this->status = $status;
+        $this->status = str_replace('wc-', '', $status);
         return $this;
     }
 

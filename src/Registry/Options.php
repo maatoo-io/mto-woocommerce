@@ -24,7 +24,7 @@ class Options
 
         $lastFullSync = get_option('_mto_last_sync');
 
-        $hook = 'mto_sync';
+        $hook = 'mto_sync_orders';
         $crons = get_option('cron');
         $event = [];
         $startTimestamp = time();

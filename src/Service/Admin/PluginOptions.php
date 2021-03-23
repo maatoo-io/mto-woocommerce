@@ -68,7 +68,7 @@ class PluginOptions
 
     private function registerStore(MtoConnector $provider)
     {
-        $msg = __('Store exist on Maatoo', 'mto');
+        $msg = __('The store exists on maatoo', 'mto');
 
         //create store if not exist
         $store = MtoStoreManger::getStoreData();

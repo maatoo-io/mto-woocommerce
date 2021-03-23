@@ -116,7 +116,7 @@ $logs = LogData::downloadLogLinks();
                             <?php
                             if ($lastFullSync) : ?>
                                 <?php
-                                printf(__('The latest full sync was done %s', 'mto'), $lastFullSync); ?>
+                                printf(__('The latest full sync was done %s', 'mto'), wp_date('m/d/Y H:i:s', strtotime($lastFullSync))); ?>
                             <?php
                             else:
                                 _e(
@@ -155,7 +155,7 @@ $logs = LogData::downloadLogLinks();
         if (MTO_STORE_ID): ?>
             <div class="sync-info-next dashicons-before">
                 <?php
-                printf(__('Next synchronization is scheduled for <br/>%s', 'mto'), $nextEvent); ?>
+                printf(__('The next synchronization is scheduled for <br/>%s', 'mto'), $nextEvent); ?>
             </div>
         <?php
         endif;

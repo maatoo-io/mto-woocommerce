@@ -21,7 +21,6 @@ class Options
             include MTO_PLUGIN_TEMPLATES . 'admin/access-denied.php';
             return;
         }
-
         $lastFullSync = get_option('_mto_last_sync');
 
         $hook = 'mto_sync_orders';
@@ -37,7 +36,7 @@ class Options
         }
         $key = array_keys($event)[0] ?? false;
         $event = $event[$key];
-        $nextEvent = date('m/d/Y H:i:s', $startTimestamp);
+        $nextEvent =  wp_date('m/d/Y H:i:s', $startTimestamp);
         include MTO_PLUGIN_TEMPLATES . 'admin/dashboard.php';
     }
 }

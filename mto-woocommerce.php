@@ -27,7 +27,8 @@ defined('ABSPATH') or exit;
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 if (!is_plugin_active('woocommerce/woocommerce.php')) {
-    die(__('WooCommerce plugin is disabled. WooCommerce plugin needs to be activated to keep using Maatoo.', 'mto'));
+    deactivate_plugins( plugin_basename( __FILE__ ) );
+    wp_die(__('WooCommerce plugin is disabled. WooCommerce plugin needs to be activated to keep using Maatoo.', 'mto'));
 }
 
 $composer_path = __DIR__ . '/vendor/autoload.php';
@@ -35,8 +36,8 @@ clearstatcache();
 if (file_exists($composer_path)) {
     require_once($composer_path);
 } else {
-    exit;
-}
+    deactivate_plugins( plugin_basename( __FILE__ ) );
+    wp_die(__('PHP composer files id missing. Can\'t include ' . $composer_path, 'mto'));}
 
 
 if (!defined('MTO_PLUGIN_DIR')) {
@@ -128,6 +129,10 @@ class MtoWoocommerce
 
         if (!wp_next_scheduled('mto_sync_orders')) {
             wp_schedule_event(time() + 360, 'daily', 'mto_sync_orders');
+        }
+        $store = MtoStoreManger::getStoreData();
+        if($store->getShortName()){
+            update_option('_mto_tag_id', $store->getShortName() . '-pending');
         }
     }
 

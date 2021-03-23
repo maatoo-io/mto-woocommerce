@@ -145,6 +145,12 @@ class MtoOrder extends AbstractMtoEntity
      */
     public function getValue()
     {
+        if(!$this->value){
+            global $woocommerce;
+            if(!empty($woocommerce->cart->get_totals()['total'])){
+                return $woocommerce->cart->get_totals()['total'];
+            }
+        }
         return $this->value;
     }
 

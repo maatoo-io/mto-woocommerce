@@ -131,7 +131,7 @@ class MtoWoocommerce
             wp_schedule_event(time() + 360, 'daily', 'mto_sync_orders');
         }
         $store = MtoStoreManger::getStoreData();
-        if(!empty($store->getShortName())){
+        if($store && method_exists($store, 'getShortName')){
             update_option('_mto_tag_id', $store->getShortName() . '-pending');
         }
     }

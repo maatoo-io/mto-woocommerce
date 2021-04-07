@@ -43,12 +43,13 @@ class MtoConversion
             if (isset($_GET['ct'])) {;
                 wc_setcookie('mto_conversion', $_GET['ct']);
 
-                $mtoConnector = MtoConnector::getInstance(new MtoUser());
-                if(!$mtoConnector){
-                    return;
-                }
-                $data = unserialize(base64_decode($_COOKIE['mto_conversion']));
-                $mtoConnector->saveConversion($data['lead'], $data['email']);
+                /* Commented out by client request */
+//                $mtoConnector = MtoConnector::getInstance(new MtoUser());
+//                if(!$mtoConnector){
+//                    return;
+//                }
+//                $data = unserialize(base64_decode($_COOKIE['mto_conversion']));
+                //$mtoConnector->saveConversion($data['lead'], $data['email']);
             }
         }
         catch (\Exception $exception){

@@ -63,8 +63,8 @@ class MtoOrder extends AbstractMtoEntity
     public function getConversion()
     {
         $data = $this->getConversionArray();
-        if (!empty($data['source'])) {
-            return $data['source'];
+        if (!empty($data[0]) && !empty($data[1])) {
+            $this->conversion = ['type' => $data[0], 'id' => $data[1]];
         }
         return $this->conversion;
     }

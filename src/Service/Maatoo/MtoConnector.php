@@ -120,6 +120,9 @@ class MtoConnector
             LogData::writeApiErrors($exception->getMessage());
         }
 
+        if(!$responseData){
+            return null;
+        }
         return $responseData;
     }
 

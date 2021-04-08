@@ -28,6 +28,7 @@ class ProductHooks
     {
         add_action('woocommerce_update_product', [$this, 'saveProduct']);
         add_action('before_delete_post', [$this, 'removeProduct']);
+        add_action('mto_background_product_sync', [$this, 'singleProductSync'], 10, 1);
     }
 
     /**
@@ -69,18 +70,7 @@ class ProductHooks
                     return;
                 }
             }
-
-            if (!$product->getLastSyncDate()) {
-                $endpoint = MtoConnector::getApiEndPoint('product')->create;
-            } else {
-                $endpoint = MtoConnector::getApiEndPoint('product')->edit;
-            }
-
-            $state = self::getConnector()->sendProducts([$postId], $endpoint);
-
-            if (!$state) {
-                LogData::writeApiErrors($state);
-            }
+            wp_schedule_single_event(time() - 1, 'mto_background_product_sync', [$product]);
             remove_action('woocommerce_update_product', [$this, 'saveProduct']);
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
@@ -128,7 +118,7 @@ class ProductHooks
                 $f = true;
                 continue;
             }
-            $isExistRemote = array_key_exists($product->getId(),$remoteProducts['products']);
+            $isExistRemote = array_key_exists($product->getId(), $remoteProducts['products']);
             if (!$isExistRemote) {
                 $toCreate[] = $productId;
                 $f = true;
@@ -166,4 +156,25 @@ class ProductHooks
         return false;
     }
 
+    public function singleProductSync(MtoProduct $product)
+    {
+        if (!$product) {
+            return;
+        }
+        try {
+            if (!$product->getLastSyncDate()) {
+                $endpoint = MtoConnector::getApiEndPoint('product')->create;
+            } else {
+                $endpoint = MtoConnector::getApiEndPoint('product')->edit;
+            }
+
+            $state = self::getConnector()->sendProducts([$product->getExternalProductId()], $endpoint);
+
+            if (!$state) {
+                LogData::writeApiErrors($state);
+            }
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
+        }
+    }
 }

@@ -108,7 +108,7 @@ class MtoConnector
         if (empty($endpointConfig)) {
             return [];
         }
-        $responseData = false;
+        $responseData = null;
         try {
             $response = $this->client->request(
                 $endpointConfig->method,
@@ -120,9 +120,6 @@ class MtoConnector
             LogData::writeApiErrors($exception->getMessage());
         }
 
-        if(!$responseData){
-            return null;
-        }
         return $responseData;
     }
 

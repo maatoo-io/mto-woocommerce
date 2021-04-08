@@ -27,18 +27,15 @@ class MtoOrder extends AbstractMtoEntity
         if (!$order) {
             return null;
         }
-        global $woocommerce;
         $this->id = get_post_meta($orderId, '_mto_id', true) ?: null;
         $this->externalOrderId = (string)$orderId;
         $this->value = floatval($order->get_total() ?: get_post_meta($orderId, '_order_total', true) ?: 0);
         $this->url = $order->get_view_order_url();
         $this->status = $order->get_status();
-        $this->email = $order->get_billing_email() ?: ($_POST['billing_email'] ?? '');
-        $this->firstName = $order->get_billing_first_name() ?: ($_POST['billing_first_name'] ?? '');
-        $this->lastName = $order->get_billing_last_name() ?: ($_POST['billing_last_name'] ?? '');
-        if (!empty($_COOKIE['mtc_id'])) {
-            $this->lead = $_COOKIE['mtc_id'];
-        }
+        $this->email = (string)$order->get_billing_email() ?: ($_POST['billing_email'] ?? '');
+        $this->firstName = (string)$order->get_billing_first_name() ?: ($_POST['billing_first_name'] ?? '');
+        $this->lastName = (string)$order->get_billing_last_name() ?: ($_POST['billing_last_name'] ?? '');
+        $this->lead = get_post_meta($orderId, '_mto_contact_id', true);
     }
 
     /**
@@ -71,8 +68,12 @@ class MtoOrder extends AbstractMtoEntity
 
     protected function getConversionArray()
     {
-        if (!empty($_COOKIE['mto_conversion'])) {
-            $src = unserialize(base64_decode($_COOKIE['mto_conversion']));
+        $conversion = get_post_meta($this->getExternalOrderId(), '_mto_conversion', true);
+        if(empty($conversion)){
+            $conversion = $_COOKIE['mto_conversion'] ?? '';
+        }
+        if (!empty($conversion)) {
+            $src = unserialize(base64_decode($conversion));
             if ($src['source']) {
                 return $src['source'];
             }

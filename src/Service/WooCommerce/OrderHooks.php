@@ -37,6 +37,7 @@ class OrderHooks
     {
         add_action('save_post_shop_order', [$this, 'saveOrder']);
         add_action('before_delete_post', [$this, 'deleteOrder']);
+        add_action('mto_background_order_sync', [$this, 'singleOrderSync'], 10, 2);
     }
 
     public static function isOrderSynced(array $orderIds): bool
@@ -50,7 +51,7 @@ class OrderHooks
         $f = false;
         $mtoConnector = self::getConnector();
         $remoteOrders = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('order'));
-        if(!$remoteOrders){
+        if (!$remoteOrders) {
             LogData::writeApiErrors('Maatoo orders list is not available');
             $remoteOrders = [];
         }
@@ -61,7 +62,7 @@ class OrderHooks
                 $f = true;
                 continue;
             }
-            $isExistRemote = array_key_exists($order->getId(),$remoteOrders['orders']);
+            $isExistRemote = array_key_exists($order->getId(), $remoteOrders['orders']);
             if (!$isExistRemote) {
                 $toCreate[] = $orderId;
                 $f = true;
@@ -111,40 +112,23 @@ class OrderHooks
         }
         try {
             $isSubscribed = (bool)$_POST['mto_email_subscription'] ?? false;
-            $contact = $_COOKIE['mtc_id'];
-
-            if ($isSubscribed && !empty($_POST['billing_email'])) {
-                self::getConnector()->updateContact(
-                    $contact,
-                    [
-                        'firstname' => $_POST['billing_first_name'] ?? 'not set',
-                        'lastname' =>$_POST['billing_last_name'] ?? 'not set',
-                        'email' => $_POST['billing_email'] ?? '',
-                        'phone' => $_POST['billing_phone'] ?? '',
-                        'tags'=>[MTO_STORE_TAG_ID]
-                    ]
-                );
-            }
-
-            $f = self::isOrderSynced([$orderId]);
-
+            $contact = $_COOKIE['mtc_id'] ?? null;
+            update_post_meta($orderId, '_mto_is_subscribed', $isSubscribed ? '1' : '0');
+            update_post_meta($orderId, '_mto_contact_id', $contact);
             // clear conversion data
-            if(!empty($_COOKIE['mto_conversion'])){
+            if (!empty($_COOKIE['mto_conversion'])) {
+                update_post_meta($orderId, '_mto_conversion', $contact);
                 wc_setcookie('mto_conversion', null);
             }
-
-            if (!$f) {
-                LogData::writeApiErrors($f);
-            }
+            wp_schedule_single_event(time() - 1, 'mto_background_order_sync', [$orderId, $_POST]);
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
         }
     }
 
-    public function deleteOrder($orderId){
-        global $post;
-
-        if('shop_order' !== get_post_type($orderId)){
+    public function deleteOrder($orderId)
+    {
+        if ('shop_order' !== get_post_type($orderId)) {
             return;
         }
 
@@ -152,10 +136,36 @@ class OrderHooks
             $state = self::getConnector()->sendOrders([$orderId], MtoConnector::getApiEndPoint('order')->delete);
 
             if (!$state) {
-                LogData::writeApiErrors('Order '. $orderId .' doesn\'t removed: ' . $state);
+                LogData::writeApiErrors('Order ' . $orderId . ' doesn\'t removed: ' . $state);
             }
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
+        }
+    }
+
+    public function singleOrderSync($orderId, $postData)
+    {
+        update_post_meta($orderId, 'test_sync', time());
+        $isSubscribed = (bool)get_post_meta($orderId, '_mto_is_subscribed', true);
+        $contact = get_post_meta($orderId, '_mto_contact_id', true);
+
+        if ($isSubscribed && !empty($postData['billing_email'])) {
+            self::getConnector()->updateContact(
+                $contact,
+                [
+                    'firstname' => $postData['billing_first_name'] ?? 'not set',
+                    'lastname' => $postData['billing_last_name'] ?? 'not set',
+                    'email' => $postData['billing_email'] ?? '',
+                    'phone' => $postData['billing_phone'] ?? '',
+                    'tags' => [MTO_STORE_TAG_ID],
+                ]
+            );
+        }
+
+        $f = self::isOrderSynced([$orderId]);
+
+        if (!$f) {
+            LogData::writeApiErrors($f);
         }
     }
 }

@@ -2,14 +2,13 @@
 Contributors: maatoo.io
 Donate link: https://maatoo.io
 Tags: ecommerce,email,marketing,automation,maatoo
-Requires at least: 5.4
-Tested up to: 5.6
-Stable tag: 5.0
-Requires PHP: 7.4
-WC requires at least: 5.0
-WC tested up to: 5.0
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Requires at least: 5.0
+Tested up to: 5.7
+Requires PHP: 7.3
+WC requires at least: 4.9
+WC tested up to: 5.1
+License: GPLv3 or later
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Connect your online shop to drive more revenue with intelligent automations, e.g. abanoned cart reminders and more.
 

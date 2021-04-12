@@ -12,7 +12,7 @@ class Options
     public function registerOptionPage()
     {
         $icon = MTO_PLUGIN_URL . 'assets/images/maatoo.ico';
-        add_menu_page('Maatoo', 'Maatoo', 'manage_options', 'mto', [$this, 'dashboard'], $icon, 4);
+        add_menu_page('maatoo', 'maatoo', 'manage_options', 'mto', [$this, 'dashboard'], $icon, 4);
     }
 
     public function dashboard()

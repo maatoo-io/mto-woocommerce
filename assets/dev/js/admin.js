@@ -30,7 +30,8 @@ jQuery(($) => {
         action: 'mto_save_options',
         username: $form.find('#login').val(),
         pass: $form.find('#password').val(),
-        url: $form.find('#url').val()
+        url: $form.find('#url').val(),
+        birthday: $form.find('#birthday').is(':checked')
       },
       dataType: 'json'
     })

@@ -7,8 +7,9 @@ namespace Maatoo\WooCommerce\Entity;
 class MtoUser
 {
     private ?string $username = null;
-    private ?string $password= null;
-    private ?string $url= null;
+    private ?string $password = null;
+    private ?string $url = null;
+    private bool $isBirthdayEnabled = false;
 
     public function __construct()
     {
@@ -20,6 +21,7 @@ class MtoUser
         $this->username = $options['username'] ?? null;
         $this->password = $options['password'] ?? null;
         $this->url = rtrim($options['url']) ?? null;
+        $this->isBirthdayEnabled = (bool)$options['birthday'] ?? false;
     }
 
     /**
@@ -36,6 +38,14 @@ class MtoUser
     public function getUrl(): ?string
     {
         return $this->url;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBirthdayEnabled()
+    {
+        return $this->isBirthdayEnabled;
     }
 
     /**
@@ -56,6 +66,12 @@ class MtoUser
     public function setPassword($password): MtoUser
     {
         $this->password = $password;
+        return $this;
+    }
+
+    public function setIsBirthdayEnabled($isBirthdayEnabled)
+    {
+        $this->isBirthdayEnabled = $isBirthdayEnabled;
         return $this;
     }
 
@@ -85,11 +101,12 @@ class MtoUser
         return $this;
     }
 
-    public static function toMtoUser($username, $password, $url)
+    public static function toMtoUser($username, $password, $url, $isBirthdayEnabled = false)
     {
         $user = new MtoUser();
         return $user->setUsername($username)
-                    ->setPassword($password)
-                    ->setUrl($url);
+          ->setPassword($password)
+          ->setUrl($url)
+          ->setIsBirthdayEnabled($isBirthdayEnabled);
     }
 }

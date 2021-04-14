@@ -35,7 +35,8 @@ class PluginOptions
             $mtoUser = MtoUser::toMtoUser(
                 trim($_POST['username']),
                 trim($_POST['pass']),
-                filter_var(rtrim($_POST['url'], '/'), FILTER_SANITIZE_URL)
+                filter_var(rtrim($_POST['url'], '/'), FILTER_SANITIZE_URL),
+                $_POST['birthday'] == "true"
             );
 
             $provider = MtoConnector::getInstance($mtoUser);
@@ -44,11 +45,13 @@ class PluginOptions
                 $msg[] = __('Credentials are valid and saved', 'mto');
                 if ($this->mtoOptions['username'] !== $mtoUser->getUsername(
                     ) || $this->mtoOptions['password'] !== $mtoUser->getPassword(
-                    ) || $this->mtoOptions['url'] !== $mtoUser->getUrl()) {
+                    ) || $this->mtoOptions['url'] !== $mtoUser->getUrl()
+                     || (bool)$this->mtoOptions['birthday'] !== $mtoUser->isBirthdayEnabled()){
                     $this->mtoOptions['username'] = $mtoUser->getUsername();
                     $this->mtoOptions['password'] = $mtoUser->getPassword();
                     $this->mtoOptions['url'] = $mtoUser->getUrl();
                     $this->mtoOptions['store'] = null;
+                    $this->mtoOptions['birthday'] = (int)$mtoUser->isBirthdayEnabled();
                     update_option('mto', $this->mtoOptions);
                     //register store if not exist and get status message
                 }

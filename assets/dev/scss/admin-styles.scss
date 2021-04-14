@@ -10,6 +10,16 @@
   input {
     width: 100%;
   }
+  input[type=checkbox]{
+    width: 25px;
+    height: 25px;
+
+    &:checked:before {
+      width: 25px;
+      height: 25px;
+      margin: -1px -1px;
+    }
+  }
 
   input[type=submit], button {
     color: #fff;

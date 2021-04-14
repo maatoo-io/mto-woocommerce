@@ -35,9 +35,25 @@ class OrderHooks
 
     public function __construct()
     {
+        $mtoUser = new MtoUser();
         add_action('save_post_shop_order', [$this, 'saveOrder']);
         add_action('before_delete_post', [$this, 'deleteOrder']);
         add_action('mto_background_order_sync', [$this, 'singleOrderSync'], 10, 2);
+        if($mtoUser && $mtoUser->isBirthdayEnabled()){
+            add_filter( 'woocommerce_billing_fields', [$this,'addBirthdayField'], 20, 1 );
+        }
+    }
+
+    public function addBirthdayField($fields){
+        $fields['billing_birth_date'] = array(
+          'type' => 'date',
+          'label' => __('Birth date'),
+          'class' => array('form-row-wide'),
+          'priority' => 25,
+          'required' => false,
+          'clear' => true,
+        );
+        return $fields;
     }
 
     public static function isOrderSynced(array $orderIds): bool
@@ -158,6 +174,7 @@ class OrderHooks
                     'email' => $postData['billing_email'] ?? '',
                     'phone' => $postData['billing_phone'] ?? '',
                     'tags' => [MTO_STORE_TAG_ID],
+                    'fields' => ['all' => ['birthday_date'=>$postData['billing_birth_date'] ?? '']]
                 ]
             );
         }

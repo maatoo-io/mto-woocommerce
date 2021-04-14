@@ -116,11 +116,14 @@ $logs = LogData::downloadLogLinks();
                             <?php
                             if ($lastFullSync) : ?>
                                 <?php
-                                printf(__('The latest full sync was done %s', 'mto'), wp_date('m/d/Y H:i:s', strtotime($lastFullSync))); ?>
+                                printf(
+                                  __('The latest full sync was done %s', 'mto'),
+                                  wp_date('m/d/Y H:i:s', strtotime($lastFullSync))
+                                ); ?>
                             <?php
                             else:
                                 _e(
-                                    'The very first synchronization have been scheduled and will be done automatically by WordPress Event manager'
+                                  'The very first synchronization have been scheduled and will be done automatically by WordPress Event manager'
                                 );
                             endif; ?>
                         </div>
@@ -147,6 +150,11 @@ $logs = LogData::downloadLogLinks();
                 _e('Password', 'mto'); ?>
                 <input type="password" name="password" id="password" value="<?php
                 echo $mtoUser->getPassword() ?? ''; ?>" required/>
+            </label>
+            <label for="birthday">
+                <input type="checkbox" name="add_birthday_field" id="birthday" <?php
+                echo $mtoUser->isBirthdayEnabled() ? 'checked' : ''; ?>/> <?php
+                _e('Add Birthday filed to checkout page', 'mto'); ?>
             </label>
             <input type="submit" name="save" value="<?php
             _e('Save Credentials', 'mto'); ?>">

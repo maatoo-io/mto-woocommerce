@@ -11,6 +11,10 @@ class MtoOrder extends AbstractMtoEntity
 {
     private ?int $id = null;
     private string $externalOrderId = '';
+    private string $dateProceed = '';
+    private string $dateUpdated = '';
+    private ?string $dateCancelled = '';
+    private string $paymentMethod = '';
     private float $value;
     private string $url;
     private string $status;
@@ -36,6 +40,9 @@ class MtoOrder extends AbstractMtoEntity
         $this->firstName = (string)$order->get_billing_first_name() ?: ($_POST['billing_first_name'] ?? '');
         $this->lastName = (string)$order->get_billing_last_name() ?: ($_POST['billing_last_name'] ?? '');
         $this->lead = get_post_meta($orderId, '_mto_contact_id', true);
+        $this->dateProceed = (string)$order->get_date_created();
+        $this->dateUpdated = (string)$order->get_date_modified();
+        $this->paymentMethod = (string)$order->get_payment_method() ?: '';
     }
 
     /**
@@ -69,7 +76,7 @@ class MtoOrder extends AbstractMtoEntity
     protected function getConversionArray()
     {
         $conversion = get_post_meta($this->getExternalOrderId(), '_mto_conversion', true);
-        if(empty($conversion)){
+        if (empty($conversion)) {
             $conversion = $_COOKIE['mto_conversion'] ?? '';
         }
         if (!empty($conversion)) {
@@ -110,7 +117,7 @@ class MtoOrder extends AbstractMtoEntity
      */
     public function getStatus(): string
     {
-        if(!empty($_POST['order_status'])){
+        if (!empty($_POST['order_status'])) {
             $this->setStatus($_POST['order_status']);
         }
 
@@ -146,9 +153,9 @@ class MtoOrder extends AbstractMtoEntity
      */
     public function getValue()
     {
-        if(!$this->value){
+        if (!$this->value) {
             global $woocommerce;
-            if(!empty($woocommerce->cart->get_totals()['total'])){
+            if (!empty($woocommerce->cart->get_totals()['total'])) {
                 return $woocommerce->cart->get_totals()['total'];
             }
         }
@@ -199,6 +206,41 @@ class MtoOrder extends AbstractMtoEntity
     }
 
     /**
+     * @return string|null
+     */
+    public function getDateUpdated(): ?string
+    {
+        return date('Y-m-d H:i:s', strtotime($this->dateUpdated));
+    }
+
+    /**
+     * @return string
+     */
+    public function getDateProceed()
+    {
+        return date('Y-m-d H:i:s', strtotime($this->dateProceed));
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDateCancelled()
+    {
+        if(!empty($this->dateCancelled)){
+            return date('Y-m-d H:i:s', strtotime($this->dateCancelled));
+        }
+        return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPayementMethod()
+    {
+        return $this->paymentMethod;
+    }
+
+    /**
      * To Array.
      *
      * @return array
@@ -208,6 +250,10 @@ class MtoOrder extends AbstractMtoEntity
         $arr = [
             'store' => MTO_STORE_ID,
             'externalOrderId' => $this->getExternalOrderId(),
+            'externalDateProcessed' => $this->getDateProceed(),
+            'externalDateUpdated' => $this->getDateUpdated(),
+            'externalDateCancelled' => $this->getDateCancelled(),
+            'paymentMethod' => $this->getPayementMethod(),
             'value' => $this->getValue(),
             'url' => $this->getUrl(),
             'status' => $this->getStatus(),
@@ -225,8 +271,10 @@ class MtoOrder extends AbstractMtoEntity
 
     public function toArrayPatch()
     {
+        $status = $this->getStatus();
         return [
-            'status' => $this->getStatus(),
+            'status' => $status,
+            'externalDateCancelled' => $status == 'cancelled' ? $this->getDateCancelled() : null,
             'conversion' => $this->getConversion(),
         ];
     }

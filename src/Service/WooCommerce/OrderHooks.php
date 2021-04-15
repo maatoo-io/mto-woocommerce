@@ -174,7 +174,7 @@ class OrderHooks
                     'email' => $postData['billing_email'] ?? '',
                     'phone' => $postData['billing_phone'] ?? '',
                     'tags' => [MTO_STORE_TAG_ID],
-                    'fields' => ['all' => ['birthday_date'=>$postData['billing_birth_date'] ?? '']]
+                    'birthday_date' => $postData['billing_birth_date'] ?? ''
                 ]
             );
         }

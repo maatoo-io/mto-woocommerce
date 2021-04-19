@@ -47,7 +47,7 @@ class OrderHooks
     public function addBirthdayField($fields){
         $fields['billing_birth_date'] = array(
           'type' => 'date',
-          'label' => __('Birth date'),
+          'label' => __('Birthday', 'mto-woocommerce'),
           'class' => array('form-row-wide'),
           'priority' => 25,
           'required' => false,

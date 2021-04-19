@@ -10,10 +10,10 @@ class GetContactId extends AbstractAjaxCallback
         $contactId = $_POST['id'] ?? null;
         if(!$contactId){
             $this->response->setIsError(true);
-            $this->response->setResponseBody(__('Contact Id is missing', 'mto'));
+            $this->response->setResponseBody(__('Contact Id is missing', 'mto-woocommerce'));
             return;
         }
         $_SESSION['mtc_id'] = $contactId;
-        $this->response->setResponseBody(__('Success: contact ID received', 'mto'));
+        $this->response->setResponseBody(__('Success: contact ID received', 'mto-woocommerce'));
     }
 }

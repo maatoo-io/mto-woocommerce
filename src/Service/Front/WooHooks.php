@@ -15,7 +15,7 @@ class WooHooks
                     <input type="checkbox" id="mto-email-subscription" name="mto_email_subscription" checked class="woocommerce-form__input-checkbox input-checkbox" value="1" />
                     <input type="hidden" value="' . ($_COOKIE['mtc_id'] ?? false) . '"/>' . __(
                 'I want to receive emails with special offers',
-                'mto'
+                'mto-woocommerce'
             ) . '</label></div>' . $html;
     }
 }

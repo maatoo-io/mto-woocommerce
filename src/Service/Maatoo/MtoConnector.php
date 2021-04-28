@@ -42,6 +42,7 @@ class MtoConnector
                     $this->user->getUsername(),
                     $this->user->getPassword(),
                 ],
+                'verify' => false
             ]
         );
     }

@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: maatoo
+ * Plugin Name: maatoo for WooCommerce
  * Plugin URI:  https://github.com/maatoo-io/mto-woocommerce/
  * Description: Connect your online shop to drive more revenue with intelligent automations, e.g. abanoned cart reminders and more.
  * Version:     1.2.0
  * Author: maatoo.io
  * Author URI: https://maatoo.io
  * License: GPL-3.0+
- * Text Domain: mto
+ * Text Domain: mto-woocommerce
  * Domain Path: /languages
  * Requires PHP: 7.3
  * Requires at least: 4.9
@@ -33,7 +33,7 @@ include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 if (!is_plugin_active('woocommerce/woocommerce.php')) {
     deactivate_plugins( plugin_basename( __FILE__ ) );
-    wp_die(__('WooCommerce plugin is disabled. WooCommerce plugin needs to be activated to keep using Maatoo.', 'mto'));
+    wp_die(__('WooCommerce plugin is disabled. WooCommerce plugin needs to be activated to keep using Maatoo.', 'mto-woocommerce'));
 }
 
 $composer_path = __DIR__ . '/vendor/autoload.php';
@@ -42,7 +42,7 @@ if (file_exists($composer_path)) {
     require_once($composer_path);
 } else {
     deactivate_plugins( plugin_basename( __FILE__ ) );
-    wp_die(__('PHP composer files id missing. Can\'t include ' . $composer_path, 'mto'));}
+    wp_die(__('PHP composer files id missing. Can\'t include ' . $composer_path, 'mto-woocommerce'));}
 
 
 if (!defined('MTO_PLUGIN_DIR')) {

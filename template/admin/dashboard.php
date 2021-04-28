@@ -110,14 +110,15 @@ $logs = LogData::downloadLogLinks();
                 <?php
                 if (MTO_STORE_ID) : ?>
                     <span class="success dashicons-before"><?php
-                        _e('Your credentials are valid', 'mto'); ?></span>
+                        _e('Your credentials are valid', 'mto-woocommerce'); ?></span>
                     <div class="sync-info">
                         <div class="sync-info_value dashicons-before">
                             <?php
                             if ($lastFullSync) : ?>
                                 <?php
                                 printf(
-                                  __('The latest full sync was done %s', 'mto'),
+                                  /* translators: %s is replaced with "timestamp of last full sync" */
+                                  __('The latest full sync was done %s', 'mto-woocommerce'),
                                   wp_date('m/d/Y H:i:s', strtotime($lastFullSync))
                                 ); ?>
                             <?php
@@ -136,34 +137,35 @@ $logs = LogData::downloadLogLinks();
                 <span class="error hidden dashicons-before"></span>
             </div>
             <label for="url"><?php
-                _e('Maatoo URL', 'mto'); ?>
+                _e('maatoo URL', 'mto-woocommerce'); ?>
                 <input type="url" id="url" name="url" value="<?php
                 echo $mtoUser->getUrl() ?? ''; ?>" required/>
             </label>
             <label for="login"><?php
-                _e('Username or email', 'mto'); ?>
+                _e('Username or email', 'mto-woocommerce'); ?>
                 <input type="text" id="login" name="login" value="<?php
                 echo $mtoUser->getUsername() ?? ''; ?>" required/>
             </label>
 
             <label for="password"><?php
-                _e('Password', 'mto'); ?>
+                _e('Password', 'mto-woocommerce'); ?>
                 <input type="password" name="password" id="password" value="<?php
                 echo $mtoUser->getPassword() ?? ''; ?>" required/>
             </label>
             <label for="birthday">
                 <input type="checkbox" name="add_birthday_field" id="birthday" <?php
                 echo $mtoUser->isBirthdayEnabled() ? 'checked' : ''; ?>/> <?php
-                _e('Add Birthday filed to checkout page', 'mto'); ?>
+                _e('Add Birthday Field to checkout page', 'mto-woocommerce'); ?>
             </label>
             <input type="submit" name="save" value="<?php
-            _e('Save Credentials', 'mto'); ?>">
+            _e('Update Configuration', 'mto-woocommerce'); ?>">
         </form>
         <?php
         if (MTO_STORE_ID): ?>
             <div class="sync-info-next dashicons-before">
                 <?php
-                printf(__('The next synchronization is scheduled for <br/>%s', 'mto'), $nextEvent); ?>
+                /* translators: %s is replaced with "timestamp of next full sync" */
+                printf(__('The next synchronization is scheduled for <br/>%s', 'mto-woocommerce'), $nextEvent); ?>
             </div>
         <?php
         endif;

@@ -1,5 +1,5 @@
 === maatoo for WooCommerce ===
-Contributors: maatoo.io
+Contributors: maatoo
 Donate link: https://maatoo.io
 Tags: ecommerce,email,marketing,automation,maatoo
 Requires at least: 5.0

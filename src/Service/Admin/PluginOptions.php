@@ -27,7 +27,7 @@ class PluginOptions
     {
         try {
             if (empty($_POST['username']) || empty($_POST['pass']) || empty($_POST['url'])) {
-                $this->response->setResponseBody(__('All fields should be filled in', 'mto'))
+                $this->response->setResponseBody(__('All fields should be filled in', 'mto-woocommerce'))
                                ->setIsError(true)
                                ->send();
             }
@@ -42,7 +42,7 @@ class PluginOptions
             $provider = MtoConnector::getInstance($mtoUser);
 
             if ($provider && $provider->healthCheck()) {
-                $msg[] = __('Credentials are valid and saved', 'mto');
+                $msg[] = __('Credentials are valid and saved', 'mto-woocommerce');
                 if ($this->mtoOptions['username'] !== $mtoUser->getUsername(
                     ) || $this->mtoOptions['password'] !== $mtoUser->getPassword(
                     ) || $this->mtoOptions['url'] !== $mtoUser->getUrl()
@@ -58,7 +58,7 @@ class PluginOptions
                 $msg[] = $this->registerStore($provider);
                 $this->response->setResponseBody(implode('. ', $msg));
             } else {
-                $this->response->setResponseBody(__('Credentials are invalid', 'mto'))
+                $this->response->setResponseBody(__('Credentials are invalid', 'mto-woocommerce'))
                                ->setIsError(true);
             }
             $this->response->send();
@@ -71,17 +71,17 @@ class PluginOptions
 
     private function registerStore(MtoConnector $provider)
     {
-        $msg = __('The store exists on maatoo', 'mto');
+        $msg = __('The store exists on maatoo', 'mto-woocommerce');
 
         //create store if not exist
         $store = MtoStoreManger::getStoreData();
         if (is_null($store->getId())) {
-            $msg = __('Can\'t create Store on Maatoo', 'mto');
+            $msg = __('Can\'t create Store on Maatoo', 'mto-woocommerce');
             $store = $provider->registerStore($store);
             if (!$store) {
                 $this->response->setIsError(true);
             } else {
-                $msg = __('Connection with Maatoo is set up. Full sync will be run in 30 seconds', 'mto');
+                $msg = __('Connection with Maatoo is set up. Full sync will be run in 30 seconds', 'mto-woocommerce');
                 $this->mtoOptions['store'] = $store->toArray();
                 $this->mtoOptions['store']['id'] = $store->getId();
                 update_option('mto', $this->mtoOptions);

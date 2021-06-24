@@ -85,6 +85,7 @@ class MtoWoocommerce
         $this->registerAjaxHooks();
         $this->conversionTracker();
         $this->registerWcHooks();
+        $this->translations();
         add_action('mto_sync_clear_log', ['\Maatoo\WooCommerce\Service\LogErrors\LogData', 'clearLogFiles']);
         add_action('mto_sync_products', ['\Maatoo\WooCommerce\Service\Maatoo\MtoSync', 'runProductSync']);
         add_action('mto_sync_orders', ['\Maatoo\WooCommerce\Service\Maatoo\MtoSync', 'runOrderSync']);
@@ -148,6 +149,9 @@ class MtoWoocommerce
         wp_clear_scheduled_hook('mto_sync_orders');
     }
 
+    public function translations() {
+        load_plugin_textdomain( 'mto', false, plugin_dir_path( __FILE__ ) .'languages' );
+    }
 
     public static function uninstall()
     {

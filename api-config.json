@@ -102,5 +102,23 @@
       "route": "api\/contacts\/{id}\/edit",
       "method": "PUT"
     }
+  },
+  "category": {
+    "create": {
+      "route": "api\/product-categories\/new",
+      "method": "POST"
+    },
+    "list": {
+      "route": "api\/product-categories",
+      "method": "GET"
+    },
+    "edit": {
+      "route": "api\/product-categories\/{id}\/edit",
+      "method": "PATCH"
+    },
+    "delete": {
+      "route": "api\/product-categories\/{id}\/delete",
+      "method": "DEL"
+    }
   }
 }

@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoProduct;
+use Maatoo\WooCommerce\Entity\MtoProductCategory;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\LogErrors\LogData;
@@ -36,14 +37,14 @@ class MtoConnector
     {
         $this->user = $user;
         $this->client = new Client(
-            [
-                'base_uri' => $this->user->getUrl(),
-                'auth' => [
-                    $this->user->getUsername(),
-                    $this->user->getPassword(),
-                ],
-                'verify' => false
-            ]
+          [
+            'base_uri' => $this->user->getUrl(),
+            'auth' => [
+              $this->user->getUsername(),
+              $this->user->getPassword(),
+            ],
+            'verify' => false,
+          ]
         );
     }
 
@@ -112,9 +113,9 @@ class MtoConnector
         $responseData = null;
         try {
             $response = $this->client->request(
-                $endpointConfig->method,
-                $endpointConfig->route,
-                ['form_params' => $args]
+              $endpointConfig->method,
+              $endpointConfig->route,
+              ['form_params' => $args]
             );
             $responseData = (array)json_decode($response->getBody()->getContents(), 'true');
         } catch (\Exception $exception) {
@@ -194,39 +195,43 @@ class MtoConnector
     {
         try {
             $client = $this->client;
-            $requests = function ($products, $endpoint) use ($client) {
+            $requests = function ($products, $endpoint) use ($client)
+            {
                 foreach ($products as $productId) {
                     $product = new MtoProduct($productId);
                     if (!$product) {
                         continue;
                     }
-                    yield function () use ($client, $endpoint, $product) {
+                    yield function () use ($client, $endpoint, $product)
+                    {
                         $route = str_replace('{id}', $product->getId(), $endpoint->route);
                         return $client->requestAsync($endpoint->method, $route, ['form_params' => $product->toArray()]);
                     };
                 }
             };
             $pool = new Pool(
-                $client, $requests($products, $endpoint), [
-                           'concurrency' => 5,
-                           'fulfilled' => function (Response $response, $index) {
-                               $responseDecoded = json_decode($response->getBody()->getContents(), true);
-                               if (!empty($responseDecoded['product'])) {
-                                   $id = $responseDecoded['product']['externalProductId'] ?? null;
-                                   if ($id && !empty($responseDecoded['product']['id'])) {
-                                       update_post_meta((int)$id, '_mto_id', $responseDecoded['product']['id']);
-                                       update_post_meta(
-                                           (int)$id,
-                                           '_mto_last_sync',
-                                           $responseDecoded['product']['dateUpdated'] ?? $responseDecoded['product']['dateCreated']
-                                       );
-                                   }
+              $client, $requests($products, $endpoint), [
+                       'concurrency' => 5,
+                       'fulfilled' => function (Response $response, $index)
+                       {
+                           $responseDecoded = json_decode($response->getBody()->getContents(), true);
+                           if (!empty($responseDecoded['product'])) {
+                               $id = $responseDecoded['product']['externalProductId'] ?? null;
+                               if ($id && !empty($responseDecoded['product']['id'])) {
+                                   update_post_meta((int)$id, '_mto_id', $responseDecoded['product']['id']);
+                                   update_post_meta(
+                                     (int)$id,
+                                     '_mto_last_sync',
+                                     $responseDecoded['product']['dateUpdated'] ?? $responseDecoded['product']['dateCreated']
+                                   );
                                }
-                           },
-                           'rejected' => function (RequestException $reason, $index) {
-                               LogData::writeApiErrors($reason->getMessage());
-                           },
-                       ]
+                           }
+                       },
+                       'rejected' => function (RequestException $reason, $index)
+                       {
+                           LogData::writeApiErrors($reason->getMessage());
+                       },
+                     ]
             );
             $promise = $pool->promise();
             $promise->wait();
@@ -249,13 +254,15 @@ class MtoConnector
     {
         try {
             $client = $this->client;
-            $requests = function ($orders, $endpoint) use ($client) {
+            $requests = function ($orders, $endpoint) use ($client)
+            {
                 foreach ($orders as $orderId) {
                     $order = new MtoOrder($orderId);
                     if (!$order || !$order->getValue()) {
                         continue;
                     }
-                    yield function () use ($client, $endpoint, $order) {
+                    yield function () use ($client, $endpoint, $order)
+                    {
                         $route = str_replace('{id}', $order->getId(), $endpoint->route);
                         if ($endpoint->method === 'PATCH') {
                             $formParam = ['form_params' => $order->toArrayPatch()];
@@ -267,26 +274,28 @@ class MtoConnector
                 }
             };
             $pool = new Pool(
-                $client, $requests($orders, $endpoint), [
-                           'concurrency' => 5,
-                           'fulfilled' => function (Response $response, $index) {
-                               $responseDecoded = json_decode($response->getBody()->getContents(), true);
-                               if (!empty($responseDecoded['order'])) {
-                                   $id = $responseDecoded['order']['externalOrderId'] ?? null;
-                                   if ($id && !empty($responseDecoded['order']['id'])) {
-                                       update_post_meta((int)$id, '_mto_id', $responseDecoded['order']['id']);
-                                       update_post_meta(
-                                           (int)$id,
-                                           '_mto_last_sync',
-                                           $responseDecoded['order']['dateUpdated'] ?? $responseDecoded['order']['dateCreated']
-                                       );
-                                   }
+              $client, $requests($orders, $endpoint), [
+                       'concurrency' => 5,
+                       'fulfilled' => function (Response $response, $index)
+                       {
+                           $responseDecoded = json_decode($response->getBody()->getContents(), true);
+                           if (!empty($responseDecoded['order'])) {
+                               $id = $responseDecoded['order']['externalOrderId'] ?? null;
+                               if ($id && !empty($responseDecoded['order']['id'])) {
+                                   update_post_meta((int)$id, '_mto_id', $responseDecoded['order']['id']);
+                                   update_post_meta(
+                                     (int)$id,
+                                     '_mto_last_sync',
+                                     $responseDecoded['order']['dateUpdated'] ?? $responseDecoded['order']['dateCreated']
+                                   );
                                }
-                           },
-                           'rejected' => function (RequestException $reason, $index) {
-                               LogData::writeApiErrors($reason->getMessage());
-                           },
-                       ]
+                           }
+                       },
+                       'rejected' => function (RequestException $reason, $index)
+                       {
+                           LogData::writeApiErrors($reason->getMessage());
+                       },
+                     ]
             );
             $promise = $pool->promise();
             $promise->wait();
@@ -297,6 +306,11 @@ class MtoConnector
         }
     }
 
+    /**
+     * @param array $orderLines
+     * @param $endpoint
+     * @return string
+     */
     public function sendOrderLines(array $orderLines, $endpoint)
     {
         if (empty($orderLines)) {
@@ -304,18 +318,20 @@ class MtoConnector
         }
         try {
             $promise = $this->client->requestAsync(
-                $endpoint->method,
-                $endpoint->route,
-                ['form_params' => $orderLines]
+              $endpoint->method,
+              $endpoint->route,
+              ['form_params' => $orderLines]
             );
 
             $promise->then(
-                function (Response $res) {
-                    $status = $res->getStatusCode() . "\n";
-                },
-                function (RequestException $e) {
-                    LogData::writeApiErrors($e->getMessage());
-                }
+              function (Response $res)
+              {
+                  $status = $res->getStatusCode() . "\n";
+              },
+              function (RequestException $e)
+              {
+                  LogData::writeApiErrors($e->getMessage());
+              }
             );
 
             $promise->wait();
@@ -325,6 +341,10 @@ class MtoConnector
         }
     }
 
+    /**
+     * @param $contact
+     * @param $emailId
+     */
     public function saveConversion($contact, $emailId)
     {
         try {
@@ -334,18 +354,24 @@ class MtoConnector
             $promise = $this->client->requestAsync($endpoint->method, $route);
 
             $promise->then(
-                function (Response $res) {
-                    $status = $res->getStatusCode() . "\n";
-                },
-                function (RequestException $e) {
-                    LogData::writeTechErrors($e->getMessage());
-                }
+              function (Response $res)
+              {
+                  $status = $res->getStatusCode() . "\n";
+              },
+              function (RequestException $e)
+              {
+                  LogData::writeTechErrors($e->getMessage());
+              }
             );
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
         }
     }
 
+    /**
+     * @param $shortName
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function createTag($shortName)
     {
         try {
@@ -353,14 +379,14 @@ class MtoConnector
                 return;
             }
             $resp = $this->getResponseData(
-                self::getApiEndPoint('tag')->create,
-                [
-                    'tag' => sprintf('%s-pending', $shortName),
-                ]
+              self::getApiEndPoint('tag')->create,
+              [
+                'tag' => sprintf('%s-pending', $shortName),
+              ]
             );
             if (!$resp) {
                 LogData::writeApiErrors('Can\'t create tag: ' . $resp);
-            } else{
+            } else {
                 update_option('_mto_tag_id', $resp['tag']['tag'] ?? null);
             }
         } catch (\Exception $exception) {
@@ -368,6 +394,12 @@ class MtoConnector
         }
     }
 
+    /**
+     * @param $contact
+     * @param $data
+     * @return false
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function updateContact($contact, $data)
     {
         if (!$contact) {
@@ -385,14 +417,70 @@ class MtoConnector
         }
     }
 
-    public function getRemoteList($endpoint){
-        if(!isset($endpoint->list)){
+    /**
+     * @param $endpoint
+     * @return array|false|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getRemoteList($endpoint)
+    {
+        if (!isset($endpoint->list)) {
             return false;
         }
         try {
             return $this->getResponseData($endpoint->list);
-        } catch (\Exception $exception){
+        } catch (\Exception $exception) {
             LogData::writeApiErrors($exception->getMessage());
+        }
+    }
+
+    public function sendProductCategories(array $categories, $endpoint)
+    {
+        try {
+            $client = $this->client;
+            $requests = function ($categories, $endpoint) use ($client)
+            {
+                foreach ($categories as $categoryId) {
+                    $category = new MtoProductCategory($categoryId);
+                    if (!$category) {
+                        continue;
+                    }
+                    yield function () use ($client, $endpoint, $category)
+                    {
+                        $route = str_replace('{id}', $category->getId(), $endpoint->route);
+                        return $client->requestAsync($endpoint->method, $route, ['form_params' => $category->toArray()]);
+                    };
+                }
+            };
+            $pool = new Pool(
+              $client, $requests($categories, $endpoint), [
+                       'concurrency' => 5,
+                       'fulfilled' => function (Response $response, $index)
+                       {
+                           $responseDecoded = json_decode($response->getBody()->getContents(), true);
+                           if (!empty($responseDecoded['category'])) {
+                               $id = $responseDecoded['category']['externalCategoryId'] ?? null;
+                               if ($id && !empty($responseDecoded['category']['id'])) {
+                                   update_term_meta((int)$id, '_mto_id', $responseDecoded['category']['id']);
+                                   update_term_meta(
+                                     (int)$id,
+                                     '_mto_last_sync',
+                                     $responseDecoded['category']['dateUpdated'] ?? $responseDecoded['category']['dateCreated']
+                                   );
+                               }
+                           }
+                       },
+                       'rejected' => function (RequestException $reason, $index)
+                       {
+                           LogData::writeApiErrors($reason->getMessage());
+                       },
+                     ]
+            );
+            $promise = $pool->promise();
+            $promise->wait();
+            return $promise->getState();
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors($exception->getMessage());
         }
     }
 }

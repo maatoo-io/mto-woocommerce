@@ -165,18 +165,21 @@ class OrderHooks
         update_post_meta($orderId, 'test_sync', time());
         $isSubscribed = (bool)get_post_meta($orderId, '_mto_is_subscribed', true);
         $contact = get_post_meta($orderId, '_mto_contact_id', true);
-
+        $bd =  get_post_meta($orderId, '_mto_birthday', true);
+        $args =  [
+          'firstname' => $postData['billing_first_name'] ?? 'not set',
+          'lastname' => $postData['billing_last_name'] ?? 'not set',
+          'email' => $postData['billing_email'] ?? '',
+          'phone' => $postData['billing_phone'] ?? '',
+          'tags' => [MTO_STORE_TAG_ID]
+        ];
+        if(!empty($bd)){
+            $args['birthday_date'] = $bd;
+        }
         if ($isSubscribed && !empty($postData['billing_email'])) {
             self::getConnector()->updateContact(
                 $contact,
-                [
-                    'firstname' => $postData['billing_first_name'] ?? 'not set',
-                    'lastname' => $postData['billing_last_name'] ?? 'not set',
-                    'email' => $postData['billing_email'] ?? '',
-                    'phone' => $postData['billing_phone'] ?? '',
-                    'tags' => [MTO_STORE_TAG_ID],
-                    'birthday_date' => get_post_meta($orderId, '_mto_birthday', true) ?: ''
-                ]
+                $args
             );
         }
 

@@ -5,3 +5,6 @@ vendor
 # ignore node dependency directories
 /assets/node_modules/
 /assets/package-lock.json
+
+# ignore logs
+src/Service/LogErrors/api-errors.txt

@@ -12,6 +12,8 @@ class MtoProduct extends AbstractMtoEntity
     private string $description;
     private string $sku;
     private string $imageUrl;
+    private ?int $productCategory;
+    private ?int $categoryId; //maatoo category id
 
     public function __construct($product_id = null)
     {
@@ -104,21 +106,46 @@ class MtoProduct extends AbstractMtoEntity
     }
 
     /**
+     * If possible take sister category and not mother if both are chosen
+     * @return false | int
+     */
+    public function getCategory()
+    {
+        if (!$this->externalProductId) {
+            return false;
+        }
+        $terms = wp_get_post_terms($this->getExternalProductId(), MtoProductCategory::$taxonomy);
+        if (!$terms) {
+            return false;
+        }
+
+        foreach ($terms as $term) {
+            if ($term->parent !== 0) {
+                return $term->term_id;
+            }
+        }
+        return $terms[0]->term_id;
+    }
+
+    /**
      * To Array.
      *
      * @return array
      */
     public function toArray(): array
     {
+        $category = $this->getCategory();
+        $mtoCategory = new MtoProductCategory($category);
         return [
-            'store' => $this->getStore(),
-            'externalProductId' => $this->getExternalProductId(),
-            'price' => $this->getPrice(),
-            'url' => $this->getUrl(),
-            'title' => $this->getTitle(),
-            'description' => $this->getDescription(),
-            'sku' => $this->getSku() ?: null,
-            'imageUrl' => $this->getImageUrl() ?: wc_placeholder_img_src(),
+          'store' => $this->getStore(),
+          'externalProductId' => $this->getExternalProductId(),
+          'price' => $this->getPrice(),
+          'url' => $this->getUrl(),
+          'title' => $this->getTitle(),
+          'description' => $this->getDescription(),
+          'sku' => $this->getSku() ?: null,
+          'imageUrl' => $this->getImageUrl() ?: wc_placeholder_img_src(),
+          'productCategory' => $mtoCategory ? $mtoCategory->getId() : null,
         ];
     }
 }

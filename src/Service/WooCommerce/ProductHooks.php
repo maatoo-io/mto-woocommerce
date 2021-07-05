@@ -3,6 +3,7 @@
 namespace Maatoo\WooCommerce\Service\WooCommerce;
 
 use Maatoo\WooCommerce\Entity\MtoProduct;
+use Maatoo\WooCommerce\Entity\MtoProductCategory;
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
@@ -54,8 +55,8 @@ class ProductHooks
     {
         // Check to see if we are autosaving
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE || get_post_status($postId) !== 'publish' || is_null(
-                self::getConnector()
-            )) {
+            self::getConnector()
+          )) {
             return;
         }
         if (wp_is_post_revision($postId) || wp_is_post_autosave($postId)) {
@@ -110,9 +111,10 @@ class ProductHooks
         $mtoConnector = self::getConnector();
 
         $remoteProducts = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('product'));
-
+        $categories = [];
         foreach ($productIds as $productId) {
             $product = new MtoProduct($productId);
+            $categories[] = $product->getCategory();
             if (!$product) {
                 $toDelete[] = $productIds;
                 $f = true;
@@ -136,17 +138,27 @@ class ProductHooks
             return true;
         }
 
+        self::syncProductCategories($categories);
         $isCreatedStatus = $isUpdatedStatus = $isDelStatus = true;
         if (!empty($toCreate)) {
-            $isCreatedStatus = $mtoConnector->sendProducts($toCreate, MtoConnector::getApiEndPoint('product')->create);
+            $isCreatedStatus = $mtoConnector->sendProducts(
+              $toCreate,
+              MtoConnector::getApiEndPoint('product')->create ?? null
+            );
         }
 
         if (!empty($toUpdate)) {
-            $isUpdatedStatus = $mtoConnector->sendProducts($toUpdate, MtoConnector::getApiEndPoint('product')->edit);
+            $isUpdatedStatus = $mtoConnector->sendProducts(
+              $toUpdate,
+              MtoConnector::getApiEndPoint('product')->edit ?? null
+            );
         }
 
-        if (!empty($toUpdate)) {
-            $isDelStatus = $mtoConnector->sendProducts($toDelete, MtoConnector::getApiEndPoint('product')->delete);
+        if (!empty($toDelete)) {
+            $isDelStatus = $mtoConnector->sendProducts(
+              $toDelete,
+              MtoConnector::getApiEndPoint('product')->delete ?? null
+            );
         }
 
         if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus) {
@@ -162,10 +174,11 @@ class ProductHooks
             return;
         }
         try {
+            self::syncProductCategories($product->getCategory());
             if (!$product->getLastSyncDate()) {
-                $endpoint = MtoConnector::getApiEndPoint('product')->create;
+                $endpoint = MtoConnector::getApiEndPoint('product')->create ?? null;
             } else {
-                $endpoint = MtoConnector::getApiEndPoint('product')->edit;
+                $endpoint = MtoConnector::getApiEndPoint('product')->edit ?? null;
             }
 
             $state = self::getConnector()->sendProducts([$product->getExternalProductId()], $endpoint);
@@ -175,6 +188,53 @@ class ProductHooks
             }
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
+        }
+    }
+
+    public static function syncProductCategories($categoryIds)
+    {
+        if (!$categoryIds) {
+            return;
+        }
+        $toCreate = $toUpdate = [];
+        foreach ((array)$categoryIds as $categoryId) {
+            $category = new MtoProductCategory($categoryId);
+            if ($category->getLastSyncDate()) {
+                $toUpdate[] = $categoryId;
+            } else {
+                $toCreate[] = $categoryId;
+            }
+        }
+
+        if (!empty($toUpdate)) {
+            try {
+                $state = self::getConnector()->sendProductCategories(
+                  $toUpdate,
+                  MtoConnector::getApiEndPoint(
+                    'category'
+                  )->edit ?? null
+                );
+
+                if (!$state) {
+                    LogData::writeApiErrors($state);
+                }
+            } catch (\Exception $exception) {
+                LogData::writeTechErrors($exception->getMessage());
+            }
+        } elseif (!empty($toCreate)) {
+            try {
+                $state = self::getConnector()->sendProductCategories(
+                  $toCreate,
+                  MtoConnector::getApiEndPoint(
+                    'category'
+                  )->create ?? null
+                );
+                if (!$state) {
+                    LogData::writeApiErrors($state);
+                }
+            } catch (\Exception $exception) {
+                LogData::writeTechErrors($exception->getMessage());
+            }
         }
     }
 }

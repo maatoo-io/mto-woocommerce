@@ -150,7 +150,7 @@ class MtoWoocommerce
     }
 
     public function translations() {
-        load_plugin_textdomain( 'mto', false, plugin_dir_path( __FILE__ ) .'languages' );
+        load_plugin_textdomain( 'mto-woocommerce', false, dirname( plugin_basename(__FILE__)) . '/languages');
     }
 
     public static function uninstall()

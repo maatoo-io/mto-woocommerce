@@ -100,7 +100,7 @@
   "contact": {
     "update": {
       "route": "api\/contacts\/{id}\/edit",
-      "method": "PUT"
+      "method": "PATCH"
     }
   },
   "category": {

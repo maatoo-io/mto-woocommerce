@@ -118,6 +118,7 @@ class MtoConnector
               ['form_params' => $args]
             );
             $responseData = (array)json_decode($response->getBody()->getContents(), 'true');
+            LogData::writeDebug("API Request executed. method=".$endpointConfig->method. " route=".$endpointConfig->route . " params=".json_encode($args). " status=".$response->getStatusCode()  );
         } catch (\Exception $exception) {
             LogData::writeApiErrors($exception->getMessage());
         }

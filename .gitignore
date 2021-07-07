@@ -8,3 +8,6 @@ vendor
 
 # ignore logs
 src/Service/LogErrors/api-errors.txt
+
+# misc
+.DS_Store

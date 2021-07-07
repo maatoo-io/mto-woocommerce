@@ -21,6 +21,14 @@ class LogData
         }
     }
 
+    public static function writeDebug($data)
+    {
+        $file = plugin_dir_path(__FILE__) . 'debug.txt';
+        if(self::isLogFileWritable($file)){
+            self::logFile($data, $file);
+        }
+    }
+
     private static function logFile($textLog, $file)
     {
         $text = date('Y-m-d H:i:s') . PHP_EOL;

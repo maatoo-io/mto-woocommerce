@@ -3,7 +3,7 @@
  * Plugin Name: maatoo for WooCommerce
  * Plugin URI:  https://github.com/maatoo-io/mto-woocommerce/
  * Description: Connect your online shop to drive more revenue with intelligent automations, e.g. abanoned cart reminders and more.
- * Version:     1.2.0
+ * Version:     1.3.1
  * Author: maatoo.io
  * Author URI: https://maatoo.io
  * License: GPL-3.0+

@@ -134,7 +134,7 @@ class OrderHooks
             update_post_meta($orderId, '_mto_birthday', $_POST['billing_birth_date'] ?? '');
             // clear conversion data
             if (!empty($_COOKIE['mto_conversion'])) {
-                update_post_meta($orderId, '_mto_conversion', $contact);
+                update_post_meta($orderId, '_mto_conversion', $_COOKIE['mto_conversion']);
                 wc_setcookie('mto_conversion', null);
             }
             wp_schedule_single_event(time() - 1, 'mto_background_order_sync', [$orderId, $_POST]);

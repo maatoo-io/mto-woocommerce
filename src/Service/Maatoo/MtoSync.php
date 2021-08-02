@@ -43,7 +43,7 @@ class MtoSync
                 update_option('_mto_sync_status_product', 'failed');
             }
             $products = MtoStoreManger::getAllProducts(false);
-            $statusProduct = ProductHooks::isProductsSynced($products);
+            $statusProduct = ProductHooks::isProductsSynced($products, true);
             update_option('_mto_last_sync_products', $statusProduct);
         } catch (\Exception $ex) {
             LogData::writeApiErrors($ex->getMessage());

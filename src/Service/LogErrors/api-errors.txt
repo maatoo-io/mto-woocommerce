@@ -1,6 +1,0 @@
-2021-07-07 10:08:15
-Client error: `POST http://simcen.eu.ngrok.io/api/contacts/11/edit` resulted in a `404 Not Found` response:
-{"errors":[{"message":"Requested URL not found: \/api\/contacts\/11\/edit","code":404,"type":null}],"trace":[{"namespace (truncated...)
-
-2021-07-07 10:08:15
-Can't create tag: 

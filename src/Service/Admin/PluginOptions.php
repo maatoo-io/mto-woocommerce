@@ -36,7 +36,8 @@ class PluginOptions
                 trim($_POST['username']),
                 trim($_POST['pass']),
                 filter_var(rtrim($_POST['url'], '/'), FILTER_SANITIZE_URL),
-                $_POST['birthday'] == "true"
+                $_POST['birthday'] == "true",
+                $_POST['marketing'] == "true"
             );
 
             $provider = MtoConnector::getInstance($mtoUser);
@@ -46,12 +47,14 @@ class PluginOptions
                 if ($this->mtoOptions['username'] !== $mtoUser->getUsername(
                     ) || $this->mtoOptions['password'] !== $mtoUser->getPassword(
                     ) || $this->mtoOptions['url'] !== $mtoUser->getUrl()
-                     || (bool)$this->mtoOptions['birthday'] !== $mtoUser->isBirthdayEnabled()){
+                     || (bool)$this->mtoOptions['birthday'] !== $mtoUser->isBirthdayEnabled()
+                     || (bool)$this->mtoOptions['marketing'] !== $mtoUser->isMarketingEnabled()){
                     $this->mtoOptions['username'] = $mtoUser->getUsername();
                     $this->mtoOptions['password'] = $mtoUser->getPassword();
                     $this->mtoOptions['url'] = $mtoUser->getUrl();
                     $this->mtoOptions['store'] = null;
                     $this->mtoOptions['birthday'] = (int)$mtoUser->isBirthdayEnabled();
+                    $this->mtoOptions['marketing'] = (int)$mtoUser->isMarketingEnabled();
                     update_option('mto', $this->mtoOptions);
                     //register store if not exist and get status message
                 }

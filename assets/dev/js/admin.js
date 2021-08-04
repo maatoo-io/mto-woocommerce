@@ -31,7 +31,8 @@ jQuery(($) => {
         username: $form.find('#login').val(),
         pass: $form.find('#password').val(),
         url: $form.find('#url').val(),
-        birthday: $form.find('#birthday').is(':checked')
+        birthday: $form.find('#birthday').is(':checked'),
+        marketing: $form.find('#marketing').is(':checked')
       },
       dataType: 'json'
     })

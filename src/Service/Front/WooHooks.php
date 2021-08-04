@@ -2,11 +2,16 @@
 
 namespace Maatoo\WooCommerce\Service\Front;
 
+use Maatoo\WooCommerce\Entity\MtoUser;
+
 class WooHooks
 {
     public function __construct()
     {
-        add_action('woocommerce_order_button_html', [$this, 'addSubscriptionCheckbox']);
+        $mtoUser = new MtoUser();
+        if($mtoUser && $mtoUser->isMarketingEnabled()){
+            add_action('woocommerce_order_button_html', [$this, 'addSubscriptionCheckbox']);
+        }
     }
 
     public function addSubscriptionCheckbox($html)

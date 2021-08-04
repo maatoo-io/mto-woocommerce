@@ -152,6 +152,11 @@ $logs = LogData::downloadLogLinks();
                 <input type="password" name="password" id="password" value="<?php
                 echo $mtoUser->getPassword() ?? ''; ?>" required/>
             </label>
+            <label for="marketing">
+                <input type="checkbox" name="add_marketing_field" id="marketing" <?php
+                echo $mtoUser->isMarketingEnabled() ? 'checked' : ''; ?>/> <?php
+                _e('Add marketing opt-in to checkout page', 'mto-woocommerce'); ?>
+            </label>
             <label for="birthday">
                 <input type="checkbox" name="add_birthday_field" id="birthday" <?php
                 echo $mtoUser->isBirthdayEnabled() ? 'checked' : ''; ?>/> <?php

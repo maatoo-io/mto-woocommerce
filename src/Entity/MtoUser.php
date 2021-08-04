@@ -10,6 +10,7 @@ class MtoUser
     private ?string $password = null;
     private ?string $url = null;
     private bool $isBirthdayEnabled = false;
+    private bool $isMarketingEnabled = false;
 
     public function __construct()
     {
@@ -22,6 +23,7 @@ class MtoUser
         $this->password = $options['password'] ?? null;
         $this->url = rtrim($options['url']) ?? null;
         $this->isBirthdayEnabled = (bool)$options['birthday'] ?? false;
+        $this->isMarketingEnabled = (bool)$options['marketing'] ?? false;
     }
 
     /**
@@ -46,6 +48,14 @@ class MtoUser
     public function isBirthdayEnabled()
     {
         return $this->isBirthdayEnabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMarketingEnabled()
+    {
+        return $this->isMarketingEnabled;
     }
 
     /**
@@ -75,6 +85,12 @@ class MtoUser
         return $this;
     }
 
+    public function setIsMarketingEnabled($isMarketingEnabled)
+    {
+        $this->isMarketingEnabled = $isMarketingEnabled;
+        return $this;
+    }
+
     /**
      * Set Username.
      *
@@ -101,12 +117,13 @@ class MtoUser
         return $this;
     }
 
-    public static function toMtoUser($username, $password, $url, $isBirthdayEnabled = false)
+    public static function toMtoUser($username, $password, $url, $isBirthdayEnabled = false, $isMarketingEnabled = false)
     {
         $user = new MtoUser();
         return $user->setUsername($username)
           ->setPassword($password)
           ->setUrl($url)
-          ->setIsBirthdayEnabled($isBirthdayEnabled);
+          ->setIsBirthdayEnabled($isBirthdayEnabled)
+          ->setIsMarketingEnabled($isMarketingEnabled);
     }
 }

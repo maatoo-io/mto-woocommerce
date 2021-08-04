@@ -120,10 +120,14 @@ msgid "Password"
 msgstr ""
 
 #: template/admin/dashboard.php:158
+msgid "Add marketing opt-in to checkout page"
+msgstr ""
+
+#: template/admin/dashboard.php:163
 msgid "Add Birthday Field to checkout page"
 msgstr ""
 
-#: template/admin/dashboard.php:161
+#: template/admin/dashboard.php:166
 msgid "Update Configuration"
 msgstr ""
 

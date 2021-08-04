@@ -99,7 +99,7 @@ class ProductHooks
         }
     }
 
-    public static function isProductsSynced(array $productIds): bool
+    public static function isProductsSynced(array $productIds, $forceUpdate = false): bool
     {
         if (empty($productIds)) {
             return true;
@@ -134,7 +134,7 @@ class ProductHooks
             }
         }
 
-        if (!$f) {
+        if (!$f && !$forceUpdate) {
             return true;
         }
 

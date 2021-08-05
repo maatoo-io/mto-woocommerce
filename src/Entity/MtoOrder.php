@@ -81,8 +81,10 @@ class MtoOrder extends AbstractMtoEntity
         }
         if (!empty($conversion)) {
             $src = unserialize(base64_decode($conversion));
-            if ($src['source']) {
-                return $src['source'];
+            if ($src['channel']['email']) {
+                $type = 'email';
+                $value = $src['channel']['email'];
+                return array($type, $value);
             }
             //return array('email', $conversion);
         }

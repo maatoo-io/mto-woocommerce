@@ -199,7 +199,7 @@ class ProductHooks
         $toCreate = $toUpdate = [];
         foreach ((array)$categoryIds as $categoryId) {
             $category = new MtoProductCategory($categoryId);
-            if ($category->getLastSyncDate()) {
+            if ($category->getLastSyncDate() && $category->getId()) {
                 $toUpdate[] = $categoryId;
             } else {
                 $toCreate[] = $categoryId;
@@ -221,7 +221,8 @@ class ProductHooks
             } catch (\Exception $exception) {
                 LogData::writeTechErrors($exception->getMessage());
             }
-        } elseif (!empty($toCreate)) {
+        }
+        if (!empty($toCreate)) {
             try {
                 $state = self::getConnector()->sendProductCategories(
                   $toCreate,

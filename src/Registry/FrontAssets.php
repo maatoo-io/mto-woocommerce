@@ -28,7 +28,7 @@ class FrontAssets extends AbstractAssets
         wp_enqueue_script(
             $this->handleLibs,
             MTO_PLUGIN_ASSETS . 'js/libs.js',
-            [],
+            ['jquery'],
             false,
             true
         );

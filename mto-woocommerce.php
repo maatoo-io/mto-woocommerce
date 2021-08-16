@@ -1,9 +1,8 @@
 <?php
 /**
  * Plugin Name: maatoo for WooCommerce
- * Plugin URI:  https://github.com/maatoo-io/mto-woocommerce/
  * Description: Connect your online shop to drive more revenue with intelligent automations, e.g. abanoned cart reminders and more.
- * Version:     1.3.3
+ * Version:     1.3.4
  * Author: maatoo.io
  * Author URI: https://maatoo.io
  * License: GPL-3.0+
@@ -27,6 +26,7 @@ use Maatoo\WooCommerce\Service\Front\WooHooks;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
+use Maatoo\WooCommerce\Service\Admin\PluginUpdate;
 
 defined('ABSPATH') or exit;
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -42,8 +42,16 @@ if (file_exists($composer_path)) {
     require_once($composer_path);
 } else {
     deactivate_plugins( plugin_basename( __FILE__ ) );
-    wp_die(__('PHP composer files id missing. Can\'t include ' . $composer_path, 'mto-woocommerce'));}
+    wp_die(__('PHP composer files id missing. Can\'t include ' . $composer_path, 'mto-woocommerce'));
+}
 
+if (!defined('MTO_PLUGIN_VERSION')) {
+    define('MTO_PLUGIN_VERSION', '1.3.4');
+}
+
+if (!defined('MTO_PLUGIN_SLUG')) {
+    define('MTO_PLUGIN_SLUG', 'mto-woocommerce');
+}
 
 if (!defined('MTO_PLUGIN_DIR')) {
     define('MTO_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -86,6 +94,7 @@ class MtoWoocommerce
         $this->conversionTracker();
         $this->registerWcHooks();
         $this->translations();
+        $this->registerPluginUpdate();
         add_action('mto_sync_clear_log', ['\Maatoo\WooCommerce\Service\LogErrors\LogData', 'clearLogFiles']);
         add_action('mto_sync_products', ['\Maatoo\WooCommerce\Service\Maatoo\MtoSync', 'runProductSync']);
         add_action('mto_sync_orders', ['\Maatoo\WooCommerce\Service\Maatoo\MtoSync', 'runOrderSync']);
@@ -101,6 +110,14 @@ class MtoWoocommerce
     private function registerPluginSettings()
     {
         add_action('admin_menu', new Options());
+    }
+
+    private function registerPluginUpdate()
+    {
+        add_filter( 'plugins_api', ['\Maatoo\WooCommerce\Service\Admin\PluginUpdate', 'info'], 20, 3 );
+        add_filter( 'site_transient_update_plugins', ['\Maatoo\WooCommerce\Service\Admin\PluginUpdate', 'update'] );
+        add_action( 'upgrader_process_complete', ['\Maatoo\WooCommerce\Service\Admin\PluginUpdate', 'purge'], 10, 2 );
+        add_filter( 'plugin_row_meta', ['\Maatoo\WooCommerce\Service\Admin\PluginUpdate', 'details'], 25, 4 );
     }
 
     private function registerAjaxHooks()

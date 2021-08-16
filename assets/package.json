@@ -4,9 +4,9 @@
   "description": "",
   "main": "gulpfile.js",
   "author": {
-    "name": "Alina Valovenko",
-    "email": "alina.valovenko@gmail.com",
-    "url": "https://github.com/alinavalovenko"
+    "name": "maatoo.io",
+    "email": "support@maatoo.io",
+    "url": "https://maato.io"
   },
   "license": "MIT",
   "devDependencies": {

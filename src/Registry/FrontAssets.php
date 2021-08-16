@@ -26,7 +26,7 @@ class FrontAssets extends AbstractAssets
     protected function scripts()
     {
         clearstatcache();
-        if(!file_exists(MTO_PLUGIN_ASSETS . 'js/libs.js')){
+        if(file_exists(MTO_PLUGIN_ASSETS . 'js/libs.js')){
             wp_enqueue_script(
               $this->handleLibs,
               MTO_PLUGIN_ASSETS . 'js/libs.js',
@@ -34,6 +34,7 @@ class FrontAssets extends AbstractAssets
               false,
               true
             );
+        } else {
             $this->handleLibs = null;
         }
 

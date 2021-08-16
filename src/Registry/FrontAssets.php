@@ -25,18 +25,22 @@ class FrontAssets extends AbstractAssets
      */
     protected function scripts()
     {
-        wp_enqueue_script(
-            $this->handleLibs,
-            MTO_PLUGIN_ASSETS . 'js/libs.js',
-            ['jquery'],
-            false,
-            true
-        );
+        clearstatcache();
+        if(!file_exists(MTO_PLUGIN_ASSETS . 'js/libs.js')){
+            wp_enqueue_script(
+              $this->handleLibs,
+              MTO_PLUGIN_ASSETS . 'js/libs.js',
+              ['jquery'],
+              false,
+              true
+            );
+            $this->handleLibs = null;
+        }
 
         wp_enqueue_script(
             $this->handle,
             MTO_PLUGIN_ASSETS . 'js/scripts.js',
-            [$this->handleLibs],
+            [$this->handleLibs ?: 'jquery'],
             false,
             true
         );

@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "js-cookie": "^2.2.1"
+    "@babel/preset-env": "^7.4.5"
   }
 }

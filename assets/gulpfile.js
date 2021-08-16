@@ -57,9 +57,6 @@ gulp.task('scripts', function (done) {
 
 gulp.task('libs', function (done) {
   const libs = {
-    index: [
-      'node_modules/jquery/dist/jquery.min.js'
-    ]
   }
   Object.keys(libs).forEach(name => {
     gulp.src(libs[name])

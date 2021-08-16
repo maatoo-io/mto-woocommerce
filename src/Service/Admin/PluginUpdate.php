@@ -10,7 +10,7 @@ namespace Maatoo\WooCommerce\Service\Admin;
  */
 class PluginUpdate
 {
-    public static $cache_allowed = false;
+    public static $cache_allowed = true;
 
     public static function request(){
 

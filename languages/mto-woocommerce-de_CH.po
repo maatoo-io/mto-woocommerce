@@ -1,0 +1,153 @@
+# Copyright (C) 2021 maatoo.io
+# This file is distributed under the same license as the maatoo for WooCommerce plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: maatoo for WooCommerce 1.2.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/mto-woocommerce\n"
+"Last-Translator: \n"
+"Language-Team: German\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2021-04-19T08:11:17+02:00\n"
+"PO-Revision-Date: 2021-08-18 16:15+0200\n"
+"X-Generator: Poedit 3.0\n"
+"X-Domain: mto-woocommerce\n"
+"Language: de_CH\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Loco-Version: 2.5.3; wp-5.7.2\n"
+
+#. Plugin Name of the plugin
+msgid "maatoo for WooCommerce"
+msgstr "maatoo für WooCommerce"
+
+#. Plugin URI of the plugin
+msgid "https://github.com/maatoo-io/mto-woocommerce/"
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"Connect your online shop to drive more revenue with intelligent automations, "
+"e.g. abanoned cart reminders and more."
+msgstr ""
+"Verbinden Sie Ihren Online-Shop, um mit intelligenter Automatisierung mehr "
+"Umsatz zu erzielen, z. Erinnerungen für abgebrochene Warenkörbe und mehr."
+
+#. Author of the plugin
+msgid "maatoo.io"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://maatoo.io"
+msgstr ""
+
+#: mto-woocommerce.php:36
+msgid ""
+"WooCommerce plugin is disabled. WooCommerce plugin needs to be activated to "
+"keep using Maatoo."
+msgstr ""
+"Das WooCommerce-Plugin ist deaktiviert. Das WooCommerce-Plugin muss "
+"aktiviert werden, um Maatoo weiterhin verwenden zu können."
+
+#: mto-woocommerce.php:45
+msgid "PHP composer files id missing. Can't include "
+msgstr "PHP Composer-Dateien fehlen. Kann nicht einschließen "
+
+#: src/Service/Admin/PluginOptions.php:30
+msgid "All fields should be filled in"
+msgstr "Alle Felder sollten ausgefüllt werden"
+
+#: src/Service/Admin/PluginOptions.php:45
+msgid "Credentials are valid and saved"
+msgstr "Anmeldeinformationen sind gültig und gespeichert"
+
+#: src/Service/Admin/PluginOptions.php:61
+msgid "Credentials are invalid"
+msgstr "Anmeldedaten sind ungültig"
+
+#: src/Service/Admin/PluginOptions.php:74
+msgid "The store exists on maatoo"
+msgstr "Der Laden existiert auf maatoo"
+
+#: src/Service/Admin/PluginOptions.php:79
+msgid "Can't create Store on Maatoo"
+msgstr "Kann keinen Store auf Maatoo erstellen"
+
+#: src/Service/Admin/PluginOptions.php:84
+msgid "Connection with Maatoo is set up. Full sync will be run in 30 seconds"
+msgstr ""
+"Die Verbindung mit Maatoo wird hergestellt. Die vollständige "
+"Synchronisierung wird in 30 Sekunden ausgeführt"
+
+#: src/Service/Ajax/GetContactId.php:13
+msgid "Contact Id is missing"
+msgstr "Kontakt-ID fehlt"
+
+#: src/Service/Ajax/GetContactId.php:17
+msgid "Success: contact ID received"
+msgstr ""
+
+#: src/Service/Front/WooHooks.php:16
+msgid "I want to receive emails with special offers"
+msgstr "Ich möchte E-Mails mit Sonderangeboten erhalten"
+
+#: src/Service/LogErrors/LogData.php:71
+msgid "Failed  plugin tasks"
+msgstr "Fehlgeschlagene Plugin-Aufgaben"
+
+#: src/Service/LogErrors/LogData.php:76
+msgid "Failed API requests"
+msgstr "Fehlgeschlagene API-Anfragen"
+
+#: src/Service/WooCommerce/OrderHooks.php:50
+msgid "Birthday"
+msgstr "Geburtstag"
+
+#: template/admin/access-denied.php:1
+msgid "Access Forbidden"
+msgstr "Zugang verboten"
+
+#: template/admin/access-denied.php:2
+msgid ""
+"Sorry, access to this page is denied. Only administrator can edit this page"
+msgstr ""
+"Der Zugriff auf diese Seite wurde leider verweigert. Nur der Administrator "
+"kann diese Seite bearbeiten"
+
+#: template/admin/dashboard.php:113
+msgid "Your credentials are valid"
+msgstr "Ihre Zugangsdaten sind gültig"
+
+#. translators: %s is replaced with "timestamp of last full sync"
+#: template/admin/dashboard.php:121
+msgid "The latest full sync was done %s"
+msgstr "Die letzte vollständige Synchronisierung wurde %s durchgeführt"
+
+#: template/admin/dashboard.php:140
+msgid "maatoo URL"
+msgstr ""
+
+#: template/admin/dashboard.php:145
+msgid "Username or email"
+msgstr "Benutzername oder E-Mail-Adresse"
+
+#: template/admin/dashboard.php:151
+msgid "Password"
+msgstr "Passwort"
+
+#: template/admin/dashboard.php:158
+msgid "Add marketing opt-in to checkout page"
+msgstr "Marketing Opt-in Feld zur Checkout-Seite hinzufügen"
+
+#: template/admin/dashboard.php:151
+msgid "Add Birthday Field to checkout page"
+msgstr "Geburtstagsfeld zur Checkout-Seite hinzufügen"
+
+#: template/admin/dashboard.php:163
+msgid "Update Configuration"
+msgstr "Konfiguration aktualisieren"
+
+#. translators: %s is replaced with "timestamp of next full sync"
+#: template/admin/dashboard.php:168
+msgid "The next synchronization is scheduled for <br/>%s"
+msgstr "Die nächste Synchronisierung ist für geplant <br/>%s"

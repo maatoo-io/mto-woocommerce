@@ -5,6 +5,8 @@ on:
     branches:
       - master
       - pipeline
+    tags:
+      - '*'
 
 jobs:
   test:
@@ -77,4 +79,3 @@ jobs:
           artifacts: "mto-woocommerce-${{ github.sha }}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
           #prerelease: true
-          allowUpdates: true

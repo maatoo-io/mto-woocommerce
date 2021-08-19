@@ -5,8 +5,6 @@ on:
     branches:
       - master
       - pipeline
-    tags:
-      - '*'
 
 jobs:
   test:
@@ -62,20 +60,19 @@ jobs:
       - name: Build
         uses: thedoctor0/zip-release@master
         with:
-          type: 'zip'
           filename: "mto-woocommerce-${{ github.sha }}.zip"
-          exclusions: '*.git* /assets/dev/* /*node_modules/* .editorconfig'
+          exclusions: '*.git* /*node_modules/* .editorconfig'
 
-      #- name: Upload build artifact
-      #  uses: actions/upload-artifact@v2
-      #  with:
-      #    path: "mto-woocommerce-${{ github.sha }}.zip"
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          path: "mto-woocommerce-${{ github.sha }}.zip"
 
       - name: Create release
         uses: ncipollo/release-action@v1
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
-          #name: "mto-woocommerce-${{ github.sha }}"
+          name: "mto-woocommerce-${{ github.sha }}"
           artifacts: "mto-woocommerce-${{ github.sha }}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
-          #prerelease: true
+          prerelease: true

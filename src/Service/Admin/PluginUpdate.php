@@ -36,7 +36,7 @@ class PluginUpdate
                 return false;
             }
 
-            set_transient( MTO_PLUGIN_SLUG, $remote, DAY_IN_SECONDS );
+            set_transient( MTO_PLUGIN_SLUG, $remote, MTO_UPDATE_CACHE_EXPIRE );
 
         }
 

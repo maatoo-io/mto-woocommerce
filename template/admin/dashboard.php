@@ -137,18 +137,18 @@ $logs = LogData::downloadLogLinks();
                 <span class="error hidden dashicons-before"></span>
             </div>
             <label for="url"><?php
-                _e('maatoo URL', 'mto-woocommerce'); ?>
+                _e('API URL', 'mto-woocommerce'); ?>
                 <input type="url" id="url" name="url" value="<?php
                 echo $mtoUser->getUrl() ?? ''; ?>" required/>
             </label>
             <label for="login"><?php
-                _e('Username or email', 'mto-woocommerce'); ?>
+                _e('API Token', 'mto-woocommerce'); ?>
                 <input type="text" id="login" name="login" value="<?php
                 echo $mtoUser->getUsername() ?? ''; ?>" required/>
             </label>
 
             <label for="password"><?php
-                _e('Password', 'mto-woocommerce'); ?>
+                _e('API Key', 'mto-woocommerce'); ?>
                 <input type="password" name="password" id="password" value="<?php
                 echo $mtoUser->getPassword() ?? ''; ?>" required/>
             </label>

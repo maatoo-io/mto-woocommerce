@@ -124,16 +124,16 @@ msgid "The latest full sync was done %s"
 msgstr "Die letzte vollständige Synchronisierung wurde %s durchgeführt"
 
 #: template/admin/dashboard.php:140
-msgid "maatoo URL"
-msgstr ""
+msgid "API URL"
+msgstr "API URL"
 
 #: template/admin/dashboard.php:145
-msgid "Username or email"
-msgstr "Benutzername oder E-Mail-Adresse"
+msgid "API Token"
+msgstr "API Token"
 
 #: template/admin/dashboard.php:151
-msgid "Password"
-msgstr "Passwort"
+msgid "API Key"
+msgstr "API Schlüssel"
 
 #: template/admin/dashboard.php:158
 msgid "Add marketing opt-in to checkout page"

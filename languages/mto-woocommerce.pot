@@ -108,15 +108,15 @@ msgid "The latest full sync was done %s"
 msgstr ""
 
 #: template/admin/dashboard.php:140
-msgid "maatoo URL"
+msgid "API URL"
 msgstr ""
 
 #: template/admin/dashboard.php:145
-msgid "Username or email"
+msgid "API Token"
 msgstr ""
 
 #: template/admin/dashboard.php:151
-msgid "Password"
+msgid "API Key"
 msgstr ""
 
 #: template/admin/dashboard.php:158

@@ -466,6 +466,9 @@ class MtoConnector
 
         if ($orderId) {
             $mtoId = get_post_meta($orderId, '_mto_id', true);
+            if(!$mtoId){
+                return false;
+            }
             $route = str_replace('{id}', $mtoId, $endpoint->retrieveOrderLines->route);
             $endpoint->retrieveOrderLines->route = $route;
             $endpoint = $endpoint->retrieveOrderLines;

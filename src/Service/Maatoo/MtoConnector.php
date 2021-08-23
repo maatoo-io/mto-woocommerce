@@ -118,7 +118,11 @@ class MtoConnector
               ['form_params' => $args]
             );
             $responseData = (array)json_decode($response->getBody()->getContents(), 'true');
-            LogData::writeDebug("API Request executed. method=".$endpointConfig->method. " route=".$endpointConfig->route . " params=".json_encode($args). " status=".$response->getStatusCode()  );
+            LogData::writeDebug(
+              "API Request executed. method=" . $endpointConfig->method . " route=" . $endpointConfig->route . " params=" . json_encode(
+                $args
+              ) . " status=" . $response->getStatusCode()
+            );
         } catch (\Exception $exception) {
             LogData::writeApiErrors($exception->getMessage());
         }
@@ -317,24 +321,40 @@ class MtoConnector
         if (empty($orderLines)) {
             return 'Nothing to update';
         }
+        $orderLines = array_unique($orderLines);
+        $limit = MtoConnector::getApiEndPoint('orderLine')->limit ?? 199;
         try {
-            $promise = $this->client->requestAsync(
-              $endpoint->method,
-              $endpoint->route,
-              ['form_params' => $orderLines]
-            );
+            $client = $this->client;
+            $requests = function ($orderLines, $endpoint) use ($client, $limit)
+            {
+                $length = count($orderLines);
+                for ($i = 0; $i < $length; $i += $limit) {
+                    $orderLinesPart = array_slice($orderLines, $i, $limit);
+                    yield function () use ($client, $endpoint, $orderLinesPart)
+                    {
+                        return $client->requestAsync(
+                          $endpoint->method,
+                          $endpoint->route,
+                          ['form_params' => $orderLinesPart]
+                        );
+                    };
+                }
+            };
 
-            $promise->then(
-              function (Response $res)
-              {
-                  $status = $res->getStatusCode() . "\n";
-              },
-              function (RequestException $e)
-              {
-                  LogData::writeApiErrors($e->getMessage());
-              }
+            $pool = new Pool(
+              $client, $requests($orderLines, $endpoint), [
+                       'concurrency' => 5,
+                       'fulfilled' => function (Response $response, $index)
+                       {
+                           $status = $response->getStatusCode() . "\n";
+                       },
+                       'rejected' => function (RequestException $reason, $index)
+                       {
+                           LogData::writeApiErrors($reason->getMessage());
+                           },
+                     ]
             );
-
+            $promise = $pool->promise();
             $promise->wait();
             return $promise->getState();
         } catch (\Exception $exception) {
@@ -449,7 +469,8 @@ class MtoConnector
                     yield function () use ($client, $endpoint, $category)
                     {
                         $route = str_replace('{id}', $category->getId(), $endpoint->route);
-                        return $client->requestAsync($endpoint->method, $route, ['form_params' => $category->toArray()]);
+                        return $client->requestAsync($endpoint->method, $route, ['form_params' => $category->toArray()]
+                        );
                     };
                 }
             };

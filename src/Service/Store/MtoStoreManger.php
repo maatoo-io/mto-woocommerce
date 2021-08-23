@@ -4,6 +4,7 @@ namespace Maatoo\WooCommerce\Service\Store;
 
 use Maatoo\WooCommerce\Entity\MtoOrderLine;
 use Maatoo\WooCommerce\Entity\MtoStore;
+use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
 
 /**
  * Class MtoStoreManger
@@ -119,6 +120,7 @@ class MtoStoreManger
     {
         if (is_numeric($items)) {
             $orderLines = new MtoOrderLine($items);
+            self::isOrderLinesProductsSynced($orderLines);
             if ($orderLines) {
                 return $orderLines->toArray();
             }
@@ -127,6 +129,7 @@ class MtoStoreManger
             $data = [];
             foreach ($items as $orderId) {
                 $orderLines = new MtoOrderLine($orderId);
+                self::isOrderLinesProductsSynced($orderLines);
                 if (!$orderLines) {
                     continue;
                 }
@@ -137,5 +140,23 @@ class MtoStoreManger
             return $data;
         }
         return [];
+    }
+
+    /**
+     * Create products if they are missed in maatoo, but present at order
+     * @param MtoOrderLine $orderLine
+     */
+    public static function isOrderLinesProductsSynced(MtoOrderLine $orderLine){
+        $toCreate = [];
+        foreach ($orderLine->getItemsIds() as $item){
+            $mtoId = get_post_meta($item, '_mto_id', true);
+            if(!$mtoId){
+                $toCreate[] = $item;
+            }
+        }
+
+        if($toCreate){
+            ProductHooks::isProductsSynced($toCreate);
+        }
     }
 }

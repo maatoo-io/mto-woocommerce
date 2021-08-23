@@ -104,6 +104,7 @@ class ProductHooks
         if (empty($productIds)) {
             return true;
         }
+        $productIds = array_unique($productIds);
         $toUpdate = [];
         $toCreate = [];
         $toDelete = [];
@@ -196,6 +197,8 @@ class ProductHooks
         if (!$categoryIds) {
             return;
         }
+        $mtoConnector = self::getConnector();
+        $remoteCategories = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('category'));
         $categoryIds = array_unique($categoryIds);
         $toCreate = $toUpdate = [];
         foreach ((array)$categoryIds as $categoryId) {

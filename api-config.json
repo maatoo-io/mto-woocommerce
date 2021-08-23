@@ -26,6 +26,7 @@
     }
   },
   "product": {
+    "limit": 200,
     "create": {
       "route": "api\/products\/new",
       "method": "POST"
@@ -48,6 +49,7 @@
     }
   },
   "order": {
+    "limit": 200,
     "create": {
       "route": "api\/orders\/new",
       "method": "POST"
@@ -70,6 +72,7 @@
     }
   },
   "orderLine": {
+    "limit": 50,
     "create": {
       "route": "api\/orderLines\/new",
       "method": "POST"
@@ -104,6 +107,7 @@
     }
   },
   "category": {
+    "limit": 200,
     "create": {
       "route": "api\/product-categories\/new",
       "method": "POST"

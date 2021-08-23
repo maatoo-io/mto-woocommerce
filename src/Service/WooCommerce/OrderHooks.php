@@ -78,12 +78,15 @@ class OrderHooks
                 $f = true;
                 continue;
             }
+
             $isExistRemote = array_key_exists($order->getId(), $remoteOrders['orders']);
             if (!$isExistRemote) {
                 $toCreate[] = $orderId;
                 $f = true;
                 continue;
-            } elseif ($order->isSyncRequired()) {
+            }
+
+            if ($order->isSyncRequired()) {
                 $toUpdate[] = $orderId;
                 $f = true;
                 continue;

@@ -4,6 +4,8 @@ namespace Maatoo\WooCommerce\Service\Store;
 
 use Maatoo\WooCommerce\Entity\MtoOrderLine;
 use Maatoo\WooCommerce\Entity\MtoStore;
+use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
 
 /**
@@ -118,25 +120,44 @@ class MtoStoreManger
 
     public static function getOrdersLines($items = null)
     {
-        if (is_numeric($items)) {
-            $orderLines = new MtoOrderLine($items);
-            self::isOrderLinesProductsSynced($orderLines);
-            if ($orderLines) {
-                return $orderLines->toArray();
-            }
-            return [];
-        } elseif (is_array($items)) {
+        $mtoConnector = MtoConnector::getInstance(new MtoUser());
+        if (is_array($items)) {
             $data = [];
             foreach ($items as $orderId) {
+                $orderLinesRemote = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('order'), $orderId)['orderLines'] ?? [];
+                $formattedArray = []; // formatted array to contain remote order lines
+                foreach ($orderLinesRemote as $id => $item) {
+                    $formattedArray[$id]['id'] = $id;
+                    $formattedArray[$id]['store'] = $item['store']['id'];
+                    $formattedArray[$id]['product'] = $item['product']['id'];
+                    $formattedArray[$id]['order'] = $item['order']['id'];
+                    $formattedArray[$id]['quantity'] = $item['quantity'];
+                }
+
+
                 $orderLines = new MtoOrderLine($orderId);
                 self::isOrderLinesProductsSynced($orderLines);
                 if (!$orderLines) {
                     continue;
                 }
+
                 foreach ($orderLines->toArray() as $orderLine) {
-                    $data[] = $orderLine;
+                    $products = array_column($formattedArray, 'product', 'id');
+                    if(in_array((int)$orderLine['product'], $products)){
+                        $data['update'][array_search((int)$orderLine['product'], $products)] = $orderLine;
+                    } else {
+                        $data['create'][] = $orderLine;
+                    }
+                }
+
+                if(count($data['update']) !== count($formattedArray)){
+                    //get list of items needs to be removed
+                    $toUpdateKeys = array_keys($data['update']) ?? [];
+                    $remoteKeys = array_keys($formattedArray) ?? [];
+                    $data['delete'] = array_diff($remoteKeys, $toUpdateKeys);
                 }
             }
+
             return $data;
         }
         return [];

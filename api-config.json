@@ -22,7 +22,7 @@
     },
     "delete": {
       "route": "api\/stores\/{id}\/delete",
-      "method": "DEL"
+      "method": "DELETE"
     }
   },
   "product": {
@@ -45,7 +45,7 @@
     },
     "delete": {
       "route": "api\/products\/{id}\/delete",
-      "method": "DEL"
+      "method": "DELETE"
     }
   },
   "order": {
@@ -58,6 +58,10 @@
       "route": "api\/orders\/{id}",
       "method": "GET"
     },
+    "retrieveOrderLines": {
+      "route": "api\/orders\/{id}\/orderLines",
+      "method": "GET"
+    },
     "list": {
       "route": "api\/orders?limit=0&minimal=1",
       "method": "GET"
@@ -68,7 +72,7 @@
     },
     "delete": {
       "route": "api\/orders\/{id}\/delete",
-      "method": "DEL"
+      "method": "DELETE"
     }
   },
   "orderLine": {
@@ -81,13 +85,17 @@
       "route": "api\/orderLines\/batch\/new",
       "method": "POST"
     },
+    "edit": {
+      "route": "api\/orderLines\/{id}\/edit",
+      "method": "PATCH"
+    },
     "list": {
       "route": "api\/orderLines",
       "method": "GET"
     },
     "delete": {
       "route": "api\/orderLines\/{id}\/delete",
-      "method": "DEL"
+      "method": "DELETE"
     }
   },
   "conversion": {
@@ -122,7 +130,7 @@
     },
     "delete": {
       "route": "api\/product-categories\/{id}\/delete",
-      "method": "DEL"
+      "method": "DELETE"
     }
   }
 }

@@ -196,6 +196,7 @@ class ProductHooks
         if (!$categoryIds) {
             return;
         }
+        $categoryIds = array_unique($categoryIds);
         $toCreate = $toUpdate = [];
         foreach ((array)$categoryIds as $categoryId) {
             $category = new MtoProductCategory($categoryId);

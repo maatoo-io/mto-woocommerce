@@ -198,7 +198,6 @@ class ProductHooks
             return;
         }
         $mtoConnector = self::getConnector();
-        $remoteCategories = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('category'));
         $categoryIds = array_unique($categoryIds);
         $toCreate = $toUpdate = [];
         foreach ((array)$categoryIds as $categoryId) {

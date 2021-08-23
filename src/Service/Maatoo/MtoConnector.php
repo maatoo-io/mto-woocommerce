@@ -321,7 +321,6 @@ class MtoConnector
         if (empty($orderLines)) {
             return 'Nothing to update';
         }
-        $orderLines = array_unique($orderLines);
         $limit = MtoConnector::getApiEndPoint('orderLine')->limit ?? 199;
         try {
             $client = $this->client;

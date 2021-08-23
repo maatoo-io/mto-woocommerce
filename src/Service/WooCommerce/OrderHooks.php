@@ -96,11 +96,6 @@ class OrderHooks
         $isCreatedStatus = $isUpdatedStatus = $isDelStatus = $statusOrderLines = true;
         if (!empty($toCreate)) {
             $isCreatedStatus = $mtoConnector->sendOrders($toCreate, MtoConnector::getApiEndPoint('order')->create);
-            $orderLines = MtoStoreManger::getOrdersLines($orderIds);
-            $statusOrderLines = $mtoConnector->sendOrderLines(
-                $orderLines,
-                MtoConnector::getApiEndPoint('orderLine')->batch
-            );
         }
 
         if (!empty($toUpdate)) {
@@ -112,7 +107,12 @@ class OrderHooks
         }
 
 
-        if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus && $statusOrderLines) {
+        if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus) {
+            $orderLines = MtoStoreManger::getOrdersLines($orderIds);
+            $statusOrderLines = $mtoConnector->sendOrderLines(
+              $orderLines,
+              MtoConnector::getApiEndPoint('orderLine')->batch
+            );
             return true;
         }
 

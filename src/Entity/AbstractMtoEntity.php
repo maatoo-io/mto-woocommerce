@@ -39,7 +39,7 @@ abstract class AbstractMtoEntity
 
     public function isSyncRequired(): bool
     {
-        if (!$this->getLastModifiedDate() || $this->getLastModifiedDate() > $this->getLastSyncDate()) {
+        if (!$this->getLastModifiedDate() || strtotime($this->getLastModifiedDate()) > strtotime($this->getLastSyncDate())) {
             return true;
         }
 

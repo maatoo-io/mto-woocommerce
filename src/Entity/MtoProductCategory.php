@@ -2,12 +2,11 @@
 
 namespace Maatoo\WooCommerce\Entity;
 
-class MtoProductCategory
+class MtoProductCategory extends AbstractMtoEntity
 {
     private string $name;
     private string $alias;
     private ?string $url;
-    private ?string $lastSyncDate;
     private int $externalId; // local id
     private ?int $id = null; // id stored in maatoo service
     public static string $taxonomy = 'product_cat';
@@ -25,14 +24,7 @@ class MtoProductCategory
         $this->url = get_term_link($term, self::$taxonomy);
         $this->externalId = $term->term_id;
         $this->lastSyncDate = get_term_meta($term->term_id, '_mto_last_sync', true) ?: null;
-    }
-
-    /**
-     * @return mixed|string|null
-     */
-    public function getLastSyncDate()
-    {
-        return $this->lastSyncDate;
+        $this->lastModifiedDate = get_the_modified_date(DATE_W3C, $id);
     }
 
     public function getId(){

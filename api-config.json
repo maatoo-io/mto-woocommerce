@@ -121,7 +121,7 @@
       "method": "POST"
     },
     "list": {
-      "route": "api\/product-categories",
+      "route": "api\/product-categories?limit=0&minimal=1",
       "method": "GET"
     },
     "edit": {

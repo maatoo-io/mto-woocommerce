@@ -175,7 +175,7 @@ class ProductHooks
             return;
         }
         try {
-            self::syncProductCategories($product->getCategory());
+            self::syncProductCategories([$product->getCategory()]);
             if (!$product->getLastSyncDate()) {
                 $endpoint = MtoConnector::getApiEndPoint('product')->create ?? null;
             } else {
@@ -192,22 +192,24 @@ class ProductHooks
         }
     }
 
-    public static function syncProductCategories($categoryIds)
+    public static function syncProductCategories(array $categoryIds)
     {
-        if (!$categoryIds) {
+        if (empty($categoryIds)) {
             return;
         }
         $mtoConnector = self::getConnector();
         $remoteCategories = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('category'));
-        $remoteCategoriesIds = array_column($remoteCategories, 'externalCategoryId', 'id');
+        $remoteCategoriesIds = !empty($remoteCategories['categories']) ? array_column($remoteCategories['categories'], 'externalCategoryId', 'id') : [];
         $categoryIds = array_unique($categoryIds);
         $toCreate = $toUpdate = [];
-        foreach ((array)$categoryIds as $categoryId) {
+        foreach ($categoryIds as $categoryId) {
             $category = new MtoProductCategory($categoryId);
+            if(!$category->getId() || !in_array($categoryId, $remoteCategoriesIds)) {
+                $toCreate[] = $categoryId;
+            }
+
             if ($category->isSyncRequired() && in_array($categoryId, $remoteCategoriesIds)) {
                 $toUpdate[] = $categoryId;
-            } else {
-                $toCreate[] = $categoryId;
             }
         }
 

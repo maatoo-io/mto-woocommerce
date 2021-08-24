@@ -346,7 +346,6 @@ class MtoConnector
                         if ($isReplacementRequired) {
                             $route = str_replace('{id}', array_key_first($orderLinesPart), $endpoint->route);
                         }
-                        LogData::writeDebug("orderline1 Route: ". $route);
                         return $client->requestAsync(
                           $endpoint->method,
                           $route ?: $endpoint->route,

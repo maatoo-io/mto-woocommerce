@@ -321,7 +321,7 @@ class MtoConnector
         if (empty($orderLines)) {
             return 'Nothing to update';
         }
-        $isReplacementRequired = $endpoint->method === 'PATCH' || $endpoint->method === 'DEL';
+        $isReplacementRequired = $endpoint->method === 'PATCH' || $endpoint->method === 'DELETE';
         if ($isReplacementRequired) {
             $limit = 1;
         } else {
@@ -346,6 +346,7 @@ class MtoConnector
                         if ($isReplacementRequired) {
                             $route = str_replace('{id}', array_key_first($orderLinesPart), $endpoint->route);
                         }
+                        LogData::writeDebug("orderline1 Route: ". $route);
                         return $client->requestAsync(
                           $endpoint->method,
                           $route ?: $endpoint->route,
@@ -470,6 +471,7 @@ class MtoConnector
                 return false;
             }
             $route = str_replace('{id}', $mtoId, $endpoint->retrieveOrderLines->route);
+            LogData::writeDebug("orderline2 Route: ". $route);
             $endpoint->retrieveOrderLines->route = $route;
             $endpoint = $endpoint->retrieveOrderLines;
         } else {

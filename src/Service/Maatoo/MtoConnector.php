@@ -344,7 +344,9 @@ class MtoConnector
                     {
                         $route = false;
                         if ($isReplacementRequired) {
-                            $route = str_replace('{id}', array_key_first($orderLinesPart), $endpoint->route);
+                            $id = array_key_first($orderLinesPart);
+                            $route = str_replace('{id}', $id, $endpoint->route);
+                            $orderLinesPart = $orderLinesPart[$id];
                         }
                         return $client->requestAsync(
                           $endpoint->method,

@@ -470,6 +470,7 @@ class MtoConnector
                 return false;
             }
             $route = str_replace('{id}', $mtoId, $endpoint->retrieveOrderLines->route);
+            LogData::writeDebug("orderline2 Route: ". $route);
             $endpoint->retrieveOrderLines->route = $route;
             $endpoint = $endpoint->retrieveOrderLines;
         } else {

@@ -321,7 +321,7 @@ class MtoConnector
         if (empty($orderLines)) {
             return 'Nothing to update';
         }
-        $isReplacementRequired = $endpoint->method === 'PATCH' || $endpoint->method === 'DEL';
+        $isReplacementRequired = $endpoint->method === 'PATCH' || $endpoint->method === 'DELETE';
         if ($isReplacementRequired) {
             $limit = 1;
         } else {

@@ -281,6 +281,7 @@ class MtoOrder extends AbstractMtoEntity
             'externalDateUpdated' => $this->getDateUpdated(),
             'paymentMethod' => $this->getPayementMethod(),
             'conversion' => $this->getConversion(),
+            'value' => $this->getValue(),
         ];
     }
 }

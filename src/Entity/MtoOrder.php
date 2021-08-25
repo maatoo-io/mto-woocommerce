@@ -158,7 +158,7 @@ class MtoOrder extends AbstractMtoEntity
     {
         if (!$this->value) {
             global $woocommerce;
-            if (!empty($woocommerce->cart->get_totals()['total'])) {
+            if (property_exists($woocommerce, 'cart')  && !is_null($woocommerce->cart) && !empty($woocommerce->cart->get_totals()['total'])) {
                 return $woocommerce->cart->get_totals()['total'];
             }
         }
@@ -281,6 +281,7 @@ class MtoOrder extends AbstractMtoEntity
             'externalDateUpdated' => $this->getDateUpdated(),
             'paymentMethod' => $this->getPayementMethod(),
             'conversion' => $this->getConversion(),
+            'value' => $this->getValue(),
         ];
     }
 }

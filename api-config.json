@@ -22,10 +22,11 @@
     },
     "delete": {
       "route": "api\/stores\/{id}\/delete",
-      "method": "DEL"
+      "method": "DELETE"
     }
   },
   "product": {
+    "limit": 200,
     "create": {
       "route": "api\/products\/new",
       "method": "POST"
@@ -44,16 +45,21 @@
     },
     "delete": {
       "route": "api\/products\/{id}\/delete",
-      "method": "DEL"
+      "method": "DELETE"
     }
   },
   "order": {
+    "limit": 200,
     "create": {
       "route": "api\/orders\/new",
       "method": "POST"
     },
     "retrieve": {
       "route": "api\/orders\/{id}",
+      "method": "GET"
+    },
+    "retrieveOrderLines": {
+      "route": "api\/orders\/{id}\/orderLines",
       "method": "GET"
     },
     "list": {
@@ -66,10 +72,11 @@
     },
     "delete": {
       "route": "api\/orders\/{id}\/delete",
-      "method": "DEL"
+      "method": "DELETE"
     }
   },
   "orderLine": {
+    "limit": 50,
     "create": {
       "route": "api\/orderLines\/new",
       "method": "POST"
@@ -78,13 +85,17 @@
       "route": "api\/orderLines\/batch\/new",
       "method": "POST"
     },
+    "edit": {
+      "route": "api\/orderLines\/{id}\/edit",
+      "method": "PATCH"
+    },
     "list": {
       "route": "api\/orderLines",
       "method": "GET"
     },
     "delete": {
       "route": "api\/orderLines\/{id}\/delete",
-      "method": "DEL"
+      "method": "DELETE"
     }
   },
   "conversion": {
@@ -104,12 +115,13 @@
     }
   },
   "category": {
+    "limit": 200,
     "create": {
       "route": "api\/product-categories\/new",
       "method": "POST"
     },
     "list": {
-      "route": "api\/product-categories",
+      "route": "api\/product-categories?limit=0&minimal=1",
       "method": "GET"
     },
     "edit": {
@@ -118,7 +130,7 @@
     },
     "delete": {
       "route": "api\/product-categories\/{id}\/delete",
-      "method": "DEL"
+      "method": "DELETE"
     }
   }
 }

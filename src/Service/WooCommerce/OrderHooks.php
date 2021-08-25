@@ -78,12 +78,15 @@ class OrderHooks
                 $f = true;
                 continue;
             }
+
             $isExistRemote = array_key_exists($order->getId(), $remoteOrders['orders']);
             if (!$isExistRemote) {
                 $toCreate[] = $orderId;
                 $f = true;
                 continue;
-            } elseif ($order->isSyncRequired()) {
+            }
+
+            if ($order->isSyncRequired()) {
                 $toUpdate[] = $orderId;
                 $f = true;
                 continue;
@@ -96,15 +99,14 @@ class OrderHooks
         $isCreatedStatus = $isUpdatedStatus = $isDelStatus = $statusOrderLines = true;
         if (!empty($toCreate)) {
             $isCreatedStatus = $mtoConnector->sendOrders($toCreate, MtoConnector::getApiEndPoint('order')->create);
-            $orderLines = MtoStoreManger::getOrdersLines($orderIds);
-            $statusOrderLines = $mtoConnector->sendOrderLines(
-                $orderLines,
-                MtoConnector::getApiEndPoint('orderLine')->batch
-            );
+            $orderLines = MtoStoreManger::getOrdersLines($toCreate);
+            self::launchOrderLineSync($orderLines, $mtoConnector);
         }
 
         if (!empty($toUpdate)) {
             $isUpdatedStatus = $mtoConnector->sendOrders($toUpdate, MtoConnector::getApiEndPoint('order')->edit);
+            $orderLines = MtoStoreManger::getOrdersLines($toUpdate);
+            self::launchOrderLineSync($orderLines, $mtoConnector);
         }
 
         if (!empty($toDelete)) {
@@ -112,7 +114,7 @@ class OrderHooks
         }
 
 
-        if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus && $statusOrderLines) {
+        if ($isCreatedStatus && $isUpdatedStatus && $isDelStatus) {
             return true;
         }
 
@@ -188,5 +190,30 @@ class OrderHooks
         if (!$f) {
             LogData::writeApiErrors($f);
         }
+    }
+
+    private static function launchOrderLineSync($orderLines, $mtoConnector){
+        if(!empty($orderLines['create'])){
+            $statusOrderLines = $mtoConnector->sendOrderLines(
+              $orderLines['create'],
+              MtoConnector::getApiEndPoint('orderLine')->batch
+            );
+        }
+
+        if(!empty($orderLines['update'])){
+            $statusOrderLines = $mtoConnector->sendOrderLines(
+              $orderLines['update'],
+              MtoConnector::getApiEndPoint('orderLine')->edit
+            );
+        }
+
+        if(!empty($orderLines['delete'])){
+            $statusOrderLines = $mtoConnector->sendOrderLines(
+              $orderLines['delete'],
+              MtoConnector::getApiEndPoint('orderLine')->delete
+            );
+        }
+
+
     }
 }

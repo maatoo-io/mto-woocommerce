@@ -118,7 +118,11 @@ class MtoConnector
               ['form_params' => $args]
             );
             $responseData = (array)json_decode($response->getBody()->getContents(), 'true');
-            LogData::writeDebug("API Request executed. method=".$endpointConfig->method. " route=".$endpointConfig->route . " params=".json_encode($args). " status=".$response->getStatusCode()  );
+            LogData::writeDebug(
+              "API Request executed. method=" . $endpointConfig->method . " route=" . $endpointConfig->route . " params=" . json_encode(
+                $args
+              ) . " status=" . $response->getStatusCode()
+            );
         } catch (\Exception $exception) {
             LogData::writeApiErrors($exception->getMessage());
         }
@@ -317,24 +321,56 @@ class MtoConnector
         if (empty($orderLines)) {
             return 'Nothing to update';
         }
+        $isReplacementRequired = $endpoint->method === 'PATCH' || $endpoint->method === 'DELETE';
+        if ($isReplacementRequired) {
+            $limit = 1;
+        } else {
+            $limit = MtoConnector::getApiEndPoint('orderLine')->limit ?? 199;
+        }
         try {
-            $promise = $this->client->requestAsync(
-              $endpoint->method,
-              $endpoint->route,
-              ['form_params' => $orderLines]
-            );
+            $client = $this->client;
+            $requests = function ($orderLines, $endpoint) use ($client, $limit, $isReplacementRequired)
+            {
+                $length = count($orderLines);
+                for ($i = 0; $i < $length; $i += $limit) {
+                    if ($limit === 1 && !is_array($orderLines[array_key_first($orderLines)])) {
+                        $arrayKeys = array_values($orderLines);
+                        //make array format similar to all the rest
+                        $orderLinesPart = [$arrayKeys[$i] => []];
+                    } else {
+                        $orderLinesPart = array_slice($orderLines, $i, $limit, true);
+                    }
+                    yield function () use ($client, $endpoint, $orderLinesPart, $isReplacementRequired)
+                    {
+                        $route = false;
+                        if ($isReplacementRequired) {
+                            $id = array_key_first($orderLinesPart);
+                            $route = str_replace('{id}', $id, $endpoint->route);
+                            $orderLinesPart = $orderLinesPart[$id];
+                        }
+                        return $client->requestAsync(
+                          $endpoint->method,
+                          $route ?: $endpoint->route,
+                          ['form_params' => $orderLinesPart]
+                        );
+                    };
+                }
+            };
 
-            $promise->then(
-              function (Response $res)
-              {
-                  $status = $res->getStatusCode() . "\n";
-              },
-              function (RequestException $e)
-              {
-                  LogData::writeApiErrors($e->getMessage());
-              }
+            $pool = new Pool(
+              $client, $requests($orderLines, $endpoint), [
+                       'concurrency' => 5,
+                       'fulfilled' => function (Response $response, $index)
+                       {
+                           $status = $response->getStatusCode() . "\n";
+                       },
+                       'rejected' => function (RequestException $reason, $index)
+                       {
+                           LogData::writeApiErrors($reason->getMessage());
+                       },
+                     ]
             );
-
+            $promise = $pool->promise();
             $promise->wait();
             return $promise->getState();
         } catch (\Exception $exception) {
@@ -420,16 +456,29 @@ class MtoConnector
 
     /**
      * @param $endpoint
-     * @return array|false|null
+     * @param int $orderId - if id is set, it means that orderlines should be retrieved for specific orderId
+     * @return array|false|void|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getRemoteList($endpoint)
+    public function getRemoteList($endpoint, $orderId = 0)
     {
-        if (!isset($endpoint->list)) {
+        if (!isset($endpoint->list) || ($orderId && !isset($endpoint->retrieveOrderLines))) {
             return false;
         }
+
+        if ($orderId) {
+            $mtoId = get_post_meta($orderId, '_mto_id', true);
+            if(!$mtoId){
+                return false;
+            }
+            $route = str_replace('{id}', $mtoId, $endpoint->retrieveOrderLines->route);
+            $endpoint->retrieveOrderLines->route = $route;
+            $endpoint = $endpoint->retrieveOrderLines;
+        } else {
+            $endpoint = $endpoint->list;
+        }
         try {
-            return $this->getResponseData($endpoint->list);
+            return $this->getResponseData($endpoint);
         } catch (\Exception $exception) {
             LogData::writeApiErrors($exception->getMessage());
         }
@@ -449,7 +498,8 @@ class MtoConnector
                     yield function () use ($client, $endpoint, $category)
                     {
                         $route = str_replace('{id}', $category->getId(), $endpoint->route);
-                        return $client->requestAsync($endpoint->method, $route, ['form_params' => $category->toArray()]);
+                        return $client->requestAsync($endpoint->method, $route, ['form_params' => $category->toArray()]
+                        );
                     };
                 }
             };

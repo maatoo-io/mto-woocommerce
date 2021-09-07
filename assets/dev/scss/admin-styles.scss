@@ -40,6 +40,8 @@
     width: auto;
 
     &:disabled {
+      border: none;
+      cursor: default;
       background-color: grey;
       color: white;
     }

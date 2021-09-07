@@ -1,6 +1,7 @@
 jQuery(($) => {
   const $form = $('.js-mto-credentials')
   const $statusBar = $('.js-status-bar')
+  const $submitButton = $(".mto-credentials").find(':submit')
   const ajaxUrl = window.ajaxurl
 
   const resetStatusBar = () => {
@@ -22,6 +23,9 @@ jQuery(($) => {
 
   $form.on('submit', (e) => {
     e.preventDefault()
+    $submitButton.prop('disabled', true)
+    var oldValue = $submitButton.prop('value')
+    $submitButton.prop('value', 'Saving...')
     resetStatusBar()
     $.ajax({
       method: 'POST',
@@ -37,10 +41,15 @@ jQuery(($) => {
       dataType: 'json'
     })
       .done(function (response) {
+        $submitButton.prop('disabled', false)
+        $submitButton.prop('value', oldValue)
         successMsg(response)
       })
       .fail(function (response) {
         errorMsg(response)
+        $submitButton.prop('disabled', false)
+        $submitButton.prop('value', oldValue)
       })
   })
+
 })

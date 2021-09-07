@@ -11,8 +11,8 @@ class Options
 
     public function registerOptionPage()
     {
-        $icon = MTO_PLUGIN_URL . 'assets/images/maatoo.ico';
-        add_menu_page('maatoo', 'maatoo', 'manage_options', 'mto', [$this, 'dashboard'], $icon, 4);
+        $icon = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgdmlld0JveD0iMCAwIDI1NiAyNTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMjggMEM1Ny4xNTcyIDAgMCA1Ny4xNTcyIDAgMTI4QzAgMTk4Ljg0MyA1Ny4xNTcyIDI1NiAxMjggMjU2QzE5OC44NDMgMjU2IDI1NiAxOTguODQzIDI1NiAxMjhDMjU2IDU3LjE1NzIgMTk4Ljg0MyAwIDEyOCAwWk04MC41MDMxIDIwOC41MDNINTkuNTcyM1YxNjYuNjQySDgwLjUwMzFWMjA4LjUwM1pNMTE3LjUzNSAyMDguNTAzSDk2LjYwMzhWMTI1LjU4NUgxMTcuNTM1VjIwOC41MDNaTTE1NC41NjYgMjA4LjUwM0gxMzMuNjM1VjgzLjcyMzNIMTU0LjU2NlYyMDguNTAzWk0xNzUuNDk3IDgzLjcyMzNWNjIuNzkyNUgxNTQuNTY2VjQxLjg2MTZIMTk2LjQyOFY2Mi43OTI1VjYxLjE4MjRWNjQuNDAyNVY4My43MjMzSDE3NS40OTdaIiBmaWxsPSIjMDBDMURCIi8+Cjwvc3ZnPgo=';
+        add_menu_page('maatoo', 'maatoo', 'manage_options', 'mto', [$this, 'dashboard'], $icon, 59);
     }
 
     public function dashboard()

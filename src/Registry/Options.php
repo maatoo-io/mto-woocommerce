@@ -36,7 +36,13 @@ class Options
         }
         $key = array_keys($event)[0] ?? false;
         $event = $event[$key];
-        $nextEvent =  wp_date('m/d/Y H:i:s', $startTimestamp);
+
+        if (function_exists("wp_date")) {
+            $nextEvent =  wp_date('m/d/Y H:i:s', $startTimestamp); 
+        } else {
+            $nextEvent =  date('m/d/Y H:i:s', $startTimestamp); 
+        }
+
         include MTO_PLUGIN_TEMPLATES . 'admin/dashboard.php';
     }
 }

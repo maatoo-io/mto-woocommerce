@@ -40,12 +40,12 @@ $logs = LogData::downloadLogLinks();
                                 if (function_exists("wp_date")) {
                                     $lastFullSyncDate =  wp_date('m/d/Y H:i:s', strtotime($lastFullSync)); 
                                 } else {
-                                    $lastextEventDate =  date('m/d/Y H:i:s', strtotime($lastFullSync)); 
+                                    $lastFullSyncDate =  date('m/d/Y H:i:s', strtotime($lastFullSync)); 
                                 }
                                 printf(
                                   /* translators: %s is replaced with "timestamp of last full sync" */
                                   __('The latest full sync was done %s', 'mto-woocommerce'),
-                                  $lastextEventDate
+                                  $lastFullSyncDate
                                 ); ?>
                             <?php
                             else:

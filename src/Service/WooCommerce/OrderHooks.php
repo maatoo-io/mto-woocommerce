@@ -80,6 +80,7 @@ class OrderHooks
             }
 
             $isExistRemote = array_key_exists($order->getId(), $remoteOrders['orders']);
+
             if (!$isExistRemote) {
                 $toCreate[] = $orderId;
                 $f = true;

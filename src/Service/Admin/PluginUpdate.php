@@ -160,7 +160,7 @@ class PluginUpdate
 
     }
 
-    public static function purge(){
+    public static function purge($options){
 
         if (
             self::$cache_allowed

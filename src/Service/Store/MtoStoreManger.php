@@ -5,6 +5,7 @@ namespace Maatoo\WooCommerce\Service\Store;
 use Maatoo\WooCommerce\Entity\MtoOrderLine;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
 
@@ -119,10 +120,18 @@ class MtoStoreManger
 
     public static function getOrdersLines($items = null)
     {
+
         $mtoConnector = MtoConnector::getInstance(new MtoUser());
         if (is_array($items)) {
+            $items = array_unique($items);
             $data = [];
+            LogData::writeDebug(
+                "Pre-Request debug info: getOrdersLines Line 129." .  implode('\n', $items)
+            );
             foreach ($items as $orderId) {
+                LogData::writeDebug(
+                    "Pre-Request debug info: getOrdersLines Line 132. get remote list for id" .  $orderId
+                );
                 $orderLinesRemote = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('order'), $orderId)['orderLines'] ?? [];
                 $formattedArray = []; // formatted array to contain remote order lines
                 foreach ($orderLinesRemote as $id => $item) {

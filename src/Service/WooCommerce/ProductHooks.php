@@ -111,18 +111,14 @@ class ProductHooks
         $f = false;
         $mtoConnector = self::getConnector();
 
-        $remoteProducts = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('product'));
         $categories = [];
         foreach ($productIds as $productId) {
             $product = new MtoProduct($productId);
             $categories[] = $product->getCategory();
             if (!$product) {
-                $toDelete[] = $productIds;
-                $f = true;
                 continue;
             }
-            $isExistRemote = array_key_exists($product->getId(), $remoteProducts['products']);
-            if (!$isExistRemote) {
+            if (!$product->getId()) {
                 $toCreate[] = $productId;
                 $f = true;
                 continue;
@@ -131,7 +127,6 @@ class ProductHooks
             if ($product->isSyncRequired()) {
                 $toUpdate[] = $productId;
                 $f = true;
-                continue;
             }
         }
 

@@ -46,7 +46,7 @@ class MtoSync
             $products = MtoStoreManger::getAllProducts(false, $start, $limit);
             $statusProduct = ProductHooks::isProductsSynced($products->have_posts() ? $products->posts : [], true);
             $start = $start + $limit;
-            if($products->found_posts > ($start + 1)){
+            if($products->found_posts > ($start + 1) && ! wp_next_scheduled( 'mto_sync_products', [$start, $limit])){
                 wp_schedule_single_event(time() + 2, 'mto_sync_products', [$start, $limit]);
             }
             update_option('_mto_last_sync_products', $statusProduct);
@@ -57,7 +57,7 @@ class MtoSync
     }
 
 
-    public static function runOrderSync($start = 0, $limit = 30)
+    public static function runOrderSync($start = 0, $limit = 10)
     {
         try {
             $state = self::checkConnections();
@@ -65,9 +65,9 @@ class MtoSync
                 update_option('_mto_sync_status_order', 'failed');
             }
             $orders = MtoStoreManger::getAllOrders(false, $start, $limit);
-            $statusOrder = OrderHooks::isOrderSynced($orders->have_posts() ? $orders->posts : []);
+            $statusOrder = OrderHooks::isOrderSynced($orders->have_posts() ? $orders->posts : [], true);
             $start = $start + $limit;
-            if ($orders->found_posts > ($start + 1)) {
+            if ($orders->found_posts > ($start + 1) && ! wp_next_scheduled( 'mto_sync_orders', [$start, $limit])) {
                 wp_schedule_single_event(time() + 2, 'mto_sync_orders', [$start, $limit]);
             }
             update_option('_mto_sync_status_order', $statusOrder);

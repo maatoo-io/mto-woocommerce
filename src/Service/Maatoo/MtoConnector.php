@@ -470,15 +470,11 @@ class MtoConnector
      * @return array|false|void|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getRemoteList($endpoint, $orderId = 0)
+    public function getRemoteList($endpoint, int $orderId = 0)
     {
-        $endpointNew = [];
         if (!isset($endpoint->list) || ($orderId && !isset($endpoint->retrieveOrderLines))) {
             return false;
         }
-        LogData::writeDebug(
-            "Pre-Request debug info: Endpoint " .  $endpoint->retrieveOrderLines->route
-        );
         LogData::writeDebug(
             "Pre-Request debug info: getRemoteList line 485. Local Order Id" .  $orderId
         );

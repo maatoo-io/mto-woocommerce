@@ -5,6 +5,7 @@ namespace Maatoo\WooCommerce\Service\Store;
 use Maatoo\WooCommerce\Entity\MtoOrderLine;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
 
@@ -64,37 +65,41 @@ class MtoStoreManger
     /**
      * Get All Products.
      *
-     * @return array|int[]
+     * @return \WP_Query
      */
-    public static function getAllProducts($newOnly = true): array
+    public static function getAllProducts($newOnly = true, $start = 0, $limit = 50)
     {
-        return self::getAllItemsByCPT('product', $newOnly);
+        return self::getAllItemsByCPT('product', $newOnly, $start, $limit);
     }
 
     /**
      * Get All Orders.
      *
-     * @return array|int[]
+     * @return \WP_Query
      */
-    public static function getAllOrders($newOnly = true): array
+    public static function getAllOrders($newOnly = true, $start = 0, $limit = 50)
     {
-        return self::getAllItemsByCPT('shop_order', $newOnly);
+        return self::getAllItemsByCPT('shop_order', $newOnly, $start, $limit);
     }
 
     /**
      * Get All Items By CPT.
      *
      * @param string $cpt
-     *
-     * @return array|int[]
+     * @param bool $newOnly
+     * @param int $start
+     * @param int $limit
+     * @return \WP_Query
      */
-    private static function getAllItemsByCPT(string $cpt, $newOnly = true)
+    private static function getAllItemsByCPT(string $cpt, $newOnly = true, $start = 0, $limit = 50)
     {
         $args = [
             'post_type' => $cpt,
-            'posts_per_page' => -1,
+            'posts_per_page' => $limit,
+            'offset' => $start,
             'fields' => 'ids',
             'post_status' => 'publish',
+            'orderby' => ['date'=>'DESC']
         ];
 
         if($cpt !== 'product'){
@@ -109,21 +114,24 @@ class MtoStoreManger
                 ],
             ];
         }
-        $items = new \WP_Query($args);
 
-        if (!$items->have_posts()) {
-            return [];
-        }
-
-        return $items->posts;
+        return new \WP_Query($args);
     }
 
     public static function getOrdersLines($items = null)
     {
+
         $mtoConnector = MtoConnector::getInstance(new MtoUser());
         if (is_array($items)) {
+            $items = array_unique($items);
             $data = [];
+            LogData::writeDebug(
+                "Pre-Request debug info: getOrdersLines Line 129." .  implode('\n', $items)
+            );
             foreach ($items as $orderId) {
+                LogData::writeDebug(
+                    "Pre-Request debug info: getOrdersLines Line 132. get remote list for id" .  $orderId
+                );
                 $orderLinesRemote = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('order'), $orderId)['orderLines'] ?? [];
                 $formattedArray = []; // formatted array to contain remote order lines
                 foreach ($orderLinesRemote as $id => $item) {

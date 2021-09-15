@@ -56,7 +56,7 @@ class OrderHooks
         return $fields;
     }
 
-    public static function isOrderSynced(array $orderIds): bool
+    public static function isOrderSynced(array $orderIds, $forceUpdate = false): bool
     {
         if (empty($orderIds) || !self::getConnector()) {
             return true;
@@ -66,27 +66,19 @@ class OrderHooks
         $toDelete = [];
         $f = false;
         $mtoConnector = self::getConnector();
-        $remoteOrders = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('order'));
-        if (!$remoteOrders) {
-            LogData::writeApiErrors('Maatoo orders list is not available');
-            $remoteOrders = [];
-        }
         foreach ($orderIds as $orderId) {
             $order = new MtoOrder($orderId);
             if (!$order) {
-                $toDelete[] = $orderId;
-                $f = true;
                 continue;
             }
 
-            $isExistRemote = array_key_exists($order->getId(), $remoteOrders['orders']);
-            if (!$isExistRemote) {
+            if (!$order->getId()) {
                 $toCreate[] = $orderId;
                 $f = true;
                 continue;
             }
 
-            if ($order->isSyncRequired()) {
+            if ($order->isSyncRequired() || $forceUpdate) {
                 $toUpdate[] = $orderId;
                 $f = true;
                 continue;
@@ -99,14 +91,17 @@ class OrderHooks
         $isCreatedStatus = $isUpdatedStatus = $isDelStatus = $statusOrderLines = true;
         if (!empty($toCreate)) {
             $isCreatedStatus = $mtoConnector->sendOrders($toCreate, MtoConnector::getApiEndPoint('order')->create);
-            $orderLines = MtoStoreManger::getOrdersLines($toCreate);
-            self::launchOrderLineSync($orderLines, $mtoConnector);
+            LogData::writeDebug(
+                "Pre-Request debug info: orderLines to create." .  implode('\n', $toCreate)
+            );
+            $orderLinesToCreate = MtoStoreManger::getOrdersLines($toCreate);
+            self::launchOrderLineSync($orderLinesToCreate, $mtoConnector);
         }
 
         if (!empty($toUpdate)) {
             $isUpdatedStatus = $mtoConnector->sendOrders($toUpdate, MtoConnector::getApiEndPoint('order')->edit);
-            $orderLines = MtoStoreManger::getOrdersLines($toUpdate);
-            self::launchOrderLineSync($orderLines, $mtoConnector);
+            $orderLinesUpdate = MtoStoreManger::getOrdersLines($toUpdate);
+            self::launchOrderLineSync($orderLinesUpdate, $mtoConnector);
         }
 
         if (!empty($toDelete)) {

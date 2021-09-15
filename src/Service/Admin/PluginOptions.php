@@ -89,6 +89,7 @@ class PluginOptions
                 $this->mtoOptions['store']['id'] = $store->getId();
                 update_option('mto', $this->mtoOptions);
                 update_option('_mto_last_sync', null);
+
                 //run full sync in 30 seconds
                 wp_schedule_single_event(time() - 1, 'mto_sync_clear_log');
                 wp_schedule_single_event(time() + 30, 'mto_sync_products');

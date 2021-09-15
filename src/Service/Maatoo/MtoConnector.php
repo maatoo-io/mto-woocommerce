@@ -84,7 +84,29 @@ class MtoConnector
     public function healthCheck()
     {
         if (is_null($this->isCredentialsOk)) {
-            $response = $this->getResponseData(static::getApiEndPoint('healthCheck'));
+            $store = MtoStoreManger::getStoreData();
+
+            $lastFullSync = get_option('_mto_last_sync');
+            if (function_exists("wp_date")) {
+                $lastFullSyncDate =  wp_date('Y-m-d H:i:s', strtotime($lastFullSync)); 
+            } else {
+                $lastFullSyncDate =  date('Y-m-d H:i:s', strtotime($lastFullSync)); 
+            }
+
+            $payload = [
+                "store" => MTO_STORE_ID,
+                "shortName" => $store ? $store->getShortName() : null,
+                "available_categories" => sizeof(get_terms('product_cat')),
+                "available_products" => MtoStoreManger::getAllProducts(false, 0, 0)->found_posts,
+                "available_orders" => MtoStoreManger::getAllOrders(false, 0, 0)->found_posts,
+                "last_order_sync" => $lastFullSyncDate,
+                "next_order_sync" => null,
+                "last_product_sync" => $lastFullSyncDate,
+                "next_product_sync" => null,
+                "plugin_version" => MTO_PLUGIN_VERSION
+
+            ];
+            $response = $this->getResponseData(static::getApiEndPoint('healthCheck'), $payload);
 
             if (isset($response['status'])) {
                 $this->isCredentialsOk = strtoupper($response['status']) === 'OK';

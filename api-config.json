@@ -1,7 +1,7 @@
 {
   "healthCheck": {
     "route": "api\/health-check",
-    "method": "GET"
+    "method": "POST"
   },
   "store": {
     "create": {

@@ -57,7 +57,7 @@ class MtoSync
     }
 
 
-    public static function runOrderSync($start = 0, $limit = 10)
+    public static function runOrderSync($start = 0, $limit = 50)
     {
         try {
             $state = self::checkConnections();

@@ -83,6 +83,8 @@ class MtoConnector
      */
     public function healthCheck()
     {
+        global $wpdb;
+
         if (is_null($this->isCredentialsOk)) {
             $store = MtoStoreManger::getStoreData();
 
@@ -93,16 +95,31 @@ class MtoConnector
                 $lastFullSyncDate =  date('Y-m-d H:i:s', strtotime($lastFullSync)); 
             }
 
+            $hook = 'mto_sync_orders';
+            $crons = get_option('cron');
+            $nextFullSync = time();
+            foreach ( $crons as $timestamp => $cron ) {
+                if(isset( $cron[$hook])) {
+                    $nextFullSync = $timestamp;
+                    break;
+                }
+            }
+            if (function_exists("wp_date")) {
+                $nextFullSyncDate =  wp_date('Y-m-d H:i:s', $nextFullSync);
+            } else {
+                $nextFullSyncDate =  date('Y-m-d H:i:s', $nextFullSync);
+            }
+
             $payload = [
                 "store" => MTO_STORE_ID,
                 "shortName" => $store ? $store->getShortName() : null,
                 "available_categories" => sizeof(get_terms('product_cat')),
                 "available_products" => MtoStoreManger::getAllProducts(false, 0, 0)->found_posts,
                 "available_orders" => MtoStoreManger::getAllOrders(false, 0, 0)->found_posts,
-                "last_order_sync" => $lastFullSyncDate,
-                "next_order_sync" => null,
-                "last_product_sync" => $lastFullSyncDate,
-                "next_product_sync" => null,
+                "available_order_lines" => $wpdb->get_row( "SELECT count(*) AS order_lines FROM {$wpdb->prefix}woocommerce_order_items WHERE order_item_type = 'line_item' " )->order_lines,
+                "last_full_sync" => $lastFullSyncDate,
+                "next_full_sync" => $nextFullSyncDate,
+                "registered_customers" => count_users()['total_users'],
                 "plugin_version" => MTO_PLUGIN_VERSION
 
             ];

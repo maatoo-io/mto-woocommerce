@@ -152,7 +152,7 @@ class MtoStoreManger
                     }
                 }
 
-                if(count($data['update']) !== count($formattedArray)){
+                if(!empty($data['update']) && count($data['update']) !== count($formattedArray)){
                     //get list of items needs to be removed
                     $toUpdateKeys = array_keys($data['update']) ?? [];
                     $remoteKeys = array_keys($formattedArray) ?? [];

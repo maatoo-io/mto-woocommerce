@@ -47,7 +47,7 @@ class MtoSync
             $statusProduct = ProductHooks::isProductsSynced($products->have_posts() ? $products->posts : []);
             $start = $start + $limit;
             if($products->found_posts > ($start + 1) && ! wp_next_scheduled( 'mto_sync_products', [$start, $limit])){
-                wp_schedule_single_event(time() + 2, 'mto_sync_products', [$start, $limit]);
+                wp_schedule_single_event(time() -1, 'mto_sync_products', [$start, $limit]);
             }
             update_option('_mto_last_sync_products', $statusProduct);
         } catch (\Exception $ex) {
@@ -69,8 +69,8 @@ class MtoSync
             $statusOrder = OrderHooks::isOrderSynced($orders->have_posts() ? $orders->posts : []);
             LogData::writeDebug('OrderHooks::isOrderSynced completed[offset: ' . $start . '; limit: ' . $limit . ';]' . PHP_EOL);
             $start = $start + $limit;
-            if ($orders->found_posts > ($start + 1) && ! wp_next_scheduled( 'mto_sync_orders', [$start, $limit])) {
-                wp_schedule_single_event(time() + 2, 'mto_sync_orders', [$start, $limit]);
+            if ($orders->found_posts >= $start && ! wp_next_scheduled( 'mto_sync_orders', [$start, $limit])) {
+                wp_schedule_single_event(time() -1, 'mto_sync_orders', [$start, $limit]);
             }
             update_option('_mto_sync_status_order', $statusOrder);
         } catch (\Exception $ex) {

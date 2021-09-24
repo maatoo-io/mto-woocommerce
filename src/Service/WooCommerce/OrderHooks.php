@@ -91,9 +91,6 @@ class OrderHooks
         $isCreatedStatus = $isUpdatedStatus = $isDelStatus = $statusOrderLines = true;
         if (!empty($toCreate)) {
             $isCreatedStatus = $mtoConnector->sendOrders($toCreate, MtoConnector::getApiEndPoint('order')->create);
-            LogData::writeDebug(
-                "Pre-Request debug info: orderLines to create." .  implode('\n', $toCreate)
-            );
             $orderLinesToCreate = MtoStoreManger::getOrdersLines($toCreate);
             self::launchOrderLineSync($orderLinesToCreate, $mtoConnector);
         }

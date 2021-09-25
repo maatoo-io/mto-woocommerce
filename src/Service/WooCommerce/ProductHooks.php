@@ -200,7 +200,7 @@ class ProductHooks
                 $toCreate[] = $categoryId;
             }
 
-            if ($category->isSyncRequired()) {
+            if ($category->getId() && $category->isSyncRequired()) {
                 $toUpdate[] = $categoryId;
             }
         }

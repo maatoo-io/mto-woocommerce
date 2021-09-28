@@ -35,7 +35,7 @@ class Options
              }
         }
         $key = array_keys($event)[0] ?? false;
-        $event = $event[$key];
+        $event = $event[$key] ?? null;
 
         if (function_exists("wp_date")) {
             $nextEvent =  wp_date('m/d/Y H:i:s', $startTimestamp); 

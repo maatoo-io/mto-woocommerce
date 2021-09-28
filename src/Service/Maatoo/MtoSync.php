@@ -35,7 +35,7 @@ class MtoSync
         return true;
     }
 
-    public static function runProductSync($start = 0, $limit = 50)
+    public static function runProductSync($start = 0, $limit = 20)
     {
         try {
             $state = self::checkConnections();
@@ -61,7 +61,7 @@ class MtoSync
     }
 
 
-    public static function runOrderSync($start = 0, $limit = 50)
+    public static function runOrderSync($start = 0, $limit = 20)
     {
         try {
             $state = self::checkConnections();

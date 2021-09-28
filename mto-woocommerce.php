@@ -83,6 +83,10 @@ if (!defined('MTO_UPDATE_CACHE_EXPIRE')) {
     define('MTO_UPDATE_CACHE_EXPIRE', DAY_IN_SECONDS / 2);
 }
 
+if (!defined('MTO_SYNC_INTERVAL')) {
+    define('MTO_SYNC_INTERVAL', DAY_IN_SECONDS);
+}
+
 add_action('init', new MtoWoocommerce());
 register_uninstall_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'uninstall']);
 register_activation_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'activate']);
@@ -146,16 +150,16 @@ class MtoWoocommerce
 
     public static function activate()
     {
-        if (!wp_next_scheduled('mto_sync_clear_log')) {
-            wp_schedule_event(time() + 30, 'daily', 'mto_sync_clear_log');
+        if (!as_next_scheduled_action('mto_sync_clear_log')) {
+            as_schedule_recurring_action(time(), MTO_SYNC_INTERVAL, 'mto_sync_clear_log');
         }
 
-        if (!wp_next_scheduled('mto_sync_products')) {
-            wp_schedule_event(time() + 120, 'daily', 'mto_sync_products');
+        if (!as_next_scheduled_action('mto_sync_products')) {
+            as_schedule_recurring_action(time() + 1, MTO_SYNC_INTERVAL, 'mto_sync_products');
         }
 
-        if (!wp_next_scheduled('mto_sync_orders')) {
-            wp_schedule_event(time() + 360, 'daily', 'mto_sync_orders');
+        if (!as_next_scheduled_action('mto_sync_orders')) {
+            as_schedule_recurring_action(time() + 360, MTO_SYNC_INTERVAL, 'mto_sync_orders');
         }
         $store = MtoStoreManger::getStoreData();
         if($store && method_exists($store, 'getShortName')){
@@ -165,9 +169,9 @@ class MtoWoocommerce
 
     public static function deactivate()
     {
-        wp_clear_scheduled_hook('mto_sync_clear_log');
-        wp_clear_scheduled_hook('mto_sync_products');
-        wp_clear_scheduled_hook('mto_sync_orders');
+        as_unschedule_all_actions('mto_sync_clear_log');
+        as_unschedule_all_actions('mto_sync_products');
+        as_unschedule_all_actions('mto_sync_orders');
     }
 
     public function translations() {
@@ -186,8 +190,8 @@ class MtoWoocommerce
         delete_option('_mto_last_sync');
         delete_option('_mto_tag_id');
 
-        wp_clear_scheduled_hook('mto_sync_clear_log');
-        wp_clear_scheduled_hook('mto_sync_products');
-        wp_clear_scheduled_hook('mto_sync_orders');
+        as_unschedule_all_actions('mto_sync_clear_log');
+        as_unschedule_all_actions('mto_sync_products');
+        as_unschedule_all_actions('mto_sync_orders');
     }
 }

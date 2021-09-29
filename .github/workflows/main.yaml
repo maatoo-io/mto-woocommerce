@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - pipeline
+      - debug-plugin
 
 jobs:
   test:

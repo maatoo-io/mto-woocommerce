@@ -50,7 +50,7 @@ class MtoSync
                 $prev = (int)get_option($key, 0);
                 $msg = 'Product Sync failed[offset: ' . $start . '; limit: ' . $limit . ';]';
                 if ($prev < MTO_MAX_ATTEMPTS) {
-                    update_option($key, $prev++);
+                    update_option($key, ++$prev);
                     throw new \Exception($msg);
                 } else {
                     LogData::writeDebug($msg . '. 3 attempts were used to sync data' . PHP_EOL);

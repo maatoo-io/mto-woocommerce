@@ -87,6 +87,10 @@ if (!defined('MTO_SYNC_INTERVAL')) {
     define('MTO_SYNC_INTERVAL', DAY_IN_SECONDS);
 }
 
+if (!defined('MTO_MAX_ATTEMPTS')) {
+    define('MTO_MAX_ATTEMPTS', 3);
+}
+
 add_action('init', new MtoWoocommerce());
 register_uninstall_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'uninstall']);
 register_activation_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'activate']);

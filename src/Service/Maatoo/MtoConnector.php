@@ -157,11 +157,6 @@ class MtoConnector
               ['form_params' => $args]
             );
             $responseData = (array)json_decode($response->getBody()->getContents(), 'true');
-            LogData::writeDebug(
-              "API Request executed. method=" . $endpointConfig->method . " route=" . $endpointConfig->route . " params=" . json_encode(
-                $args
-              ) . " status=" . $response->getStatusCode()
-            );
         } catch (\Exception $exception) {
             LogData::writeApiErrors($exception->getMessage());
         }
@@ -368,9 +363,6 @@ class MtoConnector
         } else {
             $limit = MtoConnector::getApiEndPoint('orderLine')->limit ?? 199;
         }
-        LogData::writeDebug(
-            "Pre-request Data: limit: " .  $limit . " status=" . $endpoint->method
-        );
         try {
             $client = $this->client;
             $requests = function ($orderLines, $endpoint) use ($client, $limit, $isReplacementRequired)
@@ -408,9 +400,6 @@ class MtoConnector
                        {
                            $responseContent = $response->getBody()->getContents();
                            $status = $response->getStatusCode() . "\n";
-                           LogData::writeDebug(
-                               "API Request executed." .  $responseContent . " status=" . $status
-                           );
                        },
                        'rejected' => function (RequestException $reason, $index)
                        {
@@ -514,14 +503,8 @@ class MtoConnector
         if (!isset($endpoint->list) || ($orderId && !isset($endpoint->retrieveOrderLines))) {
             return false;
         }
-        LogData::writeDebug(
-            "Pre-Request debug info: getRemoteList line 485. Local Order Id" .  $orderId
-        );
         if ($orderId) {
             $mtoId = get_post_meta($orderId, '_mto_id', true);
-            LogData::writeDebug(
-                "Pre-Request debug info: getRemoteList line 490. Remote order Id" .  $mtoId
-            );
             if(!$mtoId){
                 return false;
             }
@@ -535,9 +518,6 @@ class MtoConnector
             $endpointNew = $endpoint->list;
         }
         try {
-            LogData::writeDebug(
-                "Pre-Request debug info: getRemoteList line 503. Endpoint" .  $endpointNew->route
-            );
             return $this->getResponseData($endpointNew);
         } catch (\Exception $exception) {
             LogData::writeApiErrors($exception->getMessage());

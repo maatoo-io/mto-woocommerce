@@ -35,44 +35,72 @@ class MtoSync
         return true;
     }
 
-    public static function runProductSync($start = 0, $limit = 30)
+    public static function runProductSync($start = 0, $limit = 20)
     {
         try {
             $state = self::checkConnections();
-            if(!$state){
+            if(!$state || !function_exists('as_schedule_single_action')){
                 update_option('_mto_sync_status_product', 'failed');
             }
 
             $products = MtoStoreManger::getAllProducts(false, $start, $limit);
-            $statusProduct = ProductHooks::isProductsSynced($products->have_posts() ? $products->posts : [], true);
+            $statusProduct = ProductHooks::isProductsSynced($products->have_posts() ? $products->posts : []);
+            if(!$statusProduct){
+                $key = 'mto_product_sync_attempt_' . $start . '_' . $limit;
+                $prev = (int)get_option($key, 0);
+                $msg = 'Product Sync failed[offset: ' . $start . '; limit: ' . $limit . ';]';
+                if ($prev < MTO_MAX_ATTEMPTS) {
+                    update_option($key, ++$prev);
+                    throw new \Exception($msg);
+                } else {
+                    LogData::writeDebug($msg . '. 3 attempts were used to sync data' . PHP_EOL);
+                    delete_option($key);
+                }
+            }
             $start = $start + $limit;
-            if($products->found_posts > ($start + 1) && ! wp_next_scheduled( 'mto_sync_products', [$start, $limit])){
-                wp_schedule_single_event(time() + 2, 'mto_sync_products', [$start, $limit]);
+            if($products->found_posts >= $start && ! as_next_scheduled_action( 'mto_sync_products', [$start, $limit])){
+                as_schedule_single_action(time() -1, 'mto_sync_products', [$start, $limit]);
             }
             update_option('_mto_last_sync_products', $statusProduct);
         } catch (\Exception $ex) {
-            LogData::writeApiErrors($ex->getMessage());
+            LogData::writeDebug($ex->getMessage());
+            return as_schedule_single_action(time() - 1, 'mto_sync_products', [$start, $limit]);
         }
         self::updateLastSyncDate();
     }
 
 
-    public static function runOrderSync($start = 0, $limit = 50)
+    public static function runOrderSync($start = 0, $limit = 20)
     {
         try {
             $state = self::checkConnections();
-            if(!$state){
+            if(!$state || !function_exists('as_schedule_single_action')){
                 update_option('_mto_sync_status_order', 'failed');
             }
             $orders = MtoStoreManger::getAllOrders(false, $start, $limit);
-            $statusOrder = OrderHooks::isOrderSynced($orders->have_posts() ? $orders->posts : [], true);
+            $statusOrder = OrderHooks::isOrderSynced($orders->have_posts() ? $orders->posts : []);
+            if(!$statusOrder){
+                $key = 'mto_order_sync_attempt_' . $start . '_' . $limit;
+                $prev = (int)get_option($key, 0);
+                $msg = 'Order Sync is failed[offset: ' . $start . '; limit: ' . $limit . ';]';
+                if ($prev < MTO_MAX_ATTEMPTS) {
+                    update_option($key, ++$prev);
+                    throw new \Exception($msg);
+                } else {
+                    LogData::writeDebug($msg . '. 3 attempts were used to sync data' . PHP_EOL);
+                    delete_option($key);
+                }
+            } else {
+                LogData::writeDebug('OrderHooks::isOrderSynced completed[offset: ' . $start . '; limit: ' . $limit . ';]' . PHP_EOL);
+            }
             $start = $start + $limit;
-            if ($orders->found_posts > ($start + 1) && ! wp_next_scheduled( 'mto_sync_orders', [$start, $limit])) {
-                wp_schedule_single_event(time() + 2, 'mto_sync_orders', [$start, $limit]);
+            if ($orders->found_posts >= $start && ! as_next_scheduled_action( 'mto_sync_orders', [$start, $limit])) {
+                as_schedule_single_action(time() - 1, 'mto_sync_orders', [$start, $limit]);
             }
             update_option('_mto_sync_status_order', $statusOrder);
         } catch (\Exception $ex) {
-            LogData::writeApiErrors($ex->getMessage());
+            LogData::writeDebug($ex->getMessage());
+            return as_schedule_single_action(time() - 1, 'mto_sync_orders', [$start, $limit]);
         }
         self::updateLastSyncDate();
     }

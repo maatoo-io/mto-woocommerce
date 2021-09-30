@@ -125,13 +125,7 @@ class MtoStoreManger
         if (is_array($items)) {
             $items = array_unique($items);
             $data = [];
-            LogData::writeDebug(
-                "Pre-Request debug info: getOrdersLines Line 129." .  implode('\n', $items)
-            );
             foreach ($items as $orderId) {
-                LogData::writeDebug(
-                    "Pre-Request debug info: getOrdersLines Line 132. get remote list for id" .  $orderId
-                );
                 $orderLinesRemote = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('order'), $orderId)['orderLines'] ?? [];
                 $formattedArray = []; // formatted array to contain remote order lines
                 foreach ($orderLinesRemote as $id => $item) {
@@ -158,7 +152,7 @@ class MtoStoreManger
                     }
                 }
 
-                if(count($data['update']) !== count($formattedArray)){
+                if(!empty($data['update']) && count($data['update']) !== count($formattedArray)){
                     //get list of items needs to be removed
                     $toUpdateKeys = array_keys($data['update']) ?? [];
                     $remoteKeys = array_keys($formattedArray) ?? [];

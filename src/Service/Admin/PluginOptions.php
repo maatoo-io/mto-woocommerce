@@ -91,9 +91,15 @@ class PluginOptions
                 update_option('_mto_last_sync', null);
 
                 //run full sync in 30 seconds
-                wp_schedule_single_event(time() - 1, 'mto_sync_clear_log');
-                wp_schedule_single_event(time() + 30, 'mto_sync_products');
-                wp_schedule_single_event(time() + 180, 'mto_sync_orders');
+                if(!as_next_scheduled_action('mto_sync_clear_log')){
+                    as_schedule_single_action(time(), 'mto_sync_clear_log');
+                }
+                if(!as_next_scheduled_action('mto_sync_products')){
+                    as_schedule_single_action(time() + 1, 'mto_sync_products');
+                }
+                if(!as_next_scheduled_action('mto_sync_orders')){
+                    as_schedule_single_action(time() + 180, 'mto_sync_orders');
+                }
             }
         }
         return $msg;

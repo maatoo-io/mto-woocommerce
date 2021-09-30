@@ -2,7 +2,7 @@
 /**
  * Plugin Name: maatoo for WooCommerce
  * Description: Connect your online shop to drive more revenue with intelligent automations, e.g. abanoned cart reminders and more.
- * Version:     1.4.0
+ * Version:     1.4.1
  * Author: maatoo.io
  * Author URI: https://maatoo.io
  * License: GPL-3.0+
@@ -46,7 +46,7 @@ if (file_exists($composer_path)) {
 }
 
 if (!defined('MTO_PLUGIN_VERSION')) {
-    define('MTO_PLUGIN_VERSION', '1.4.0');
+    define('MTO_PLUGIN_VERSION', '1.4.1');
 }
 
 if (!defined('MTO_PLUGIN_SLUG')) {
@@ -81,6 +81,14 @@ if (!defined('MTO_STORE_TAG_ID')) {
 
 if (!defined('MTO_UPDATE_CACHE_EXPIRE')) {
     define('MTO_UPDATE_CACHE_EXPIRE', DAY_IN_SECONDS / 2);
+}
+
+if (!defined('MTO_SYNC_INTERVAL')) {
+    define('MTO_SYNC_INTERVAL', DAY_IN_SECONDS);
+}
+
+if (!defined('MTO_MAX_ATTEMPTS')) {
+    define('MTO_MAX_ATTEMPTS', 3);
 }
 
 add_action('init', new MtoWoocommerce());
@@ -146,16 +154,16 @@ class MtoWoocommerce
 
     public static function activate()
     {
-        if (!wp_next_scheduled('mto_sync_clear_log')) {
-            wp_schedule_event(time() + 30, 'daily', 'mto_sync_clear_log');
+        if (!as_next_scheduled_action('mto_sync_clear_log')) {
+            as_schedule_recurring_action(time(), MTO_SYNC_INTERVAL, 'mto_sync_clear_log');
         }
 
-        if (!wp_next_scheduled('mto_sync_products')) {
-            wp_schedule_event(time() + 120, 'daily', 'mto_sync_products');
+        if (!as_next_scheduled_action('mto_sync_products')) {
+            as_schedule_recurring_action(time() + 1, MTO_SYNC_INTERVAL, 'mto_sync_products');
         }
 
-        if (!wp_next_scheduled('mto_sync_orders')) {
-            wp_schedule_event(time() + 360, 'daily', 'mto_sync_orders');
+        if (!as_next_scheduled_action('mto_sync_orders')) {
+            as_schedule_recurring_action(time() + 360, MTO_SYNC_INTERVAL, 'mto_sync_orders');
         }
         $store = MtoStoreManger::getStoreData();
         if($store && method_exists($store, 'getShortName')){
@@ -165,9 +173,9 @@ class MtoWoocommerce
 
     public static function deactivate()
     {
-        wp_clear_scheduled_hook('mto_sync_clear_log');
-        wp_clear_scheduled_hook('mto_sync_products');
-        wp_clear_scheduled_hook('mto_sync_orders');
+        as_unschedule_all_actions('mto_sync_clear_log');
+        as_unschedule_all_actions('mto_sync_products');
+        as_unschedule_all_actions('mto_sync_orders');
     }
 
     public function translations() {
@@ -186,8 +194,8 @@ class MtoWoocommerce
         delete_option('_mto_last_sync');
         delete_option('_mto_tag_id');
 
-        wp_clear_scheduled_hook('mto_sync_clear_log');
-        wp_clear_scheduled_hook('mto_sync_products');
-        wp_clear_scheduled_hook('mto_sync_orders');
+        as_unschedule_all_actions('mto_sync_clear_log');
+        as_unschedule_all_actions('mto_sync_products');
+        as_unschedule_all_actions('mto_sync_orders');
     }
 }

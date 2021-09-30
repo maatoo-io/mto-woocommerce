@@ -192,20 +192,15 @@ class ProductHooks
         if (empty($categoryIds)) {
             return;
         }
-        $mtoConnector = self::getConnector();
-        $remoteCategories = $mtoConnector->getRemoteList($mtoConnector::getApiEndPoint('category'));
-        $remoteCategoriesIds = !empty($remoteCategories['categories'])
-          ? array_column($remoteCategories['categories'], 'externalCategoryId', 'id')
-          : [];
         $categoryIds = array_unique($categoryIds);
         $toCreate = $toUpdate = [];
         foreach ($categoryIds as $categoryId) {
             $category = new MtoProductCategory($categoryId);
-            if(!$category->getId() || !in_array($categoryId, $remoteCategoriesIds)) {
+            if(!$category->getId()) {
                 $toCreate[] = $categoryId;
             }
 
-            if ($category->isSyncRequired() && in_array($categoryId, $remoteCategoriesIds)) {
+            if ($category->getId() && $category->isSyncRequired()) {
                 $toUpdate[] = $categoryId;
             }
         }

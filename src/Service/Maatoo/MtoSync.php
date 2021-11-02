@@ -79,7 +79,7 @@ class MtoSync
             }
             $orders = MtoStoreManger::getAllOrders(false, $start, $limit);
             $statusOrder = OrderHooks::isOrderSynced($orders->have_posts() ? $orders->posts : []);
-            if(!$statusOrder){
+            if(!$statusOrder || !(int)get_option('mto_order_sync_status', 1)){
                 $key = 'mto_order_sync_attempt_' . $start . '_' . $limit;
                 $prev = (int)get_option($key, 0);
                 $msg = 'Order Sync is failed[offset: ' . $start . '; limit: ' . $limit . ';]';

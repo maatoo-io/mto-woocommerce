@@ -353,10 +353,12 @@ class MtoConnector
                                      $responseDecoded['order']['dateUpdated'] ?? $responseDecoded['order']['dateCreated']
                                    );
                                }
+                               update_option('mto_order_sync_status', 1);
                            }
                        },
                        'rejected' => function (RequestException $reason, $index)
                        {
+                           update_option('mto_order_sync_status', 0);
                            LogData::writeApiErrors($reason->getMessage());
                        },
                      ]

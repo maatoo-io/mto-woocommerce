@@ -269,15 +269,38 @@ class MtoConnector
                        },
                        'rejected' => function (RequestException $reason, $index)
                        {
-                           LogData::writeApiErrors($reason->getMessage());
+                           if($reason->getCode() == '404'){
+                               $path = $reason->getRequest()->getUri()->getPath();
+                               $this->cleanUpOutdateData($path, '/\/api\/products\/(.*)\//U');
+                           } else {
+                               LogData::writeApiErrors($reason->getMessage());
+                           }
                        },
                      ]
             );
             $promise = $pool->promise();
             $promise->wait();
+
             return $promise->getState();
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
+        }
+    }
+
+    private function cleanUpOutdateData($path, $pattern){
+        preg_match($pattern, $path, $matches);
+        $mtoId = $matches[1] ?? null;
+        LogData::writeApiErrors('404 response detected: data in the database for mto_id: ' . $mtoId . ' has been updated');
+        if ($mtoId) {
+            $posts = get_posts([
+                'meta_query' => [
+                    'key' => '_mto_id',
+                    'value' => $mtoId,
+                ]
+            ]);
+            if($posts[0]){
+                delete_post_meta($posts[0], '_mto_id');
+            }
         }
     }
 

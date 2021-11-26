@@ -8,6 +8,7 @@ use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
+use Simplon\Url\Url;
 
 /**
  * Class MtoStoreManger
@@ -38,14 +39,13 @@ class MtoStoreManger
         if (empty($storeOption)) {
             return null;
         }
-
         if (empty($storeOption['store'])) {
             $name = get_bloginfo('name') ?: 'Untitled Store';
+            $url = new Url(get_home_url());
             $shortName = str_replace(
                     '-',
                     '',
-                    explode('.', parse_url(get_home_url())['host'])[0]
-                ) ?? 'untitledstore';
+                    $url->getDomain());
             $externalId = substr(sha1(rand()), 0, 6);
             $currency = get_option('woocommerce_currency') ?: 'USD';
             $domain = get_home_url();

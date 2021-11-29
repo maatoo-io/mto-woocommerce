@@ -42,6 +42,8 @@ class OrderHooks
         if($mtoUser && $mtoUser->isBirthdayEnabled()){
             add_filter( 'woocommerce_billing_fields', [$this,'addBirthdayField'], 20, 1 );
         }
+
+        add_action( 'woocommerce_add_to_cart', new DraftOrdersSync(), 10, 6 );
     }
 
     public function addBirthdayField($fields){
@@ -123,6 +125,11 @@ class OrderHooks
         try {
             $isSubscribed = (bool)$_POST['mto_email_subscription'] ?? false;
             $contact = $_COOKIE['mtc_id'] ?? null;
+            if(!empty($_COOKIE['mto_draft_order_id'])){
+                $draftId = $_COOKIE['mto_draft_order_id'];
+                wc_setcookie('mto_draft_order_id', null);
+                update_post_meta($orderId, 'mto_draft_order_id', $draftId);
+            }
             update_post_meta($orderId, '_mto_is_subscribed', $isSubscribed ? '1' : '0');
             update_post_meta($orderId, '_mto_contact_id', $contact);
             update_post_meta($orderId, '_mto_birthday', $_POST['billing_birth_date'] ?? '');
@@ -184,7 +191,7 @@ class OrderHooks
         }
     }
 
-    private static function launchOrderLineSync($orderLines, $mtoConnector){
+    public static function launchOrderLineSync($orderLines, $mtoConnector){
         if(!empty($orderLines['create'])){
             $statusOrderLines = $mtoConnector->sendOrderLines(
               $orderLines['create'],
@@ -205,7 +212,5 @@ class OrderHooks
               MtoConnector::getApiEndPoint('orderLine')->delete
             );
         }
-
-
     }
 }

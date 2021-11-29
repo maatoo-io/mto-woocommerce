@@ -31,7 +31,7 @@ class MtoOrder extends AbstractMtoEntity
         if (!$order) {
             return null;
         }
-        $this->id = get_post_meta($orderId, '_mto_id', true) ?: null;
+        $this->id = get_post_meta($orderId, '_mto_id', true) ?: (get_post_meta($orderId, 'mto_draft_order_id', true) ?:null);
         $this->externalOrderId = (string)$orderId;
         $this->value = floatval($order->get_total() ?: get_post_meta($orderId, '_order_total', true) ?: 0);
         $this->url = $order->get_view_order_url();

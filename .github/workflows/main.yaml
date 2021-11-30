@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - master
-      - pipeline
-      - debug-plugin
+      - 'feature/*'
+      - 'bugfix/*'
 
 jobs:
   test:

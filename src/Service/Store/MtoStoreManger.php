@@ -148,7 +148,10 @@ class MtoStoreManger
                     if(in_array((int)$orderLine['product'], $products)){
                         $data['update'][array_search((int)$orderLine['product'], $products)] = $orderLine;
                     } else {
-                        $data['create'][] = $orderLine;
+                        // Don't try to create orderlines whose orders haven't been created yet
+                        if (get_post_meta($orderId, '_mto_id', true)) {
+                            $data['create'][] = $orderLine;
+                        }
                     }
                 }
 

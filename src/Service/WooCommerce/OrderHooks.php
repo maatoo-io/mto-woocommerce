@@ -3,12 +3,10 @@
 namespace Maatoo\WooCommerce\Service\WooCommerce;
 
 use Maatoo\WooCommerce\Entity\MtoOrder;
-use Maatoo\WooCommerce\Entity\MtoOrderLine;
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
-use mysql_xdevapi\Exception;
 
 class OrderHooks
 {
@@ -43,7 +41,8 @@ class OrderHooks
             add_filter( 'woocommerce_billing_fields', [$this,'addBirthdayField'], 20, 1 );
         }
 
-        add_action( 'woocommerce_add_to_cart', new DraftOrdersSync(), 10, 6 );
+        add_action( 'woocommerce_add_to_cart', new DraftOrdersSync(), 10, 6);
+        add_filter( 'woocommerce_update_cart_action_cart_updated', new DraftOrdersLineSync(), 101, 1);
     }
 
     public function addBirthdayField($fields){

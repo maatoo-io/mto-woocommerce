@@ -523,16 +523,18 @@ class MtoConnector
      * @return array|false|void|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getRemoteList($endpoint, int $orderId = 0)
+    public function getRemoteList($endpoint, int $orderId = 0, $mtoOrderID=null)
     {
         if (!isset($endpoint->list) || ($orderId && !isset($endpoint->retrieveOrderLines))) {
             return false;
         }
-        if ($orderId) {
+        if ($orderId || $mtoOrderID) {
             $mtoId = get_post_meta($orderId, '_mto_id', true);
-            if(!$mtoId){
+            if(!$mtoId && is_null($mtoOrderID)){
                 return false;
             }
+            $mtoId = $mtoOrderID ?: $mtoId;
+
             $route = str_replace('{id}', $mtoId, $endpoint->retrieveOrderLines->route);
             $endpointNew = (object) [
                 'route' => $route,

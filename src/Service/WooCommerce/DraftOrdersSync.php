@@ -56,7 +56,7 @@ class DraftOrdersSync
     public static function syncOrder()
     {
         $store = MtoStoreManger::getStoreData();
-        $leadId = $_COOKIE['mtc_id'] ?? '2237';
+        $leadId = $_COOKIE['mtc_id'] ?? null;
         $orderRequestData = [
             'store' => $store->getId(),
             'externalOrderId' => static::getDraftOrderId() ?: static::getCustomerID(),

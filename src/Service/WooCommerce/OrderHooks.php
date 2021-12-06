@@ -41,9 +41,11 @@ class OrderHooks
             add_filter( 'woocommerce_billing_fields', [$this,'addBirthdayField'], 20, 1 );
         }
 
-        add_action( 'woocommerce_add_to_cart', new DraftOrdersSync(), 10, 6);
-        add_filter( 'woocommerce_update_cart_action_cart_updated', new DraftOrdersLineSync(), 101, 1);
-        add_action( 'woocommerce_cart_item_removed', [DraftOrdersLineSync::class, 'removeItemFromCart'], 101, 2);
+        if(!is_admin()){
+            add_action( 'woocommerce_add_to_cart', new DraftOrdersSync(), 10, 6);
+            add_filter( 'woocommerce_update_cart_action_cart_updated', new DraftOrdersLineSync(), 101, 1);
+            add_action( 'woocommerce_cart_item_removed', [DraftOrdersLineSync::class, 'removeItemFromCart'], 101, 2);
+        }
     }
 
     public function addBirthdayField($fields){

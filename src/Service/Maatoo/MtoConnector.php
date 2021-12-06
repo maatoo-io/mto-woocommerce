@@ -6,6 +6,7 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoProduct;
@@ -157,6 +158,30 @@ class MtoConnector
               ['form_params' => $args]
             );
             $responseData = (array)json_decode($response->getBody()->getContents(), 'true');
+        } catch (\Exception $exception) {
+            LogData::writeApiErrors($exception->getMessage());
+        }
+
+        return $responseData;
+    }
+
+    public function getResponseDataAsync($endpointConfig, $args = []): ?PromiseInterface
+    {
+        if (empty($endpointConfig)) {
+            return null;
+        }
+        $responseData = null;
+        try {
+            $response = $this->client->requestAsync(
+                $endpointConfig->method,
+                $endpointConfig->route,
+                ['form_params' => $args]
+            );
+            $responseData = $response->then(function ($response) {
+                return $response;
+            });
+            $response->wait();
+            return $responseData;
         } catch (\Exception $exception) {
             LogData::writeApiErrors($exception->getMessage());
         }

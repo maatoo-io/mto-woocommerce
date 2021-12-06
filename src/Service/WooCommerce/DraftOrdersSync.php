@@ -70,15 +70,18 @@ class DraftOrdersSync
         ];
 
         $connector = MtoConnector::getInstance(new MtoUser());
-        $response = $connector->getResponseData(static::getEndpoint(), $orderRequestData);
+        $response = $connector->getResponseDataAsync(static::getEndpoint(), $orderRequestData);
 
-        if (!empty($response['order'])) {
-            $id = $response['order']['externalOrderId'] ?? null;
-            if ($id && !empty($response['order']['id'])) {
-                static::setDraftOrderId($response['order']['id']);
-                DraftOrdersLineSync::syncOrderLines($response['order']['id']);
+        $response->then(function ($resp) {
+            $response = json_decode($resp->getBody()->getContents(), true);
+            if (!empty($response['order'])) {
+                $id = $response['order']['externalOrderId'] ?? null;
+                if ($id && !empty($response['order']['id'])) {
+                    static::setDraftOrderId($response['order']['id']);
+                    DraftOrdersLineSync::syncOrderLines($response['order']['id']);
+                }
             }
-        }
+         });
     }
 
     public static function getCartTotal()

@@ -16,6 +16,10 @@ class DraftOrdersLineSync
         return $cartUpdated;
     }
 
+    public static function removeItemFromCart($cart_item_key, $that){
+        DraftOrdersSync::syncOrder();
+    }
+
     public static function syncOrderLines($mtoOrderID){
         $connector = MtoConnector::getInstance(new MtoUser());
         $orderLinesRemote = $connector->getRemoteList($connector::getApiEndPoint('order'), 0, $mtoOrderID)['orderLines'] ?? [];

@@ -18,6 +18,7 @@
 namespace Maatoo\WooCommerce;
 
 use Maatoo\WooCommerce\Registry\AdminAssets;
+use Maatoo\WooCommerce\Registry\MtoInstall;
 use Maatoo\WooCommerce\Service\Ajax\AjaxHooks;
 use Maatoo\WooCommerce\Registry\FrontAssets;
 use Maatoo\WooCommerce\Registry\Options;
@@ -154,21 +155,7 @@ class MtoWoocommerce
 
     public static function activate()
     {
-        if (!as_next_scheduled_action('mto_sync_clear_log')) {
-            as_schedule_recurring_action(time(), MTO_SYNC_INTERVAL, 'mto_sync_clear_log');
-        }
-
-        if (!as_next_scheduled_action('mto_sync_products')) {
-            as_schedule_recurring_action(time() + 1, MTO_SYNC_INTERVAL, 'mto_sync_products');
-        }
-
-        if (!as_next_scheduled_action('mto_sync_orders')) {
-            as_schedule_recurring_action(time() + 360, MTO_SYNC_INTERVAL, 'mto_sync_orders');
-        }
-        $store = MtoStoreManger::getStoreData();
-        if($store && method_exists($store, 'getShortName')){
-            update_option('_mto_tag_id', $store->getShortName() . '-pending');
-        }
+       MtoInstall::activate();
     }
 
     public static function deactivate()
@@ -184,18 +171,6 @@ class MtoWoocommerce
 
     public static function uninstall()
     {
-        global $wpdb;
-
-        $wpdb->delete(
-            $wpdb->postmeta,
-            ['meta_key' => '_mto_last_sync']
-        );
-
-        delete_option('_mto_last_sync');
-        delete_option('_mto_tag_id');
-
-        as_unschedule_all_actions('mto_sync_clear_log');
-        as_unschedule_all_actions('mto_sync_products');
-        as_unschedule_all_actions('mto_sync_orders');
+       MtoInstall::uninstall();
     }
 }

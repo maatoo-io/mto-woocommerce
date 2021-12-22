@@ -31,7 +31,7 @@ class MtoDraftOrder
         $this->externalId = $data['mto_session_key'];
         $this->mtoId = $data['mto_id'];
         $this->mtoLeadId = $data['mto_lead_id'];
-        $this->cart = json_decode($data['mto_cart']);
+        $this->cart = unserialize($data['mto_cart']);
         $this->cartValue = $data['mto_cart_value'];
         $this->dateCreated = $data['date_created'];
         $this->dateModified = $data['date_modified'];
@@ -63,8 +63,8 @@ class MtoDraftOrder
         global $wpdb;
         $data = $this->getAsArray();
         $result = $wpdb->update($wpdb->prefix . 'mto_draft_orders', $data, ['id' => $this->id]);
-        if (!$result) {
-            LogData::writeDebug('Can\'t update draft order: ' . implode('; ', $data));
+        if ($wpdb->last_error) {
+            LogData::writeDebug('Can\'t update draft order: ' . $this->id . '; Message' . $wpdb->last_error);
         }
     }
 
@@ -80,6 +80,27 @@ class MtoDraftOrder
         return $data;
     }
 
+    public function getById(string $id)
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mto_draft_orders';
+        $sql = "SELECT * FROM $table WHERE id = '$id'";
+        $data = $wpdb->get_row($sql, ARRAY_A);
+        if (!$data) {
+            return null;
+        }
+        $this->id = $data['id'];
+        $this->externalId = $data['mto_session_key'];
+        $this->mtoId = $data['mto_id'];
+        $this->storeId = $data['mto_store'];
+        $this->mtoLeadId = $data['mto_lead_id'];
+        $this->cart = unserialize($data['mto_cart']);
+        $this->cartValue = $data['mto_cart_value'];
+        $this->dateCreated = $data['date_created'];
+        $this->dateModified = $data['date_modified'];
+        return $this;
+    }
+
     /**
      * @return mixed|string
      */
@@ -90,11 +111,11 @@ class MtoDraftOrder
     private function getAsArray(): array
     {
         return [
-            'mto_id' => $this->mtoId ?: null,
-            'mto_store' => $this->storeId,
-            'mto_session_key' => $this->externalId,
-            'mto_lead_id' => $this->mtoLeadId,
-            'mto_cart' => json_encode($this->cart),
+            'mto_id' => (string)$this->mtoId ?: null,
+            'mto_store' => (string)$this->storeId,
+            'mto_session_key' => (string)$this->externalId,
+            'mto_lead_id' => (string)$this->mtoLeadId,
+            'mto_cart' => serialize($this->cart),
             'mto_cart_value' => $this->cartValue,
             'date_created' => property_exists($this, 'dateCreated') && !empty($this->dateCreated) ? $this->dateCreated : date('Y-m-d H:i:s', strtotime('now')),
             'date_modified' => $this->dateModified
@@ -219,8 +240,8 @@ class MtoDraftOrder
             if ($id && !empty($response['order']['id'])) {
                 $this->mtoId = $response['order']['id'];
                 $this->update();
-                DraftOrdersLineSync::runBackgroundSync($this);
-                //wp_schedule_single_event(time(), 'mto_background_draft_order_sync', [$this]);
+                //DraftOrdersLineSync::runBackgroundSync($this);
+                wp_schedule_single_event(time(), 'mto_background_draft_order_sync', [$this]);
             }
         }
     }

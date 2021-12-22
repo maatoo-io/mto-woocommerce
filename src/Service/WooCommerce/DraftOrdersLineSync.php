@@ -11,8 +11,8 @@ class DraftOrdersLineSync
         $sessionKey = DraftOrdersSync::getCustomerID();
         $mtoDO = new MtoDraftOrder($sessionKey);
         if($cartUpdated && $mtoDO->getExternalId()){
-            static::runBackgroundSync($mtoDO);
-            //wp_schedule_single_event(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]);
+            //static::runBackgroundSync($mtoDO);
+            wp_schedule_single_event(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]);
         }
         return $cartUpdated;
     }

@@ -10,7 +10,9 @@ class DraftOrdersSync
 {
     public function __invoke($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data)
     {
-        static::syncOrder();
+        if(self::getCustomerID()){
+            static::syncOrder();
+        }
     }
 
     public static function getCustomerID()
@@ -42,9 +44,8 @@ class DraftOrdersSync
         }
         //update record in DB
         $mtoDO->save();
-        //todo remove and uncomment when ready
-        static::runBackgroundSync($mtoDO);
-        //wp_schedule_single_event(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]);
+        //static::runBackgroundSync($mtoDO);
+        wp_schedule_single_event(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]);
     }
 
     public static function getCartTotal()
@@ -85,17 +86,17 @@ class DraftOrdersSync
         $mtoDO->sync();
     }
 
-    public static function invokeUserSession(){
+    public static function wakeupUserSession(){
         if(empty($_GET['mto'])){
             return;
         }
         $data =unserialize(base64_decode($_GET['mto']));
         $mtoDO = new MtoDraftOrder($data['sessionKey']);
-
-        $sessionKey = static::getCustomerID();
-        $mtoDO->setExternalId($sessionKey)->update();
+        if(!$mtoDO->getExternalId()){
+            $mtoDO = $mtoDO->getById($data['draftOrderId']);
+        }
+        $_COOKIE['test'] = 'test';
         global $woocommerce;
-
         foreach ($mtoDO->getCart() as $item){
             $woocommerce->cart->add_to_cart( $item['product_id'] );
         }

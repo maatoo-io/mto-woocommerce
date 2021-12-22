@@ -18,10 +18,12 @@ class MtoInstall
 
         $table = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}mto_draft_orders (
                       id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-                      mto_id char(32) NOT NULL,
-                      mto_order_key char(32) NOT NULL,
-                      mto_customer_id char(32) NOT NULL,
+                      mto_id char(64) NULL,
+                      mto_store char(32) NULL,
+                      mto_session_key char(32) NOT NULL,
+                      mto_lead_id char(32) NOT NULL,
                       mto_cart text NOT NULL,
+                      mto_cart_value decimal NOT NULL,
                       date_created datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
                       date_modified datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
                       PRIMARY KEY  (id),

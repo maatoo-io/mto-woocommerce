@@ -37,6 +37,8 @@ class OrderHooks
         add_action('save_post_shop_order', [$this, 'saveOrder']);
         add_action('before_delete_post', [$this, 'deleteOrder']);
         add_action('mto_background_order_sync', [$this, 'singleOrderSync'], 10, 2);
+        add_action('mto_background_draft_order_sync', [DraftOrdersSync::class, 'runBackgroundSync'], 10, 1);
+        add_action('mto_background_draft_order_sync', [DraftOrdersLineSync::class, 'runBackgroundSync'], 10, 1);
         if($mtoUser && $mtoUser->isBirthdayEnabled()){
             add_filter( 'woocommerce_billing_fields', [$this,'addBirthdayField'], 20, 1 );
         }
@@ -45,6 +47,8 @@ class OrderHooks
             add_action( 'woocommerce_add_to_cart', new DraftOrdersSync(), 10, 6);
             add_filter( 'woocommerce_update_cart_action_cart_updated', new DraftOrdersLineSync(), 101, 1);
             add_action( 'woocommerce_cart_item_removed', [DraftOrdersLineSync::class, 'removeItemFromCart'], 101, 2);
+            add_action( 'template_redirect', [DraftOrdersSync::class, 'invokeUserSession']);
+
         }
     }
 

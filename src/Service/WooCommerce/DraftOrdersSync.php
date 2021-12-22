@@ -2,8 +2,8 @@
 
 namespace Maatoo\WooCommerce\Service\WooCommerce;
 
-use Maatoo\WooCommerce\Entity\MtoUser;
-use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
+use Maatoo\WooCommerce\Entity\MtoDraftOrder;
+use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 class DraftOrdersSync
@@ -20,77 +20,84 @@ class DraftOrdersSync
         return $woocommerce->session->get_customer_unique_id();
     }
 
-    /**
-     * @return bool
-     */
-    public static function isOrderCreated(): ?bool
-    {
-        if (empty($_COOKIE['mto_draft_order_id'])) {
-            return false;
-        }
-        return true;
-    }
-
-    public static function setDraftOrderId($id)
-    {
-        wc_setcookie('mto_draft_order_id', $id);
-    }
-
-    public static function getDraftOrderId()
-    {
-        return $_COOKIE['mto_draft_order_id'] ?? false;
-    }
-
-    private static function getEndpoint()
-    {
-        $endpoint = !static::isOrderCreated()
-            ? MtoConnector::getApiEndPoint('order')->create
-            : MtoConnector::getApiEndPoint('order')->edit;
-
-        if (static::getDraftOrderId()) {
-            $endpoint->route = str_replace('{id}', static::getDraftOrderId(), $endpoint->route);
-        }
-        return $endpoint;
-    }
-
     public static function syncOrder()
     {
-        $store = MtoStoreManger::getStoreData();
-        $leadId = $_COOKIE['mtc_id'] ?? null;
-        $orderRequestData = [
-            'store' => $store->getId(),
-            'externalOrderId' => static::getDraftOrderId() ?: static::getCustomerID(),
-            'externalDateProcessed' => null, //what if order is not processed?
-            'externalDateUpdated' => date('Y-m-d H:i:s', strtotime('now')),
-            'externalDateCancelled' => null,
-            'value' => static::getCartTotal(),
-            'url' => wc_get_cart_url(), // what if order hasn't been placed yet?
-            'status' => 'draft',
-            'lead_id' => $leadId
-        ];
-
-        $connector = MtoConnector::getInstance(new MtoUser());
-        $response = $connector->getResponseData(static::getEndpoint(), $orderRequestData);
-
-        if (!empty($response['order'])) {
-            $id = $response['order']['externalOrderId'] ?? null;
-            if ($id && !empty($response['order']['id'])) {
-                static::setDraftOrderId($response['order']['id']);
-                DraftOrdersLineSync::syncOrderLines($response['order']['id']);
-            }
+        $cart = static::getCartContent();
+        $cartValue = static::getCartTotal();
+        $dateModified = date('Y-m-d H:i:s', strtotime('now'));
+        $sessionKey = static::getCustomerID();
+        $mtoDO = new MtoDraftOrder($sessionKey);
+        if (!$mtoDO->getExternalId()) {
+            $store = MtoStoreManger::getStoreData();
+            $mtoDO = MtoDraftOrder::toMtoDraftOrder(
+                $store->getId(),
+                $sessionKey,
+                $_COOKIE['mtc_id'] ?? null,
+                $cart,
+                $cartValue,
+                $dateModified
+            );
+        } else {
+            $mtoDO->setCart($cart)->setCartValue($cartValue)->setDateModified($dateModified);
         }
+        //update record in DB
+        $mtoDO->save();
+        //todo remove and uncomment when ready
+        static::runBackgroundSync($mtoDO);
+        //wp_schedule_single_event(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]);
     }
 
     public static function getCartTotal()
     {
-        global $woocommerce;
         $total = 0.0;
-        $cartContent = $woocommerce->cart->get_cart_contents();
+        $cartContent = static::getCartContent();
         foreach ($cartContent as $item) {
-            $product = $item['data'] ?? null;
-            $qnt = $item['quantity'] ?? 1;
-            $total += floatval($product->get_price()) * $qnt;
+            $total += floatval($item['product_price']) * $item['quantity'];
         }
         return $total;
+    }
+
+    public static function getCartContent()
+    {
+        global $woocommerce;
+
+        $cart = $woocommerce->cart;
+        $data = [];
+
+        $cartContent = $cart->get_cart_contents();
+        foreach ($cartContent as $item) {
+            $data[] = [
+                'store' => MTO_STORE_ID,
+                'mto_product_id' => get_post_meta($item['data']->get_id(), '_mto_id', true),
+                'product_id' => $item['data']->get_id(),
+                'quantity' => $item['quantity'] ?? 1,
+                'product_price' => $item['data']->get_price(),
+            ];
+        }
+        return $data;
+    }
+
+    public static function runBackgroundSync(MtoDraftOrder $mtoDO)
+    {
+        if (!$mtoDO) {
+            LogData::writeDebug('Incorrect input data: $mtoDO is empty');
+        }
+        $mtoDO->sync();
+    }
+
+    public static function invokeUserSession(){
+        if(empty($_GET['mto'])){
+            return;
+        }
+        $data =unserialize(base64_decode($_GET['mto']));
+        $mtoDO = new MtoDraftOrder($data['sessionKey']);
+
+        $sessionKey = static::getCustomerID();
+        $mtoDO->setExternalId($sessionKey)->update();
+        global $woocommerce;
+
+        foreach ($mtoDO->getCart() as $item){
+            $woocommerce->cart->add_to_cart( $item['product_id'] );
+        }
     }
 }

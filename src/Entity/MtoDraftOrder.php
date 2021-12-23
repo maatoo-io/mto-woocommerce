@@ -278,7 +278,7 @@ class MtoDraftOrder
                 $this->mtoId = $response['order']['id'];
                 $this->update();
                 //DraftOrdersLineSync::runBackgroundSync($this);
-                as_schedule_single_action(time(), 'mto_background_draft_orderlines_sync', [$this]);
+                wp_schedule_single_event(time()-1, 'mto_background_draft_orderlines_sync', [$this]);
             }
         }
     }

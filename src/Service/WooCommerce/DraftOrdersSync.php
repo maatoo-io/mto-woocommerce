@@ -55,7 +55,7 @@ class DraftOrdersSync
         $expire = time() + 3600 * 24 * 28;
         wc_setcookie("mto_restore_do_id", sprintf("%d||%s", $mtoDO->getId(), $sessionKey), $expire);  /* expire in 28 days */
         //static::runBackgroundSync($mtoDO);
-        as_schedule_single_action(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]);
+        wp_schedule_single_event(time()-1, 'mto_background_draft_order_sync', [$mtoDO]);
     }
 
     /**
@@ -118,11 +118,12 @@ class DraftOrdersSync
             return;
         }
         // $_GET['mto'] has higher prio
+        $customerId = self::getCustomerID();
+        $draftOrderId = '';
         if (!empty($_GET['mto'])) {
             $data = unserialize(base64_decode($_GET['mto']));
             $draftOrderId = $data['draftOrderId'];
         } elseif (!empty($_COOKIE['mto_restore_do_id'])) {
-            $customerId = self::getCustomerID();
             $previousKey = explode('||', $_COOKIE['mto_restore_do_id']);
             if ($previousKey[1] === $customerId) {
                 return;

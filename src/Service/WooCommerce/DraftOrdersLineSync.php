@@ -14,7 +14,7 @@ class DraftOrdersLineSync
             //update cart data before proceed
             $mtoDO->setCart(DraftOrdersSync::getCartContent())->setCartValue(DraftOrdersSync::getCartTotal())->save();
             //DraftOrdersSync::runBackgroundSync($mtoDO);
-            as_schedule_single_action(time(), 'mto_background_draft_order_sync', [$mtoDO]);
+            wp_schedule_single_event(time()-1, 'mto_background_draft_order_sync', [$mtoDO]);
         }
         return $cartUpdated;
     }
@@ -23,7 +23,7 @@ class DraftOrdersLineSync
         $sessionKey = DraftOrdersSync::getCustomerID();
         $mtoDO = new MtoDraftOrder($sessionKey);
         if($mtoDO->getExternalId()){
-            as_schedule_single_action(time(), 'mto_background_draft_order_sync', [$mtoDO]);
+            wp_schedule_single_event(time()-1, 'mto_background_draft_order_sync', [$mtoDO]);
         }
     }
 

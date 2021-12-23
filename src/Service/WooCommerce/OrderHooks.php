@@ -131,6 +131,8 @@ class OrderHooks
             return;
         }
         try {
+            wc_setcookie('mto_restore_do_id', null); // clear cookie with draft order
+            wc_setcookie('mto_wakeup_session', null); // clear cookie with draft order
             $isSubscribed = (bool)$_POST['mto_email_subscription'] ?? false;
             $contact = $_COOKIE['mtc_id'] ?? null;
             $customerId = DraftOrdersSync::getCustomerID();
@@ -148,7 +150,7 @@ class OrderHooks
                 update_post_meta($orderId, '_mto_conversion', $_COOKIE['mto_conversion']);
                 wc_setcookie('mto_conversion', null);
             }
-            as_schedule_single_action(time() - 1, 'mto_background_order_sync', [$orderId, $_POST]);
+            wp_schedule_single_event(time() - 1, 'mto_background_order_sync', [$orderId, $_POST]);
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
         }

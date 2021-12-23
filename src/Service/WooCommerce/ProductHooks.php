@@ -71,7 +71,7 @@ class ProductHooks
                     return;
                 }
             }
-            as_schedule_single_action(time() - 1, 'mto_background_product_sync', [$product]);
+            wp_schedule_single_event(time() - 1, 'mto_background_product_sync', [$product]);
             remove_action('woocommerce_update_product', [$this, 'saveProduct']);
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());

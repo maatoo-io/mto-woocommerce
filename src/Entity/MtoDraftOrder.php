@@ -63,7 +63,7 @@ class MtoDraftOrder
     public function delete()
     {
         global $wpdb;
-        $wpdb->delete($this->table, ['id' => $this->id]);
+        $wpdb->delete($wpdb->prefix . 'mto_draft_orders', ['id' => $this->id]);
     }
 
     /**

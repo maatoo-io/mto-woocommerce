@@ -10,7 +10,7 @@ class DraftOrdersSync
 {
     public function __invoke($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data)
     {
-        if(self::getCustomerID()){
+        if (self::getCustomerID()) {
             static::syncOrder();
         }
     }
@@ -22,12 +22,19 @@ class DraftOrdersSync
         return $woocommerce->session->get_customer_unique_id();
     }
 
+    /**
+     * Method to collect data received from user and stare it for
+     */
     public static function syncOrder()
     {
+        $sessionKey = static::getCustomerID();
+        if(!$sessionKey || !isset($_COOKIE['mtc_id'])){
+            return;
+        }
         $cart = static::getCartContent();
         $cartValue = static::getCartTotal();
         $dateModified = date('Y-m-d H:i:s', strtotime('now'));
-        $sessionKey = static::getCustomerID();
+
         $mtoDO = new MtoDraftOrder($sessionKey);
         if (!$mtoDO->getExternalId()) {
             $store = MtoStoreManger::getStoreData();
@@ -48,6 +55,10 @@ class DraftOrdersSync
         wp_schedule_single_event(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]);
     }
 
+    /**
+     * Calculate cart total value
+     * @return float|int
+     */
     public static function getCartTotal()
     {
         $total = 0.0;
@@ -58,6 +69,10 @@ class DraftOrdersSync
         return $total;
     }
 
+    /**
+     * get up-to-date cart content
+     * @return array
+     */
     public static function getCartContent()
     {
         global $woocommerce;
@@ -78,6 +93,10 @@ class DraftOrdersSync
         return $data;
     }
 
+    /**
+     * Schedule event handler
+     * @param MtoDraftOrder $mtoDO
+     */
     public static function runBackgroundSync(MtoDraftOrder $mtoDO)
     {
         if (!$mtoDO) {
@@ -86,19 +105,31 @@ class DraftOrdersSync
         $mtoDO->sync();
     }
 
-    public static function wakeupUserSession(){
-        if(empty($_GET['mto'])){
+    /**
+     * Add products to the cart if user back by maatoo's link
+     */
+    public static function wakeupUserSession()
+    {
+        if (empty($_GET['mto']) || !empty($_COOKIE['mto_wakeup_session'])) {
+            //don't wake cart up more than 1 time for session
             return;
         }
-        $data =unserialize(base64_decode($_GET['mto']));
-        $mtoDO = new MtoDraftOrder($data['sessionKey']);
-        if(!$mtoDO->getExternalId()){
-            $mtoDO = $mtoDO->getById($data['draftOrderId']);
+        $data = unserialize(base64_decode($_GET['mto']));
+        $mtoDO = MtoDraftOrder::getById($data['draftOrderId']);
+        if (!empty($_COOKIE)) {
+            foreach ($_COOKIE as $key => $item) {
+                if (strpos($key, 'wp_woocommerce_session_') !== false) {
+                    $wcSessionData = explode('||', $item); // retrieve session info
+                    $customerId = $wcSessionData[0] ?? '';
+                    $mtoDO->setExternalId($customerId);
+                    $mtoDO->save();
+                }
+            }
         }
-        $_COOKIE['test'] = 'test';
         global $woocommerce;
-        foreach ($mtoDO->getCart() as $item){
-            $woocommerce->cart->add_to_cart( $item['product_id'] );
+        foreach ($mtoDO->getCart() as $item) {
+            $woocommerce->cart->add_to_cart($item['product_id']);
         }
+        wc_setcookie('mto_wakeup_session', '1');
     }
 }

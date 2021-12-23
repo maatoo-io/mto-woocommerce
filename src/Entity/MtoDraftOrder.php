@@ -4,19 +4,21 @@ namespace Maatoo\WooCommerce\Entity;
 
 use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
-use Maatoo\WooCommerce\Service\WooCommerce\DraftOrdersLineSync;
-use Maatoo\WooCommerce\Service\WooCommerce\DraftOrdersSync;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
+use Maatoo\WooCommerce\Service\WooCommerce\DraftOrdersLineSync;
 
+/**
+ * Class explain and proceed actions related to draft orders
+ */
 class MtoDraftOrder
 {
-    private ?int $id;
+    private ?int $id; //session id
     private int $storeId;
-    private string $externalId = '';
-    private ?int $mtoId;
-    private int $mtoLeadId;
-    private array $cart;
-    private float $cartValue;
+    private string $externalId = ''; // identify record in local database. For maatoo local ID is named "External"
+    private ?int $mtoId; // id in maatoo database
+    private int $mtoLeadId; // customer id in maatoo database
+    private array $cart; // array of items data which are in the cart
+    private float $cartValue; // cart total value
     private ?string $dateCreated = '';
     private ?string $dateModified = '';
 
@@ -38,6 +40,9 @@ class MtoDraftOrder
         return $this;
     }
 
+    /**
+     * save draft order data in the database
+     */
     public function save()
     {
         if ($this->id) {
@@ -52,12 +57,18 @@ class MtoDraftOrder
         }
     }
 
+    /**
+     * delete record from the datavase
+     */
     public function delete()
     {
         global $wpdb;
         $wpdb->delete($this->table, ['id' => $this->id]);
     }
 
+    /**
+     * update draft order's data in the database
+     */
     public function update()
     {
         global $wpdb;
@@ -68,6 +79,9 @@ class MtoDraftOrder
         }
     }
 
+    /*
+     * get draft order data from the db in array format
+     */
     private function getBySessionKey(string $sessionKey)
     {
         global $wpdb;
@@ -80,7 +94,12 @@ class MtoDraftOrder
         return $data;
     }
 
-    public function getById(string $id)
+    /**
+     * Creates an instance of MtoDraftOrder if such exists
+     * @param string $id
+     * @return MtoDraftOrder|null
+     */
+    public static function getById(string $id)
     {
         global $wpdb;
         $table = $wpdb->prefix . 'mto_draft_orders';
@@ -89,16 +108,16 @@ class MtoDraftOrder
         if (!$data) {
             return null;
         }
-        $this->id = $data['id'];
-        $this->externalId = $data['mto_session_key'];
-        $this->mtoId = $data['mto_id'];
-        $this->storeId = $data['mto_store'];
-        $this->mtoLeadId = $data['mto_lead_id'];
-        $this->cart = unserialize($data['mto_cart']);
-        $this->cartValue = $data['mto_cart_value'];
-        $this->dateCreated = $data['date_created'];
-        $this->dateModified = $data['date_modified'];
-        return $this;
+        $instance = new self();
+        return $instance->setId($data['id'])
+            ->setExternalId($data['mto_session_key'])
+            ->setMtoId($data['mto_id'])
+            ->setStoreId($data['mto_store'])
+            ->setMtoLeadId($data['mto_lead_id'])
+            ->setCart(unserialize($data['mto_cart']))
+            ->setCartValue($data['mto_cart_value'])
+            ->setDateCreated($data['date_created'])
+            ->setDateModified($data['date_modified']);
     }
 
     /**
@@ -108,6 +127,11 @@ class MtoDraftOrder
     {
         return $this->externalId;
     }
+
+    /**
+     * convert object to array
+     * @return array
+     */
     private function getAsArray(): array
     {
         return [
@@ -212,6 +236,10 @@ class MtoDraftOrder
         return $this;
     }
 
+    /**
+     * Send order data to maatoo
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function sync()
     {
         $endpoint = !$this->mtoId
@@ -241,11 +269,15 @@ class MtoDraftOrder
                 $this->mtoId = $response['order']['id'];
                 $this->update();
                 //DraftOrdersLineSync::runBackgroundSync($this);
-                wp_schedule_single_event(time(), 'mto_background_draft_order_sync', [$this]);
+               wp_schedule_single_event(time(), 'mto_background_draft_orderlines_sync', [$this]);
             }
         }
     }
 
+    /**
+     * Send orders data to maatoo
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function syncOrderLines(){
         $connector = MtoConnector::getInstance(new MtoUser());
         $orderLinesRemote = $connector->getRemoteList($connector::getApiEndPoint('order'), 0, $this->mtoId)['orderLines'] ?? [];
@@ -278,6 +310,10 @@ class MtoDraftOrder
 
     }
 
+    /**
+     * Convert cart data to array with order lines to be sent to maatoo
+     * @return array
+     */
     private function getOrderLines(){
         $data = [];
         foreach ($this->cart as $item) {
@@ -291,6 +327,10 @@ class MtoDraftOrder
         return $data;
     }
 
+    /**
+     * create a link which add items to cart automatically and be the draft order url
+     * @return string
+     */
     private function getOrderUrl()
     {
         return sprintf(
@@ -313,6 +353,27 @@ class MtoDraftOrder
         return (array)$this->cart;
     }
 
+    /**
+     * @return int|mixed|null
+     */
+    public function getMtoId()
+    {
+        return $this->mtoId;
+    }
+
+    /**
+     * Convert data to MtoDraftOrder object
+     *
+     * @param $storeId
+     * @param $sessionKey
+     * @param $leadId
+     * @param $cart
+     * @param $cartValue
+     * @param $dateModified
+     * @param null $id
+     * @param null $mtoId
+     * @return MtoDraftOrder
+     */
     public static function toMtoDraftOrder(
         $storeId,
         $sessionKey,

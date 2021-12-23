@@ -2,11 +2,13 @@
 
 namespace Maatoo\WooCommerce\Service\WooCommerce;
 
+use Maatoo\WooCommerce\Entity\MtoDraftOrder;
 use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
+use Maatoo\WooCommerce\Service\WooCommerce\DraftOrdersLineSync;
 
 class OrderHooks
 {
@@ -38,7 +40,7 @@ class OrderHooks
         add_action('before_delete_post', [$this, 'deleteOrder']);
         add_action('mto_background_order_sync', [$this, 'singleOrderSync'], 10, 2);
         add_action('mto_background_draft_order_sync', [DraftOrdersSync::class, 'runBackgroundSync'], 10, 1);
-        add_action('mto_background_draft_order_sync', [DraftOrdersLineSync::class, 'runBackgroundSync'], 10, 1);
+        add_action('mto_background_draft_orderlines_sync', [DraftOrdersLineSync::class, 'runBackgroundSync'], 10, 1);
         if($mtoUser && $mtoUser->isBirthdayEnabled()){
             add_filter( 'woocommerce_billing_fields', [$this,'addBirthdayField'], 20, 1 );
         }
@@ -131,10 +133,12 @@ class OrderHooks
         try {
             $isSubscribed = (bool)$_POST['mto_email_subscription'] ?? false;
             $contact = $_COOKIE['mtc_id'] ?? null;
-            if(!empty($_COOKIE['mto_draft_order_id'])){
-                $draftId = $_COOKIE['mto_draft_order_id'];
-                wc_setcookie('mto_draft_order_id', null);
-                update_post_meta($orderId, 'mto_draft_order_id', $draftId);
+            $customerId = DraftOrdersSync::getCustomerID();
+            $draftOrder = new MtoDraftOrder($customerId);
+
+            if(!empty($draftOrder->getExternalId())){
+                update_post_meta($orderId, '_mto_id', $draftOrder->getMtoId() ?: '');
+                $draftOrder->delete(); //remove draft order from the DB
             }
             update_post_meta($orderId, '_mto_is_subscribed', $isSubscribed ? '1' : '0');
             update_post_meta($orderId, '_mto_contact_id', $contact);
@@ -197,7 +201,7 @@ class OrderHooks
         }
     }
 
-    public static function launchOrderLineSync($orderLines, $mtoConnector){
+    public static function launchOrderLineSync($orderLines, MtoConnector $mtoConnector){
         if(!empty($orderLines['create'])){
             $statusOrderLines = $mtoConnector->sendOrderLines(
               $orderLines['create'],

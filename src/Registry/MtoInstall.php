@@ -6,7 +6,7 @@ use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 class MtoInstall
 {
-    private static function createDraftOrderTable()
+    public static function createDraftOrderTable()
     {
         global $wpdb;
 

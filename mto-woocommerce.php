@@ -47,7 +47,7 @@ if (file_exists($composer_path)) {
 }
 
 if (!defined('MTO_PLUGIN_VERSION')) {
-    define('MTO_PLUGIN_VERSION', '1.4.2');
+    define('MTO_PLUGIN_VERSION', '1.5.0');
 }
 
 if (!defined('MTO_PLUGIN_SLUG')) {

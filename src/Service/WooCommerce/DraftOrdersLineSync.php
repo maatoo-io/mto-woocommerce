@@ -20,7 +20,11 @@ class DraftOrdersLineSync
     }
 
     public static function removeItemFromCart($cart_item_key, $that){
-        DraftOrdersSync::syncOrder();
+        $sessionKey = DraftOrdersSync::getCustomerID();
+        $mtoDO = new MtoDraftOrder($sessionKey);
+        if($mtoDO->getExternalId()){
+            wp_schedule_single_event(time(), 'mto_background_draft_order_sync', [$mtoDO]);
+        }
     }
 
     public static function runBackgroundSync(MtoDraftOrder $mtoDO){

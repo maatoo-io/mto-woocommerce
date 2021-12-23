@@ -23,7 +23,7 @@ class MtoInstall
                       mto_session_key char(32) NOT NULL,
                       mto_lead_id char(32) NOT NULL,
                       mto_cart text NOT NULL,
-                      mto_cart_value decimal NOT NULL,
+                      mto_cart_value DECIMAL(19 , 2) NOT NULL,
                       date_created datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
                       date_modified datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
                       PRIMARY KEY  (id),

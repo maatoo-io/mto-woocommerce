@@ -41,6 +41,14 @@ class MtoDraftOrder
     }
 
     /**
+     * @return int|mixed|null
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * save draft order data in the database
      */
     public function save()
@@ -55,6 +63,7 @@ class MtoDraftOrder
         if (!$result) {
             LogData::writeDebug('Can\'t insert draft order: ' . implode('; ', $data));
         }
+        $this->id = $wpdb->insert_id;
     }
 
     /**
@@ -269,7 +278,7 @@ class MtoDraftOrder
                 $this->mtoId = $response['order']['id'];
                 $this->update();
                 //DraftOrdersLineSync::runBackgroundSync($this);
-               wp_schedule_single_event(time(), 'mto_background_draft_orderlines_sync', [$this]);
+                as_schedule_single_action(time(), 'mto_background_draft_orderlines_sync', [$this]);
             }
         }
     }

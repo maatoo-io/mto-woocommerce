@@ -148,7 +148,7 @@ class OrderHooks
                 update_post_meta($orderId, '_mto_conversion', $_COOKIE['mto_conversion']);
                 wc_setcookie('mto_conversion', null);
             }
-            wp_schedule_single_event(time() - 1, 'mto_background_order_sync', [$orderId, $_POST]);
+            as_schedule_single_action(time() - 1, 'mto_background_order_sync', [$orderId, $_POST]);
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
         }

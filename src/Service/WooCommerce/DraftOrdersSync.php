@@ -5,6 +5,7 @@ namespace Maatoo\WooCommerce\Service\WooCommerce;
 use Maatoo\WooCommerce\Entity\MtoDraftOrder;
 use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
+use PHPUnit\Exception;
 
 class DraftOrdersSync
 {
@@ -28,7 +29,7 @@ class DraftOrdersSync
     public static function syncOrder()
     {
         $sessionKey = static::getCustomerID();
-        if(!$sessionKey || !isset($_COOKIE['mtc_id'])){
+        if (!$sessionKey || !isset($_COOKIE['mtc_id'])) {
             return;
         }
         $cart = static::getCartContent();
@@ -51,8 +52,10 @@ class DraftOrdersSync
         }
         //update record in DB
         $mtoDO->save();
+        $expire = time() + 3600 * 24 * 28;
+        wc_setcookie("mto_restore_do_id", sprintf("%d||%s", $mtoDO->getId(), $sessionKey), $expire);  /* expire in 28 days */
         //static::runBackgroundSync($mtoDO);
-        wp_schedule_single_event(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]);
+        as_schedule_single_action(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]);
     }
 
     /**
@@ -110,26 +113,45 @@ class DraftOrdersSync
      */
     public static function wakeupUserSession()
     {
-        if (empty($_GET['mto']) || !empty($_COOKIE['mto_wakeup_session'])) {
+        if ((empty($_GET['mto']) || !empty($_COOKIE['mto_wakeup_session'])) && empty($_COOKIE['mto_restore_do_id'])) {
             //don't wake cart up more than 1 time for session
             return;
         }
-        $data = unserialize(base64_decode($_GET['mto']));
-        $mtoDO = MtoDraftOrder::getById($data['draftOrderId']);
-        if (!empty($_COOKIE)) {
-            foreach ($_COOKIE as $key => $item) {
-                if (strpos($key, 'wp_woocommerce_session_') !== false) {
-                    $wcSessionData = explode('||', $item); // retrieve session info
-                    $customerId = $wcSessionData[0] ?? '';
-                    $mtoDO->setExternalId($customerId);
-                    $mtoDO->save();
+        // $_GET['mto'] has higher prio
+        if (!empty($_GET['mto'])) {
+            $data = unserialize(base64_decode($_GET['mto']));
+            $draftOrderId = $data['draftOrderId'];
+        } elseif (!empty($_COOKIE['mto_restore_do_id'])) {
+            $customerId = self::getCustomerID();
+            $previousKey = explode('||', $_COOKIE['mto_restore_do_id']);
+            if ($previousKey[1] === $customerId) {
+                return;
+            }
+            $draftOrderId = $previousKey[0];
+            wc_setcookie('mto_restore_do_id', null);
+        }
+
+        try {
+            $mtoDO = MtoDraftOrder::getById((int)$draftOrderId);
+            if (!empty($_COOKIE) && !$customerId) {
+                foreach ($_COOKIE as $key => $item) {
+                    if (strpos($key, 'wp_woocommerce_session_') !== false) {
+                        $wcSessionData = explode('||', $item); // retrieve session info
+                        $customerId = $wcSessionData[0] ?? '';
+                        $mtoDO->setExternalId($customerId);
+                        $mtoDO->save();
+                    }
                 }
             }
+
+            global $woocommerce;
+            foreach ($mtoDO->getCart() as $item) {
+                $woocommerce->cart->add_to_cart($item['product_id']);
+            }
+            wc_setcookie('mto_wakeup_session', '1');
+        } catch (\Exception $exception) {
+            LogData::writeTechErrors('Can\'t wake up a session with id ' . $draftOrderId . '. Error message: ' . $exception->getMessage());
         }
-        global $woocommerce;
-        foreach ($mtoDO->getCart() as $item) {
-            $woocommerce->cart->add_to_cart($item['product_id']);
-        }
-        wc_setcookie('mto_wakeup_session', '1');
+
     }
 }

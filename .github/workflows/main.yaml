@@ -31,7 +31,7 @@ jobs:
             ${{ runner.os }}-php-
       
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer install --ignore-platform-reqs --prefer-dist --no-progress --no-suggest
 
       # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
       # Docs: https://getcomposer.org/doc/articles/scripts.md
@@ -55,7 +55,7 @@ jobs:
             ${{ runner.os }}-php-
     
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer install --ignore-platform-reqs --prefer-dist --no-progress --no-suggest
 
       # TODO: Rename artifact to use git tag name
       - name: Build

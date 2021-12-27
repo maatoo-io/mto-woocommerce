@@ -144,7 +144,7 @@ class MtoConnector
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    private function getResponseData($endpointConfig, $args = []): ?array
+    public function getResponseData($endpointConfig, $args = []): ?array
     {
         if (empty($endpointConfig)) {
             return [];

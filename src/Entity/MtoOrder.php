@@ -277,9 +277,15 @@ class MtoOrder extends AbstractMtoEntity
         $status = $this->getStatus();
         return [
             'status' => $status,
+            'externalOrderId' => $this->getExternalOrderId(),
+            'externalDateProcessed' => $this->getDateProceed(),
             'externalDateCancelled' => $status == 'cancelled' ? $this->getDateCancelled() : null,
             'externalDateUpdated' => $this->getDateUpdated(),
             'paymentMethod' => $this->getPayementMethod(),
+            'url' => $this->getUrl(),
+            'email' => $this->getEmail(),
+            'firstName' => $this->getFirstName(),
+            'lastName' => $this->getLastName(),
             'conversion' => $this->getConversion(),
             'value' => $this->getValue(),
         ];

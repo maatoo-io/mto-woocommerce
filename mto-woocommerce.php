@@ -2,7 +2,7 @@
 /**
  * Plugin Name: maatoo for WooCommerce
  * Description: Connect your online shop to drive more revenue with intelligent automations, e.g. abanoned cart reminders and more.
- * Version:     1.4.2
+ * Version:     1.5.0
  * Author: maatoo.io
  * Author URI: https://maatoo.io
  * License: GPL-3.0+
@@ -18,6 +18,7 @@
 namespace Maatoo\WooCommerce;
 
 use Maatoo\WooCommerce\Registry\AdminAssets;
+use Maatoo\WooCommerce\Registry\MtoInstall;
 use Maatoo\WooCommerce\Service\Ajax\AjaxHooks;
 use Maatoo\WooCommerce\Registry\FrontAssets;
 use Maatoo\WooCommerce\Registry\Options;
@@ -46,7 +47,7 @@ if (file_exists($composer_path)) {
 }
 
 if (!defined('MTO_PLUGIN_VERSION')) {
-    define('MTO_PLUGIN_VERSION', '1.4.2');
+    define('MTO_PLUGIN_VERSION', '1.5.0');
 }
 
 if (!defined('MTO_PLUGIN_SLUG')) {
@@ -90,7 +91,7 @@ if (!defined('MTO_SYNC_INTERVAL')) {
 if (!defined('MTO_MAX_ATTEMPTS')) {
     define('MTO_MAX_ATTEMPTS', 3);
 }
-
+add_action( 'plugins_loaded', [MtoInstall::class, 'createDraftOrderTable'] );
 add_action('init', new MtoWoocommerce());
 register_uninstall_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'uninstall']);
 register_activation_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'activate']);
@@ -154,21 +155,7 @@ class MtoWoocommerce
 
     public static function activate()
     {
-        if (!as_next_scheduled_action('mto_sync_clear_log')) {
-            as_schedule_recurring_action(time(), MTO_SYNC_INTERVAL, 'mto_sync_clear_log');
-        }
-
-        if (!as_next_scheduled_action('mto_sync_products')) {
-            as_schedule_recurring_action(time() + 1, MTO_SYNC_INTERVAL, 'mto_sync_products');
-        }
-
-        if (!as_next_scheduled_action('mto_sync_orders')) {
-            as_schedule_recurring_action(time() + 360, MTO_SYNC_INTERVAL, 'mto_sync_orders');
-        }
-        $store = MtoStoreManger::getStoreData();
-        if($store && method_exists($store, 'getShortName')){
-            update_option('_mto_tag_id', $store->getShortName() . '-pending');
-        }
+       MtoInstall::activate();
     }
 
     public static function deactivate()
@@ -184,18 +171,6 @@ class MtoWoocommerce
 
     public static function uninstall()
     {
-        global $wpdb;
-
-        $wpdb->delete(
-            $wpdb->postmeta,
-            ['meta_key' => '_mto_last_sync']
-        );
-
-        delete_option('_mto_last_sync');
-        delete_option('_mto_tag_id');
-
-        as_unschedule_all_actions('mto_sync_clear_log');
-        as_unschedule_all_actions('mto_sync_products');
-        as_unschedule_all_actions('mto_sync_orders');
+       MtoInstall::uninstall();
     }
 }

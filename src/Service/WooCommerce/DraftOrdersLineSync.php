@@ -13,8 +13,11 @@ class DraftOrdersLineSync
         if($cartUpdated && $mtoDO->getExternalId()){
             //update cart data before proceed
             $mtoDO->setCart(DraftOrdersSync::getCartContent())->setCartValue(DraftOrdersSync::getCartTotal())->save();
-            //DraftOrdersSync::runBackgroundSync($mtoDO);
-            wp_schedule_single_event(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]); // run in 60 seconds
+            //DraftOrdersSync::runBackgroundSync($sessionKey);
+            $args = [$sessionKey];
+            if(!as_next_scheduled_action('mto_background_draft_order_sync', $args)){
+                as_schedule_single_action(time() + 60, 'mto_background_draft_order_sync', $args); // run in 60 seconds
+            }
         }
         return $cartUpdated;
     }
@@ -22,8 +25,9 @@ class DraftOrdersLineSync
     public static function removeItemFromCart($cart_item_key, $that){
         $sessionKey = DraftOrdersSync::getCustomerID();
         $mtoDO = new MtoDraftOrder($sessionKey);
-        if($mtoDO->getExternalId()){
-            wp_schedule_single_event(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]); // run in 60 seconds
+        $args = [$sessionKey];
+        if($mtoDO->getExternalId() && !as_next_scheduled_action('mto_background_draft_order_sync', $args)){
+            as_schedule_single_action(time() + 60, 'mto_background_draft_order_sync', $args); // run in 2 seconds
         }
     }
 

@@ -24,7 +24,7 @@ class MtoDraftOrder
 
     public function __construct(string $sessionKey = '')
     {
-        $data = $this->getBySessionKey($sessionKey);
+        $data = static::getBySessionKey($sessionKey);
         if (!$data) {
             return null;
         }
@@ -91,7 +91,7 @@ class MtoDraftOrder
     /*
      * get draft order data from the db in array format
      */
-    private function getBySessionKey(string $sessionKey)
+    public static function getBySessionKey(string $sessionKey)
     {
         global $wpdb;
         $table = $wpdb->prefix . 'mto_draft_orders';
@@ -278,7 +278,7 @@ class MtoDraftOrder
                 $this->mtoId = $response['order']['id'];
                 $this->update();
                 //DraftOrdersLineSync::runBackgroundSync($this);
-                wp_schedule_single_event(time()+ 10, 'mto_background_draft_orderlines_sync', [$this]); // run in 10 seconds
+                as_schedule_single_action(time()+ 10, 'mto_background_draft_orderlines_sync', [$this]); // run in 10 seconds
             }
         }
     }

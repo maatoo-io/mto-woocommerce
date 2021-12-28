@@ -24,7 +24,7 @@ class MtoDraftOrder
 
     public function __construct(string $sessionKey = '')
     {
-        $data = static::getBySessionKey($sessionKey);
+        $data = $this->getBySessionKey($sessionKey);
         if (!$data) {
             return null;
         }
@@ -91,7 +91,7 @@ class MtoDraftOrder
     /*
      * get draft order data from the db in array format
      */
-    public static function getBySessionKey(string $sessionKey)
+    private function getBySessionKey(string $sessionKey)
     {
         global $wpdb;
         $table = $wpdb->prefix . 'mto_draft_orders';

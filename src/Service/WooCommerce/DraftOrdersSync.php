@@ -105,8 +105,8 @@ class DraftOrdersSync
      */
     public static function runBackgroundSync($sessionKey)
     {
-        $mtoDO = MtoDraftOrder::getBySessionKey($sessionKey);
-        if (!$mtoDO) {
+        $mtoDO = new MtoDraftOrder($sessionKey);
+        if (!$mtoDO->getExternalId()) {
             LogData::writeDebug('Incorrect input data: $mtoDO is empty');
         }
         $mtoDO->sync();

@@ -147,7 +147,7 @@ class DraftOrdersSync
 
             global $woocommerce;
             foreach ($mtoDO->getCart() as $item) {
-                $woocommerce->cart->add_to_cart($item['product_id']);
+                $woocommerce->cart->add_to_cart($item['product_id'], $item['quantity']);
             }
             wc_setcookie('mto_wakeup_session', '1');
         } catch (\Exception $exception) {

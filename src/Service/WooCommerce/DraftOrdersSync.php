@@ -54,8 +54,11 @@ class DraftOrdersSync
         $mtoDO->save();
         $expire = time() + 3600 * 24 * 28;
         wc_setcookie("mto_restore_do_id", sprintf("%d||%s", $mtoDO->getId(), $sessionKey), $expire);  /* expire in 28 days */
-        //static::runBackgroundSync($mtoDO);
-        wp_schedule_single_event(time()-1, 'mto_background_draft_order_sync', [$mtoDO]);
+        //static::runBackgroundSync($sessionKey);
+        $args = [$sessionKey];
+        if(!as_next_scheduled_action('mto_background_draft_order_sync', $args)){
+            as_schedule_single_action(time() + 60, 'mto_background_draft_order_sync', $args); // run in 60 seconds
+        }
     }
 
     /**
@@ -98,11 +101,12 @@ class DraftOrdersSync
 
     /**
      * Schedule event handler
-     * @param MtoDraftOrder $mtoDO
+     * @param $sessionKey
      */
-    public static function runBackgroundSync(MtoDraftOrder $mtoDO)
+    public static function runBackgroundSync($sessionKey)
     {
-        if (!$mtoDO) {
+        $mtoDO = new MtoDraftOrder($sessionKey);
+        if (!$mtoDO->getExternalId()) {
             LogData::writeDebug('Incorrect input data: $mtoDO is empty');
         }
         $mtoDO->sync();
@@ -147,7 +151,7 @@ class DraftOrdersSync
 
             global $woocommerce;
             foreach ($mtoDO->getCart() as $item) {
-                $woocommerce->cart->add_to_cart($item['product_id']);
+                $woocommerce->cart->add_to_cart($item['product_id'], $item['quantity']);
             }
             wc_setcookie('mto_wakeup_session', '1');
         } catch (\Exception $exception) {

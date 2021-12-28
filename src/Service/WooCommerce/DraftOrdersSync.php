@@ -55,7 +55,7 @@ class DraftOrdersSync
         $expire = time() + 3600 * 24 * 28;
         wc_setcookie("mto_restore_do_id", sprintf("%d||%s", $mtoDO->getId(), $sessionKey), $expire);  /* expire in 28 days */
         //static::runBackgroundSync($mtoDO);
-        wp_schedule_single_event(time()-1, 'mto_background_draft_order_sync', [$mtoDO]);
+        wp_schedule_single_event(time() + 60, 'mto_background_draft_order_sync', [$mtoDO]); // run in 60 seconds
     }
 
     /**

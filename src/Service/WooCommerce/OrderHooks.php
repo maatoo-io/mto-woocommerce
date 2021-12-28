@@ -133,22 +133,24 @@ class OrderHooks
         try {
             wc_setcookie('mto_restore_do_id', null); // clear cookie with draft order
             wc_setcookie('mto_wakeup_session', null); // clear cookie with draft order
-            $isSubscribed = (bool)$_POST['mto_email_subscription'] ?? false;
-            $contact = $_COOKIE['mtc_id'] ?? null;
-            $customerId = DraftOrdersSync::getCustomerID();
-            $draftOrder = new MtoDraftOrder($customerId);
+            if(!get_post_meta($orderId, '_mto_id', true)) {
+                $isSubscribed = (bool)($_POST['mto_email_subscription'] ?? false);
+                $contact = $_COOKIE['mtc_id'] ?? null;
+                $customerId = DraftOrdersSync::getCustomerID();
+                $draftOrder = new MtoDraftOrder($customerId);
 
-            if(!empty($draftOrder->getExternalId())){
-                update_post_meta($orderId, '_mto_id', $draftOrder->getMtoId() ?: '');
-                $draftOrder->delete(); //remove draft order from the DB
-            }
-            update_post_meta($orderId, '_mto_is_subscribed', $isSubscribed ? '1' : '0');
-            update_post_meta($orderId, '_mto_contact_id', $contact);
-            update_post_meta($orderId, '_mto_birthday', $_POST['billing_birth_date'] ?? '');
-            // clear conversion data
-            if (!empty($_COOKIE['mto_conversion'])) {
-                update_post_meta($orderId, '_mto_conversion', $_COOKIE['mto_conversion']);
-                wc_setcookie('mto_conversion', null);
+                if (!empty($draftOrder->getExternalId())) {
+                    update_post_meta($orderId, '_mto_id', $draftOrder->getMtoId() ?: '');
+                    $draftOrder->delete(); //remove draft order from the DB
+                }
+                update_post_meta($orderId, '_mto_is_subscribed', $isSubscribed ? '1' : '0');
+                update_post_meta($orderId, '_mto_contact_id', $contact);
+                update_post_meta($orderId, '_mto_birthday', $_POST['billing_birth_date'] ?? '');
+                // clear conversion data
+                if (!empty($_COOKIE['mto_conversion'])) {
+                    update_post_meta($orderId, '_mto_conversion', $_COOKIE['mto_conversion']);
+                    wc_setcookie('mto_conversion', null);
+                }
             }
             wp_schedule_single_event(time() - 1, 'mto_background_order_sync', [$orderId, $_POST]);
         } catch (\Exception $exception) {

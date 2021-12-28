@@ -27,7 +27,7 @@ class DraftOrdersLineSync
         $mtoDO = new MtoDraftOrder($sessionKey);
         $args = [$sessionKey];
         if($mtoDO->getExternalId() && !as_next_scheduled_action('mto_background_draft_order_sync', $args)){
-            as_schedule_single_action(time() + 60, 'mto_background_draft_order_sync', $args); // run in 2 seconds
+            as_schedule_single_action(time() + 60, 'mto_background_draft_order_sync', $args); // run in 60 seconds
         }
     }
 

@@ -54,10 +54,10 @@ class DraftOrdersSync
         $mtoDO->save();
         $expire = time() + 3600 * 24 * 28;
         wc_setcookie("mto_restore_do_id", sprintf("%d||%s", $mtoDO->getId(), $sessionKey), $expire);  /* expire in 28 days */
-        //static::runBackgroundSync($sessionKey);
+        //static::runBackgroundSync($sessionKey); // uncomment to debug without delay
         $args = [$sessionKey];
         if(!as_next_scheduled_action('mto_background_draft_order_sync', $args)){
-            as_schedule_single_action(time() + 60, 'mto_background_draft_order_sync', $args); // run in 60 seconds
+            as_schedule_single_action(time(), 'mto_background_draft_order_sync', $args); // run in 60 seconds
         }
     }
 

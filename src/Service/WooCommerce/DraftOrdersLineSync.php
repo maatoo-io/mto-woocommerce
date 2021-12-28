@@ -10,28 +10,30 @@ class DraftOrdersLineSync
     {
         $sessionKey = DraftOrdersSync::getCustomerID();
         $mtoDO = new MtoDraftOrder($sessionKey);
-        if($cartUpdated && $mtoDO->getExternalId()){
+        if ($cartUpdated && $mtoDO->getExternalId()) {
             //update cart data before proceed
             $mtoDO->setCart(DraftOrdersSync::getCartContent())->setCartValue(DraftOrdersSync::getCartTotal())->save();
-            //DraftOrdersSync::runBackgroundSync($sessionKey);
-            $args = [$sessionKey];
-            if(!as_next_scheduled_action('mto_background_draft_order_sync', $args)){
-                as_schedule_single_action(time() + 60, 'mto_background_draft_order_sync', $args); // run in 60 seconds
-            }
+            //DraftOrdersSync::runBackgroundSync($sessionKey); // uncomment to debug without delay
+            as_schedule_single_action(time(), 'mto_background_draft_order_sync', [$sessionKey]); // run in 10 seconds
         }
         return $cartUpdated;
     }
 
-    public static function removeItemFromCart($cart_item_key, $that){
+    public static function removeItemFromCart($cart_item_key, $that)
+    {
         $sessionKey = DraftOrdersSync::getCustomerID();
         $mtoDO = new MtoDraftOrder($sessionKey);
-        $args = [$sessionKey];
-        if($mtoDO->getExternalId() && !as_next_scheduled_action('mto_background_draft_order_sync', $args)){
-            as_schedule_single_action(time() + 60, 'mto_background_draft_order_sync', $args); // run in 60 seconds
+        $mtoDO->setCartValue(DraftOrdersSync::getCartTotal())
+            ->setCart(DraftOrdersSync::getCartContent())
+            ->save();
+        //DraftOrdersSync::runBackgroundSync($sessionKey); // uncomment to debug without delay
+        if ($mtoDO->getExternalId()) {
+            as_schedule_single_action(time(), 'mto_background_draft_order_sync', [$sessionKey]); // run in 60 seconds
         }
     }
 
-    public static function runBackgroundSync(MtoDraftOrder $mtoDO){
+    public static function runBackgroundSync(MtoDraftOrder $mtoDO)
+    {
         $mtoDO->syncOrderLines();
     }
 }

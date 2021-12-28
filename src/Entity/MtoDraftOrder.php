@@ -251,16 +251,16 @@ class MtoDraftOrder
      */
     public function sync()
     {
-        $endpoint = !$this->mtoId
+        $endpoint = !$this->getMtoId()
             ? MtoConnector::getApiEndPoint('order')->create
             : MtoConnector::getApiEndPoint('order')->edit;
 
-        if ($this->mtoId) {
-            $endpoint->route = str_replace('{id}', $this->mtoId, $endpoint->route);
+        if ($this->getMtoId()) {
+            $endpoint->route = str_replace('{id}', $this->getMtoId(), $endpoint->route);
         }
         $orderRequestData = [
             'store' => $this->storeId,
-            'externalOrderId' => $this->externalId,
+            'externalOrderId' => $this->getExternalId(),
             'externalDateProcessed' => null, //what if order is not processed?
             'externalDateUpdated' => date('Y-m-d H:i:s', strtotime('now')),
             'externalDateCancelled' => null,

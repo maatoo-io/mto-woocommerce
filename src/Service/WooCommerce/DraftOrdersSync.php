@@ -7,7 +7,7 @@ use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use PHPUnit\Exception;
 
-class DraftOrdersSync
+class  DraftOrdersSync
 {
     public function __invoke($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data)
     {
@@ -19,8 +19,10 @@ class DraftOrdersSync
     public static function getCustomerID()
     {
         global $woocommerce;
-
-        return $woocommerce->session->get_customer_unique_id();
+        if(property_exists($woocommerce, 'session') && $woocommerce->session){
+            return $woocommerce->session->get_customer_unique_id();
+        }
+        return '';
     }
 
     /**

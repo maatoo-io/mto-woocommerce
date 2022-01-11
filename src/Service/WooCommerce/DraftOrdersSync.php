@@ -7,7 +7,7 @@ use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use PHPUnit\Exception;
 
-class  DraftOrdersSync
+class DraftOrdersSync
 {
     public function __invoke($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data)
     {

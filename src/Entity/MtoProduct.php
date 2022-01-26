@@ -148,4 +148,12 @@ class MtoProduct extends AbstractMtoEntity
           'productCategory' => $mtoCategory ? $mtoCategory->getId() : null,
         ];
     }
+
+    public static function isProductHasBeenSynced($productId){
+        if(get_post_meta($productId, '_mto_id', true)){
+            return true;
+        }
+
+        return false;
+    }
 }

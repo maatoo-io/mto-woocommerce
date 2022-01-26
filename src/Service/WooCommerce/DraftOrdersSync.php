@@ -3,6 +3,7 @@
 namespace Maatoo\WooCommerce\Service\WooCommerce;
 
 use Maatoo\WooCommerce\Entity\MtoDraftOrder;
+use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use PHPUnit\Exception;
@@ -11,6 +12,10 @@ class DraftOrdersSync
 {
     public function __invoke($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data)
     {
+        if(!MtoProduct::isProductHasBeenSynced($product_id)){
+            $product = new MtoProduct($product_id);
+            wp_schedule_single_event(time() - 1, 'mto_background_product_sync', [$product]);
+        }
         if (self::getCustomerID()) {
             static::syncOrder();
         }
@@ -59,7 +64,7 @@ class DraftOrdersSync
         //static::runBackgroundSync($sessionKey); // uncomment to debug without delay
         $args = [$sessionKey];
         if(!as_next_scheduled_action('mto_background_draft_order_sync', $args)){
-            as_schedule_single_action(time(), 'mto_background_draft_order_sync', $args); // run in 60 seconds
+            as_schedule_single_action(time() + 15, 'mto_background_draft_order_sync', $args); // run in 15 seconds
         }
     }
 

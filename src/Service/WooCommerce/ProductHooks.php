@@ -28,6 +28,7 @@ class ProductHooks
     public function __construct()
     {
         add_action('woocommerce_update_product', [$this, 'saveProduct']);
+        add_action('woocommerce_product_duplicate', [$this, 'duplicateProduct']);
         add_action('before_delete_post', [$this, 'removeProduct']);
         add_action('mto_background_product_sync', [$this, 'singleProductSync'], 10, 1);
     }
@@ -75,6 +76,22 @@ class ProductHooks
             remove_action('woocommerce_update_product', [$this, 'saveProduct']);
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
+        }
+    }
+
+    /**
+     * Update a product when it is duplicated to remove mto metadata
+     *
+     * @param $product
+     */
+    public function duplicateProduct($product)
+    {
+        $mtoProduct = new MtoProduct($product->get_id());
+        // When duplicating a product we need to make sure that the mto_id and mto_last_sync will not get copied over to the new product
+        if($mtoProduct->getId()){
+            update_post_meta((int)$product->get_id(), '_mto_id', '');
+            update_post_meta((int)$product->get_id(), '_mto_last_sync', '');
+            $this->saveProduct($product->get_id());
         }
     }
 

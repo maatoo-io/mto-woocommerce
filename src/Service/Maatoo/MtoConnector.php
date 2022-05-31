@@ -2,12 +2,12 @@
 
 namespace Maatoo\WooCommerce\Service\Maatoo;
 
-use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Pool;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7\Response;
+use \Exception;
+use \GuzzleHttp\Client;
+use \GuzzleHttp\Pool;
+use \GuzzleHttp\Exception\RequestException;
+use \GuzzleHttp\Promise\PromiseInterface;
+use \GuzzleHttp\Psr7\Response;
 use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoProductCategory;

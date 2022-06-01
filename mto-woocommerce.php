@@ -2,7 +2,7 @@
 /**
  * Plugin Name: maatoo for WooCommerce
  * Description: Connect your online shop to drive more revenue with intelligent automations, e.g. abanoned cart reminders and more.
- * Version:     1.7.0
+ * Version:     1.7.1
  * Author: maatoo.io
  * Author URI: https://maatoo.io
  * License: GPL-3.0+
@@ -47,7 +47,7 @@ if (file_exists($composer_path)) {
 }
 
 if (!defined('MTO_PLUGIN_VERSION')) {
-    define('MTO_PLUGIN_VERSION', '1.7.0');
+    define('MTO_PLUGIN_VERSION', '1.7.1');
 }
 
 if (!defined('MTO_PLUGIN_SLUG')) {
@@ -134,8 +134,9 @@ class MtoWoocommerce
         add_filter( 'plugins_api', ['\Maatoo\WooCommerce\Service\Admin\PluginUpdate', 'info'], 20, 3 );
         add_filter( 'site_transient_update_plugins', ['\Maatoo\WooCommerce\Service\Admin\PluginUpdate', 'update'] );
         add_action( 'upgrader_process_complete', ['\Maatoo\WooCommerce\Service\Admin\PluginUpdate', 'purge'], 10, 2 );
-        add_action( 'upgrader_process_complete', ['\Maatoo\WooCommerce\Service\Admin\PluginUpdate', 'update_v1_6_0'], 20, 2 );
         add_filter( 'plugin_row_meta', ['\Maatoo\WooCommerce\Service\Admin\PluginUpdate', 'details'], 25, 4 );
+
+        PluginUpdate::db_updates();
     }
 
     private function registerAjaxHooks()

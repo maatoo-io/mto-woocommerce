@@ -2,6 +2,7 @@
 
 namespace Maatoo\WooCommerce\Service\Admin;
 
+use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 
 /**
  * Class PluginUpdate
@@ -173,11 +174,19 @@ class PluginUpdate
 
     }
 
-    public static function update_v1_6_0( $upgrader_object, $options) {
-        if ('update' === $options['action']
-         && 'plugin' === $options[ 'type' ]
-         && in_array(MTO_PLUGIN_SLUG, $options['plugins'])) {
+    public static function db_updates() {
+        // v1.7.1 - Schedule forced product sync
+        if ( !get_option( '_mto_db_version' ) || version_compare( get_option( '_mto_db_version' ), '1.7.1', "<" ) ) {
+            
+            $productIds = MtoStoreManger::getAllProducts(false, 0, 0)->posts;
+            foreach($productIds as $productId) {
+                update_post_meta((int)$productId, '_mto_last_sync', '');
+            }
 
+            as_unschedule_all_actions('mto_sync_products');
+            as_schedule_recurring_action(time() + 1, MTO_SYNC_INTERVAL, 'mto_sync_products');
+            
+            update_option( '_mto_db_version', MTO_PLUGIN_VERSION );
         }
     }
 

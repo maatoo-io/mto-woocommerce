@@ -91,6 +91,10 @@ if (!defined('MTO_SYNC_INTERVAL')) {
 if (!defined('MTO_MAX_ATTEMPTS')) {
     define('MTO_MAX_ATTEMPTS', 3);
 }
+
+if (!defined('MTO_ALLOWED_MARKETING_CTA_TAGS')) {
+    define('MTO_ALLOWED_MARKETING_CTA_TAGS', "<a><br><b>");
+}
 add_action( 'plugins_loaded', [MtoInstall::class, 'createDraftOrderTable'] );
 add_action('init', new MtoWoocommerce());
 register_uninstall_hook(__FILE__, ['\Maatoo\WooCommerce\MtoWoocommerce', 'uninstall']);

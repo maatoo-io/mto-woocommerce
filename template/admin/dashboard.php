@@ -5,7 +5,7 @@ use Maatoo\WooCommerce\Service\LogErrors\LogData;
 
 $mtoUser = new MtoUser();
 $logs = LogData::downloadLogLinks();
-$marketingCta = $mtoUser->getMarketingCta() ?: __(
+$marketingCta = stripcslashes($mtoUser->getMarketingCta()) ?: __(
     'I want to receive emails with special offers',
     'mto-woocommerce'
 );

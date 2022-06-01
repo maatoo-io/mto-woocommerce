@@ -39,7 +39,7 @@ class PluginOptions
                 $_POST['birthday'] == "true",
                 $_POST['marketing'] == "true",
                 $_POST['marketing_checked'] == "true",
-                trim($_POST['marketing_cta'])
+                trim(strip_tags($_POST['marketing_cta'], MTO_ALLOWED_MARKETING_CTA_TAGS))
             );
 
             $provider = MtoConnector::getInstance($mtoUser);

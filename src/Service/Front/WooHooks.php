@@ -18,7 +18,7 @@ class WooHooks
     {
         $mtoUser = new MtoUser();
         $checked = (int)$mtoUser->isMarketingCheckedEnabled() ? "checked " : "";
-        $marketingCta = $mtoUser->getMarketingCta() ?: __('I want to receive emails with special offers', 'mto-woocommerce' );
+        $marketingCta = stripcslashes($mtoUser->getMarketingCta()) ?: __('I want to receive emails with special offers', 'mto-woocommerce' );
         return '<div class="mto-option-wrap"><label for="mto-email-subscription" class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
                     <input type="checkbox" id="mto-email-subscription" name="mto_email_subscription" class="woocommerce-form__input-checkbox input-checkbox" value="1" '.$checked.'/>
                     <input type="hidden" value="' . ($_COOKIE['mtc_id'] ?? false) . '"/>' . $marketingCta . '</label></div>' . $html;

@@ -10,6 +10,7 @@ class MtoProduct extends AbstractMtoEntity
     private string $url;
     private string $title;
     private string $description;
+    private string $shortDescription;
     private string $sku;
     private string $imageUrl;
     private ?int $productCategory;
@@ -29,7 +30,8 @@ class MtoProduct extends AbstractMtoEntity
         $this->price = $product->get_price() ?: 0;
         $this->url = $product->get_permalink();
         $this->title = $product->get_title() ?: 'not set';
-        $this->description = $product->get_description() ?: 'not set';
+        $this->description = $product->get_description() ?: '';
+        $this->shortDescription = $product->get_short_description() ?: '';
         $this->imageUrl = wp_get_attachment_image_url($product->get_image_id()) ?: '';
     }
 
@@ -46,7 +48,11 @@ class MtoProduct extends AbstractMtoEntity
      */
     public function getDescription(): string
     {
-        return $this->description;
+        if ($this->shortDescription !== '') {
+            return $this->shortDescription;
+        } else {
+            return $this->description;
+        }
     }
 
     /**

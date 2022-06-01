@@ -98,7 +98,7 @@ $marketingCta = stripcslashes($mtoUser->getMarketingCta()) ?: __(
                 <span style="color: #979797; font-style: italic"><?php _e(
                     'Allowed HTML Tags:',
                     'mto-woocommerce'
-                ); ?> &lt;a href="" target=""&gt;&lt;a&gt;, &lt;br /&gt;</span>
+                ); ?> &lt;a href="" target=""&gt;&lt;a&gt;, &lt;b /&gt;, &lt;br /&gt;</span>
             </label>
             <label for="birthday">
                 <input type="checkbox" name="add_birthday_field" id="birthday" <?php

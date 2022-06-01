@@ -7,12 +7,15 @@ class MtoProduct extends AbstractMtoEntity
     private ?int $id = null;
     private string $externalProductId;
     private float $price = 0;
+    private float $regularPrice = 0;
     private string $url;
     private string $title;
     private string $description;
     private string $shortDescription;
     private string $sku;
     private string $imageUrl;
+    private string $datePublished = '';
+    private bool   $isVisible = true;
     private ?int $productCategory;
     private ?int $categoryId; //maatoo category id
 
@@ -28,11 +31,14 @@ class MtoProduct extends AbstractMtoEntity
         $this->sku = $product->get_sku();
         $this->externalProductId = (string)$product_id;
         $this->price = $product->get_price() ?: 0;
+        $this->regularPrice = $product->get_regular_price() ?: 0;
         $this->url = $product->get_permalink();
         $this->title = $product->get_title() ?: 'not set';
         $this->description = $product->get_description() ?: '';
         $this->shortDescription = $product->get_short_description() ?: '';
         $this->imageUrl = wp_get_attachment_image_url($product->get_image_id()) ?: '';
+        $this->datePublished = (string)$product->get_date_created() ?: null;
+        $this->isVisible = $product->is_visible();
     }
 
     /**
@@ -69,6 +75,18 @@ class MtoProduct extends AbstractMtoEntity
     public function getPrice()
     {
         return $this->price;
+    }
+
+    /**
+     * @return float|int
+     */
+    public function getRegularPrice()
+    {
+        if ($this->regularPrice !== $this->getPrice()) {
+            return $this->regularPrice;
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -134,6 +152,22 @@ class MtoProduct extends AbstractMtoEntity
     }
 
     /**
+     * @return string|null
+     */
+    public function getDatePublished(): ?string
+    {
+        return date('Y-m-d H:i:s', strtotime($this->datePublished));
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->isVisible;
+    }
+
+    /**
      * To Array.
      *
      * @return array
@@ -146,12 +180,15 @@ class MtoProduct extends AbstractMtoEntity
           'store' => $this->getStore(),
           'externalProductId' => $this->getExternalProductId(),
           'price' => $this->getPrice(),
+          'regularPrice' => $this->getRegularPrice(),
           'url' => $this->getUrl(),
           'title' => $this->getTitle(),
           'description' => $this->getDescription(),
           'sku' => $this->getSku() ?: null,
           'imageUrl' => $this->getImageUrl() ?: wc_placeholder_img_src(),
           'productCategory' => $mtoCategory ? $mtoCategory->getId() : null,
+          'externalDatePublished' => $this->getDatePublished() ?: null,
+          'isVisible' => $this->isVisible()
         ];
     }
 

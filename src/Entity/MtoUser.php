@@ -11,6 +11,8 @@ class MtoUser
     private ?string $url = null;
     private bool $isBirthdayEnabled = false;
     private bool $isMarketingEnabled = false;
+    private bool $isMarketingCheckedEnabled = true;
+    private ?string $marketingCta = null;
 
     public function __construct()
     {
@@ -22,8 +24,10 @@ class MtoUser
         $this->username = $options['username'] ?? null;
         $this->password = $options['password'] ?? null;
         $this->url = rtrim($options['url']) ?? null;
-        $this->isBirthdayEnabled = (bool)$options['birthday'] ?? false;
-        $this->isMarketingEnabled = (bool)$options['marketing'] ?? false;
+        $this->isBirthdayEnabled = (bool)($options['birthday'] ?? false);
+        $this->isMarketingEnabled = (bool)($options['marketing'] ?? false);
+        $this->isMarketingCheckedEnabled = (bool)($options['marketing_checked'] ?? true);
+        $this->marketingCta = $options['marketing_cta'] ?? null;
     }
 
     /**
@@ -59,11 +63,31 @@ class MtoUser
     }
 
     /**
+     * @return bool
+     */
+    public function isMarketingCheckedEnabled()
+    {
+        return $this->isMarketingCheckedEnabled;
+    }
+
+    /**
      * @return string|null
      */
     public function getUsername(): ?string
     {
         return $this->username;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMarketingCta(): ?string
+    {
+        if ($this->marketingCta === "") {
+            return false;
+        } else {
+            return $this->marketingCta;
+        }
     }
 
     /**
@@ -88,6 +112,12 @@ class MtoUser
     public function setIsMarketingEnabled($isMarketingEnabled)
     {
         $this->isMarketingEnabled = $isMarketingEnabled;
+        return $this;
+    }
+
+    public function setIsMarketingCheckedEnabled($isMarketingCheckedEnabled)
+    {
+        $this->isMarketingCheckedEnabled = $isMarketingCheckedEnabled;
         return $this;
     }
 
@@ -117,13 +147,28 @@ class MtoUser
         return $this;
     }
 
-    public static function toMtoUser($username, $password, $url, $isBirthdayEnabled = false, $isMarketingEnabled = false)
+    /**
+     * Set Marketing cta.
+     *
+     * @param $marketingCta
+     *
+     * @return $this
+     */
+    public function setMarketingCta($marketingCta): MtoUser
+    {
+        $this->marketingCta = $marketingCta;
+        return $this;
+    }
+
+    public static function toMtoUser($username, $password, $url, $isBirthdayEnabled = false, $isMarketingEnabled = false, $isMarketingCheckedEnabled = true, $marketingCta = null)
     {
         $user = new MtoUser();
         return $user->setUsername($username)
           ->setPassword($password)
           ->setUrl($url)
           ->setIsBirthdayEnabled($isBirthdayEnabled)
-          ->setIsMarketingEnabled($isMarketingEnabled);
+          ->setIsMarketingEnabled($isMarketingEnabled)
+          ->setIsMarketingCheckedEnabled($isMarketingCheckedEnabled)
+          ->setMarketingCta($marketingCta);
     }
 }

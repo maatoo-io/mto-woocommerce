@@ -173,4 +173,12 @@ class PluginUpdate
 
     }
 
+    public static function update_v1_6_0( $upgrader_object, $options) {
+        if ('update' === $options['action']
+         && 'plugin' === $options[ 'type' ]
+         && in_array(MTO_PLUGIN_SLUG, $options['plugins'])) {
+
+        }
+    }
+
 }

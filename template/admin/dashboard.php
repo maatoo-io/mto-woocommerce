@@ -5,6 +5,10 @@ use Maatoo\WooCommerce\Service\LogErrors\LogData;
 
 $mtoUser = new MtoUser();
 $logs = LogData::downloadLogLinks();
+$marketingCta = $mtoUser->getMarketingCta() ?: __(
+    'I want to receive emails with special offers',
+    'mto-woocommerce'
+);
 ?>
     <div class="mto-dashboard">
     <div style="width: 100%; text-align: center; padding-top: 30px; padding-bottom: 30px;">
@@ -82,6 +86,19 @@ $logs = LogData::downloadLogLinks();
                 <input type="checkbox" name="add_marketing_field" id="marketing" <?php
                 echo $mtoUser->isMarketingEnabled() ? 'checked' : ''; ?>/> <?php
                 _e('Add marketing opt-in to checkout page', 'mto-woocommerce'); ?>
+            </label>
+            <label for="marketing_checked">
+                <input type="checkbox" name="marketing_field_checked_default" id="marketing_checked" <?php
+                echo $mtoUser->isMarketingCheckedEnabled() ? 'checked' : ''; ?>/> <?php
+                _e('Check marketing opt-in checkbox by default', 'mto-woocommerce'); ?>
+            </label>
+            <label for="marketing_cta"><?php
+                _e('Message for the opt-in checkbox', 'mto-woocommerce'); ?>
+                <textarea type="url" id="marketing_cta" name="marketing_cta" /><?php echo($marketingCta); ?></textarea>
+                <span style="color: #979797; font-style: italic"><?php _e(
+                    'Allowed HTML Tags:',
+                    'mto-woocommerce'
+                ); ?> &lt;a href="" target=""&gt;&lt;a&gt;, &lt;br /&gt;</span>
             </label>
             <label for="birthday">
                 <input type="checkbox" name="add_birthday_field" id="birthday" <?php

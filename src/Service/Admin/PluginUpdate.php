@@ -176,9 +176,10 @@ class PluginUpdate
 
     public static function db_updates() {
         // v1.7.1 - Schedule forced product sync
-        if ( !get_option( '_mto_db_version' ) || version_compare( get_option( '_mto_db_version' ), '1.7.1', "<" ) ) {
+        if ( !get_option( '_mto_db_version' ) || version_compare( get_option( '_mto_db_version' ), '1.7.2', "<" ) ) {
             
-            $productIds = MtoStoreManger::getAllProducts(false, 0, 0)->posts;
+            $productIds = MtoStoreManger::getAllProducts(false, 0, -1)->posts;
+
             foreach($productIds as $productId) {
                 update_post_meta((int)$productId, '_mto_last_sync', '');
             }

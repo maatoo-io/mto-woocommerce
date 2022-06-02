@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: maatoo for WooCommerce\n"
 "POT-Creation-Date: 2022-06-01 16:05+0200\n"
-"PO-Revision-Date: 2022-06-01 16:07+0200\n"
+"PO-Revision-Date: 2022-06-02 08:16+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -135,7 +135,7 @@ msgstr "Marketing Opt-in Feld zur Checkout-Seite hinzufügen"
 
 #: template/admin/dashboard.php:93
 msgid "Check marketing opt-in checkbox by default"
-msgstr "Marketing Opt-in Feld zur Checkout-Seite hinzufügen"
+msgstr "Marketing-Opt-in Kontrollkästchen standardmässig aktivieren"
 
 #: template/admin/dashboard.php:96
 msgid "Message for the opt-in checkbox"

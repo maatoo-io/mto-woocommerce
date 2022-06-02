@@ -97,7 +97,7 @@ $marketingCta = stripcslashes($mtoUser->getMarketingCta()) ?: __(
             <label for="marketing_cta"><?php
                 _e('Message for the opt-in checkbox', 'mto-woocommerce'); ?>
                 <textarea type="url" id="marketing_cta" name="marketing_cta" /><?php echo($marketingCta); ?></textarea>
-                <span style="color: #979797; font-style: italic; font-size: 11px"><?php _e(
+                <span class="footnote"><?php _e(
                     'Allowed HTML Tags:',
                     'mto-woocommerce'
                 ); ?> &lt;a href="" target=""&gt;&lt;a&gt;, &lt;b /&gt;, &lt;br /&gt;</span>
@@ -106,6 +106,10 @@ $marketingCta = stripcslashes($mtoUser->getMarketingCta()) ?: __(
                 _e('Marketing Opt-in checkbox position', 'mto-woocommerce'); ?>
                 <input type="text" id="marketing_position" name="marketing_position" value="<?php
                 echo $mtoUser->getMarketingPosition(); ?>" />
+                <span class="footnote"><?php _e(
+                    'Valid WooCommerce form action required',
+                    'mto-woocommerce'
+                ); ?></span>
             </label>
             </section>
             <label for="birthday">

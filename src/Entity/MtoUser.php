@@ -13,6 +13,7 @@ class MtoUser
     private bool $isMarketingEnabled = false;
     private bool $isMarketingCheckedEnabled = true;
     private ?string $marketingCta = null;
+    private string $marketingPosition = MTO_DEDAULT_MARKETING_CTA_POSITION;
 
     public function __construct()
     {
@@ -28,6 +29,7 @@ class MtoUser
         $this->isMarketingEnabled = (bool)($options['marketing'] ?? false);
         $this->isMarketingCheckedEnabled = (bool)($options['marketing_checked'] ?? true);
         $this->marketingCta = $options['marketing_cta'] ?? null;
+        $this->marketingPosition = $options['marketing_position'] ?? MTO_DEDAULT_MARKETING_CTA_POSITION;
     }
 
     /**
@@ -88,6 +90,14 @@ class MtoUser
         } else {
             return $this->marketingCta;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getMarketingPosition(): string
+    {
+        return $this->marketingPosition;
     }
 
     /**
@@ -160,7 +170,22 @@ class MtoUser
         return $this;
     }
 
-    public static function toMtoUser($username, $password, $url, $isBirthdayEnabled = false, $isMarketingEnabled = false, $isMarketingCheckedEnabled = true, $marketingCta = null)
+    /**
+     * Set marketing position.
+     *
+     * @param $marketingPosition
+     *
+     * @return $this
+     */
+    public function setMarketingPosition($marketingPosition): MtoUser
+    {
+        if ($marketingPosition !== '') {
+            $this->marketingPosition = $marketingPosition;
+        }
+        return $this;
+    }
+
+    public static function toMtoUser($username, $password, $url, $isBirthdayEnabled = false, $isMarketingEnabled = false, $isMarketingCheckedEnabled = true, $marketingCta = null, $marketingPosition = '')
     {
         $user = new MtoUser();
         return $user->setUsername($username)
@@ -169,6 +194,7 @@ class MtoUser
           ->setIsBirthdayEnabled($isBirthdayEnabled)
           ->setIsMarketingEnabled($isMarketingEnabled)
           ->setIsMarketingCheckedEnabled($isMarketingCheckedEnabled)
-          ->setMarketingCta($marketingCta);
+          ->setMarketingCta($marketingCta)
+          ->setMarketingPosition($marketingPosition);
     }
 }

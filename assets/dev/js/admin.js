@@ -21,6 +21,10 @@ jQuery(($) => {
     $statusBar.find('.error').html(response.body).removeClass('hidden')
   }
 
+  $form.find("#toggle_marketing_optin_settings").on('click', (e) => {
+    $form.find("#marketing_optin_options").toggle();
+  });
+
   $form.on('submit', (e) => {
     e.preventDefault()
     $submitButton.prop('disabled', true)
@@ -38,7 +42,8 @@ jQuery(($) => {
         birthday: $form.find('#birthday').is(':checked'),
         marketing: $form.find('#marketing').is(':checked'),
         marketing_checked: $form.find('#marketing_checked').is(':checked'),
-        marketing_cta: $form.find('#marketing_cta').val()
+        marketing_cta: $form.find('#marketing_cta').val(),
+        marketing_position: $form.find('#marketing_position').val()
       },
       dataType: 'json'
     })

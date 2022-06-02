@@ -87,6 +87,8 @@ $marketingCta = stripcslashes($mtoUser->getMarketingCta()) ?: __(
                 echo $mtoUser->isMarketingEnabled() ? 'checked' : ''; ?>/> <?php
                 _e('Add marketing opt-in to checkout page', 'mto-woocommerce'); ?>
             </label>
+            <span><a href="#" id="toggle_marketing_optin_settings">> <?php _e('Marketing Opt-in settings', 'mto-woocommerce'); ?></a></span>
+            <section class="container" id="marketing_optin_options" style="display: none;">
             <label for="marketing_checked">
                 <input type="checkbox" name="marketing_field_checked_default" id="marketing_checked" <?php
                 echo $mtoUser->isMarketingCheckedEnabled() ? 'checked' : ''; ?>/> <?php
@@ -100,6 +102,12 @@ $marketingCta = stripcslashes($mtoUser->getMarketingCta()) ?: __(
                     'mto-woocommerce'
                 ); ?> &lt;a href="" target=""&gt;&lt;a&gt;, &lt;b /&gt;, &lt;br /&gt;</span>
             </label>
+            <label for="marketing_position"><?php
+                _e('Marketing Opt-in checkbox position', 'mto-woocommerce'); ?>
+                <input type="text" id="marketing_position" name="marketing_position" value="<?php
+                echo $mtoUser->getMarketingPosition(); ?>" />
+            </label>
+            </section>
             <label for="birthday">
                 <input type="checkbox" name="add_birthday_field" id="birthday" <?php
                 echo $mtoUser->isBirthdayEnabled() ? 'checked' : ''; ?>/> <?php

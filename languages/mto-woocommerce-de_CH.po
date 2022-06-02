@@ -1,8 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: maatoo for WooCommerce\n"
-"POT-Creation-Date: 2022-06-01 16:05+0200\n"
-"PO-Revision-Date: 2022-06-02 08:16+0200\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/mto-woocommerce\n"
+"POT-Creation-Date: 2022-06-02T09:43:53+00:00\n"
+"PO-Revision-Date: 2022-06-02 11:51+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -22,6 +23,26 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.min.js\n"
 "X-Poedit-SearchPathExcluded-1: vendor\n"
 
+#. Plugin Name of the plugin
+msgid "maatoo for WooCommerce"
+msgstr "maatoo für WooCommerce"
+
+#. Description of the plugin
+msgid ""
+"Connect your online shop to drive more revenue with intelligent automations, "
+"e.g. abanoned cart reminders and more."
+msgstr ""
+"Verbinden Sie Ihren Online-Shop, um mit intelligenter Automatisierung mehr "
+"Umsatz zu erzielen, z. Erinnerungen für abgebrochene Warenkörbe und mehr."
+
+#. Author of the plugin
+msgid "maatoo.io"
+msgstr "maatoo.io"
+
+#. Author URI of the plugin
+msgid "https://maatoo.io"
+msgstr "https://maatoo.io"
+
 #: mto-woocommerce.php:37
 msgid ""
 "WooCommerce plugin is disabled. WooCommerce plugin needs to be activated to "
@@ -38,31 +59,27 @@ msgstr "PHP Composer-Dateien fehlen. Kann nicht einschliessen "
 msgid "All fields should be filled in"
 msgstr "Alle Felder sollten ausgefüllt werden"
 
-#: src/Service/Admin/PluginOptions.php:48
+#: src/Service/Admin/PluginOptions.php:49
 msgid "Credentials are valid and saved"
 msgstr "Anmeldeinformationen sind gültig und gespeichert"
 
-#: src/Service/Admin/PluginOptions.php:70
+#: src/Service/Admin/PluginOptions.php:73
 msgid "Credentials are invalid"
 msgstr "Anmeldedaten sind ungültig"
 
-#: src/Service/Admin/PluginOptions.php:83
+#: src/Service/Admin/PluginOptions.php:86
 msgid "The store exists on maatoo"
 msgstr "Der Laden existiert auf maatoo"
 
-#: src/Service/Admin/PluginOptions.php:88
+#: src/Service/Admin/PluginOptions.php:91
 msgid "Can't create Store on Maatoo"
 msgstr "Kann keinen Store auf Maatoo erstellen"
 
-#: src/Service/Admin/PluginOptions.php:93
+#: src/Service/Admin/PluginOptions.php:96
 msgid "Connection with Maatoo is set up. Full sync will be run in 30 seconds"
 msgstr ""
 "Die Verbindung mit Maatoo wird hergestellt. Die vollständige "
 "Synchronisierung wird in 30 Sekunden ausgeführt"
-
-#: src/Service/Admin/PluginUpdate.php:73
-msgid "View details"
-msgstr "Details anzeigen"
 
 #: src/Service/Ajax/GetContactId.php:13
 msgid "Contact Id is missing"
@@ -72,7 +89,7 @@ msgstr "Kontakt-ID fehlt"
 msgid "Success: contact ID received"
 msgstr "Success: contact ID received"
 
-#: src/Service/Front/WooHooks.php:21 template/admin/dashboard.php:9
+#: src/Service/Front/WooHooks.php:22 template/admin/dashboard.php:8
 msgid "I want to receive emails with special offers"
 msgstr "Ich möchte E-Mails mit Sonderangeboten erhalten"
 
@@ -105,17 +122,8 @@ msgstr "Ihre Zugangsdaten sind gültig"
 
 #. translators: %s is replaced with "timestamp of last full sync"
 #: template/admin/dashboard.php:51
-#, php-format
 msgid "The latest full sync was done %s"
 msgstr "Die letzte vollständige Synchronisierung wurde %s durchgeführt"
-
-#: template/admin/dashboard.php:57
-msgid ""
-"The very first synchronization have been scheduled and will be done "
-"automatically by WordPress Event manager"
-msgstr ""
-"Die allererste Synchronisation wurde geplant und wird automatisch vom "
-"WordPress Event Manager durchgeführt"
 
 #: template/admin/dashboard.php:70
 msgid "API URL"
@@ -133,48 +141,45 @@ msgstr "API Schlüssel"
 msgid "Add marketing opt-in to checkout page"
 msgstr "Marketing Opt-in Feld zur Checkout-Seite hinzufügen"
 
-#: template/admin/dashboard.php:93
+#: template/admin/dashboard.php:90
+msgid "Marketing Opt-in settings"
+msgstr "Marketing Opt-in Einstellungen"
+
+#: template/admin/dashboard.php:95
 msgid "Check marketing opt-in checkbox by default"
 msgstr "Marketing-Opt-in Kontrollkästchen standardmässig aktivieren"
 
-#: template/admin/dashboard.php:96
+#: template/admin/dashboard.php:98
 msgid "Message for the opt-in checkbox"
 msgstr "Bezeichnung für das Opt-in-Kontrollkästchen"
 
-#: template/admin/dashboard.php:99
+#: template/admin/dashboard.php:100
 msgid "Allowed HTML Tags:"
 msgstr "Zulässige HTML-Tags:"
 
 #: template/admin/dashboard.php:106
+msgid "Marketing Opt-in checkbox position"
+msgstr "Marketing-Opt-in Kontrollkästchen standardmässig aktivieren"
+
+#: template/admin/dashboard.php:114
 msgid "Add Birthday Field to checkout page"
 msgstr "Geburtstagsfeld zur Checkout-Seite hinzufügen"
 
-#: template/admin/dashboard.php:109
+#: template/admin/dashboard.php:117
 msgid "Update Configuration"
 msgstr "Konfiguration aktualisieren"
 
 #. translators: %s is replaced with "timestamp of next full sync"
-#: template/admin/dashboard.php:116
-#, php-format
+#: template/admin/dashboard.php:124
 msgid "The next synchronization is scheduled for <br/>%s"
 msgstr "Die nächste Synchronisierung ist für geplant <br/>%s"
 
-#. Plugin Name of the plugin/theme
-msgid "maatoo for WooCommerce"
-msgstr "maatoo für WooCommerce"
+#~ msgid "View details"
+#~ msgstr "Details anzeigen"
 
-#. Description of the plugin/theme
-msgid ""
-"Connect your online shop to drive more revenue with intelligent automations, "
-"e.g. abanoned cart reminders and more."
-msgstr ""
-"Verbinden Sie Ihren Online-Shop, um mit intelligenter Automatisierung mehr "
-"Umsatz zu erzielen, z. Erinnerungen für abgebrochene Warenkörbe und mehr."
-
-#. Author of the plugin/theme
-msgid "maatoo.io"
-msgstr "maatoo.io"
-
-#. Author URI of the plugin/theme
-msgid "https://maatoo.io"
-msgstr "https://maatoo.io"
+#~ msgid ""
+#~ "The very first synchronization have been scheduled and will be done "
+#~ "automatically by WordPress Event manager"
+#~ msgstr ""
+#~ "Die allererste Synchronisation wurde geplant und wird automatisch vom "
+#~ "WordPress Event Manager durchgeführt"

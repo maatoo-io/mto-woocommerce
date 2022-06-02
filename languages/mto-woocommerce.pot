@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-3.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: maatoo for WooCommerce 1.7.0\n"
+"Project-Id-Version: maatoo for WooCommerce 1.7.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/mto-woocommerce\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-06-01T14:02:21+00:00\n"
+"POT-Creation-Date: 2022-06-02T09:43:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: mto-woocommerce\n"
@@ -42,23 +42,23 @@ msgstr ""
 msgid "All fields should be filled in"
 msgstr ""
 
-#: src/Service/Admin/PluginOptions.php:48
+#: src/Service/Admin/PluginOptions.php:49
 msgid "Credentials are valid and saved"
 msgstr ""
 
-#: src/Service/Admin/PluginOptions.php:70
+#: src/Service/Admin/PluginOptions.php:73
 msgid "Credentials are invalid"
 msgstr ""
 
-#: src/Service/Admin/PluginOptions.php:83
+#: src/Service/Admin/PluginOptions.php:86
 msgid "The store exists on maatoo"
 msgstr ""
 
-#: src/Service/Admin/PluginOptions.php:88
+#: src/Service/Admin/PluginOptions.php:91
 msgid "Can't create Store on Maatoo"
 msgstr ""
 
-#: src/Service/Admin/PluginOptions.php:93
+#: src/Service/Admin/PluginOptions.php:96
 msgid "Connection with Maatoo is set up. Full sync will be run in 30 seconds"
 msgstr ""
 
@@ -70,7 +70,7 @@ msgstr ""
 msgid "Success: contact ID received"
 msgstr ""
 
-#: src/Service/Front/WooHooks.php:21
+#: src/Service/Front/WooHooks.php:22
 #: template/admin/dashboard.php:8
 msgid "I want to receive emails with special offers"
 msgstr ""
@@ -120,27 +120,35 @@ msgstr ""
 msgid "Add marketing opt-in to checkout page"
 msgstr ""
 
-#: template/admin/dashboard.php:93
+#: template/admin/dashboard.php:90
+msgid "Marketing Opt-in settings"
+msgstr ""
+
+#: template/admin/dashboard.php:95
 msgid "Check marketing opt-in checkbox by default"
 msgstr ""
 
-#: template/admin/dashboard.php:96
+#: template/admin/dashboard.php:98
 msgid "Message for the opt-in checkbox"
 msgstr ""
 
-#: template/admin/dashboard.php:98
+#: template/admin/dashboard.php:100
 msgid "Allowed HTML Tags:"
 msgstr ""
 
 #: template/admin/dashboard.php:106
+msgid "Marketing Opt-in checkbox position"
+msgstr ""
+
+#: template/admin/dashboard.php:114
 msgid "Add Birthday Field to checkout page"
 msgstr ""
 
-#: template/admin/dashboard.php:109
+#: template/admin/dashboard.php:117
 msgid "Update Configuration"
 msgstr ""
 
 #. translators: %s is replaced with "timestamp of next full sync"
-#: template/admin/dashboard.php:116
+#: template/admin/dashboard.php:124
 msgid "The next synchronization is scheduled for <br/>%s"
 msgstr ""

@@ -39,7 +39,8 @@ class PluginOptions
                 $_POST['birthday'] == "true",
                 $_POST['marketing'] == "true",
                 $_POST['marketing_checked'] == "true",
-                trim(strip_tags($_POST['marketing_cta'], MTO_ALLOWED_MARKETING_CTA_TAGS))
+                trim(strip_tags($_POST['marketing_cta'], MTO_ALLOWED_MARKETING_CTA_TAGS)),
+                trim(strip_tags($_POST['marketing_position'])),
             );
 
             $provider = MtoConnector::getInstance($mtoUser);
@@ -52,7 +53,8 @@ class PluginOptions
                      || (bool)$this->mtoOptions['birthday'] !== $mtoUser->isBirthdayEnabled()
                      || (bool)$this->mtoOptions['marketing'] !== $mtoUser->isMarketingEnabled()
                      || (bool)$this->mtoOptions['marketing_checked'] !== $mtoUser->isMarketingCheckedEnabled()
-                     || $this->mtoOptions['marketing_cta'] !== $mtoUser->getMarketingCta()){
+                     || $this->mtoOptions['marketing_cta'] !== $mtoUser->getMarketingCta()
+                     || $this->mtoOptions['marketing_position'] !== $mtoUser->getMarketingPosition()){
                     $this->mtoOptions['username'] = $mtoUser->getUsername();
                     $this->mtoOptions['password'] = $mtoUser->getPassword();
                     $this->mtoOptions['url'] = $mtoUser->getUrl();
@@ -61,6 +63,7 @@ class PluginOptions
                     $this->mtoOptions['marketing'] = (int)$mtoUser->isMarketingEnabled();
                     $this->mtoOptions['marketing_checked'] = (int)$mtoUser->isMarketingCheckedEnabled();
                     $this->mtoOptions['marketing_cta'] = $mtoUser->getMarketingCta();
+                    $this->mtoOptions['marketing_position'] = $mtoUser->getMarketingPosition();
                     update_option('mto', $this->mtoOptions);
                     //register store if not exist and get status message
                 }

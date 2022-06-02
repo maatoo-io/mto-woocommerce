@@ -1,34 +1,39 @@
 "use strict";
 
-jQuery(($) => {
-  const $form = $('.js-mto-credentials')
-  const $statusBar = $('.js-status-bar')
-  const $submitButton = $(".mto-credentials").find(':submit')
-  const ajaxUrl = window.ajaxurl
+jQuery(function ($) {
+  var $form = $('.js-mto-credentials');
+  var $statusBar = $('.js-status-bar');
+  var $submitButton = $(".mto-credentials").find(':submit');
+  var ajaxUrl = window.ajaxurl;
 
-  const resetStatusBar = () => {
-    $statusBar.find('.success').addClass('hidden')
-    $statusBar.find('.error').addClass('hidden')
-  }
+  var resetStatusBar = function resetStatusBar() {
+    $statusBar.find('.success').addClass('hidden');
+    $statusBar.find('.error').addClass('hidden');
+  };
 
-  const successMsg = (response) => {
-    let $holder = $statusBar.find('.success')
+  var successMsg = function successMsg(response) {
+    var $holder = $statusBar.find('.success');
+
     if (response.isError) {
-      $holder = $statusBar.find('.error')
+      $holder = $statusBar.find('.error');
     }
-    $holder.html(response.body).removeClass('hidden')
-  }
 
-  const errorMsg = (response) => {
-    $statusBar.find('.error').html(response.body).removeClass('hidden')
-  }
+    $holder.html(response.body).removeClass('hidden');
+  };
 
-  $form.on('submit', (e) => {
-    e.preventDefault()
-    $submitButton.prop('disabled', true)
-    var oldValue = $submitButton.prop('value')
-    $submitButton.prop('value', 'Saving...')
-    resetStatusBar()
+  var errorMsg = function errorMsg(response) {
+    $statusBar.find('.error').html(response.body).removeClass('hidden');
+  };
+
+  $form.find("#toggle_marketing_optin_settings").on('click', function (e) {
+    $form.find("#marketing_optin_options").toggle();
+  });
+  $form.on('submit', function (e) {
+    e.preventDefault();
+    $submitButton.prop('disabled', true);
+    var oldValue = $submitButton.prop('value');
+    $submitButton.prop('value', 'Saving...');
+    resetStatusBar();
     $.ajax({
       method: 'POST',
       url: ajaxUrl,
@@ -40,20 +45,18 @@ jQuery(($) => {
         birthday: $form.find('#birthday').is(':checked'),
         marketing: $form.find('#marketing').is(':checked'),
         marketing_checked: $form.find('#marketing_checked').is(':checked'),
-        marketing_cta: $form.find('#marketing_cta').val()
+        marketing_cta: $form.find('#marketing_cta').val(),
+        marketing_position: $form.find('#marketing_position').val()
       },
       dataType: 'json'
-    })
-      .done(function (response) {
-        $submitButton.prop('disabled', false)
-        $submitButton.prop('value', oldValue)
-        successMsg(response)
-      })
-      .fail(function (response) {
-        errorMsg(response)
-        $submitButton.prop('disabled', false)
-        $submitButton.prop('value', oldValue)
-      })
-  })
-
-})
+    }).done(function (response) {
+      $submitButton.prop('disabled', false);
+      $submitButton.prop('value', oldValue);
+      successMsg(response);
+    }).fail(function (response) {
+      errorMsg(response);
+      $submitButton.prop('disabled', false);
+      $submitButton.prop('value', oldValue);
+    });
+  });
+});

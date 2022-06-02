@@ -18,6 +18,8 @@ class AdminAssets extends AbstractAssets
         wp_enqueue_style(
             $this->handle,
             MTO_PLUGIN_ASSETS . 'css/admin-styles.css',
+            [],
+            MTO_PLUGIN_VERSION
         );
     }
 

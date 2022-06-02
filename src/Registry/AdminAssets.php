@@ -32,7 +32,7 @@ class AdminAssets extends AbstractAssets
             $this->handle,
             MTO_PLUGIN_ASSETS . 'js/admin.js',
             ['jquery'],
-            false,
+            MTO_PLUGIN_VERSION,
             true
         );
     }

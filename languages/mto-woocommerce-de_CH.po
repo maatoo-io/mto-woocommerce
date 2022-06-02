@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: maatoo for WooCommerce\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/mto-woocommerce\n"
-"POT-Creation-Date: 2022-06-02T09:43:53+00:00\n"
-"PO-Revision-Date: 2022-06-02 11:51+0200\n"
+"POT-Creation-Date: 2022-06-02T10:14:01+00:00\n"
+"PO-Revision-Date: 2022-06-02 12:14+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -159,18 +159,22 @@ msgstr "Zulässige HTML-Tags:"
 
 #: template/admin/dashboard.php:106
 msgid "Marketing Opt-in checkbox position"
-msgstr "Marketing-Opt-in Kontrollkästchen standardmässig aktivieren"
+msgstr "Position des Marketing Opt-in Kontrollkästchens"
 
-#: template/admin/dashboard.php:114
+#: template/admin/dashboard.php:109
+msgid "Valid WooCommerce form action required"
+msgstr "Gültige WooCommerce From action erforderlich"
+
+#: template/admin/dashboard.php:118
 msgid "Add Birthday Field to checkout page"
 msgstr "Geburtstagsfeld zur Checkout-Seite hinzufügen"
 
-#: template/admin/dashboard.php:117
+#: template/admin/dashboard.php:121
 msgid "Update Configuration"
 msgstr "Konfiguration aktualisieren"
 
 #. translators: %s is replaced with "timestamp of next full sync"
-#: template/admin/dashboard.php:124
+#: template/admin/dashboard.php:128
 msgid "The next synchronization is scheduled for <br/>%s"
 msgstr "Die nächste Synchronisierung ist für geplant <br/>%s"
 

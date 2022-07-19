@@ -68,6 +68,8 @@ class OrderHooks
 
     public static function isOrderSynced(array $orderIds, $forceUpdate = false): bool
     {
+        $startOrderSyncTime = date(DATE_W3C);
+
         if (empty($orderIds) || !self::getConnector()) {
             return true;
         }
@@ -100,13 +102,13 @@ class OrderHooks
         }
         $isCreatedStatus = $isUpdatedStatus = $isDelStatus = $statusOrderLines = true;
         if (!empty($toCreate)) {
-            $isCreatedStatus = $mtoConnector->sendOrders($toCreate, MtoConnector::getApiEndPoint('order')->create);
+            $isCreatedStatus = $mtoConnector->sendOrders($toCreate, MtoConnector::getApiEndPoint('order')->create, $startOrderSyncTime);
             $orderLinesToCreate = MtoStoreManger::getOrdersLines($toCreate);
             self::launchOrderLineSync($orderLinesToCreate, $mtoConnector);
         }
 
         if (!empty($toUpdate)) {
-            $isUpdatedStatus = $mtoConnector->sendOrders($toUpdate, MtoConnector::getApiEndPoint('order')->edit);
+            $isUpdatedStatus = $mtoConnector->sendOrders($toUpdate, MtoConnector::getApiEndPoint('order')->edit, $startOrderSyncTime);
             $orderLinesUpdate = MtoStoreManger::getOrdersLines($toUpdate);
             self::launchOrderLineSync($orderLinesUpdate, $mtoConnector);
         }
@@ -152,7 +154,10 @@ class OrderHooks
                     wc_setcookie('mto_conversion', null);
                 }
             }
-            wp_schedule_single_event(time() - 1, 'mto_background_order_sync', [$orderId, $_POST]);
+            //wp_schedule_single_event(time() - 1, 'mto_background_order_sync', [$orderId, $_POST]);
+            if(!as_next_scheduled_action('mto_background_order_sync', [$orderId, $_POST])) {
+                as_schedule_single_action(time() + MTO_ORDER_SYNC_DELAY, 'mto_background_order_sync', [$orderId, $_POST]);
+            }
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());
         }

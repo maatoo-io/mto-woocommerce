@@ -338,7 +338,7 @@ class MtoConnector
      *
      * @return string
      */
-    public function sendOrders(array $orders, $endpoint)
+    public function sendOrders(array $orders, $endpoint, $startOrderSyncTime = null)
     {
         try {
             $client = $this->client;
@@ -375,7 +375,7 @@ class MtoConnector
                                    update_post_meta(
                                      (int)$id,
                                      '_mto_last_sync',
-                                     $responseDecoded['order']['dateUpdated'] ?? $responseDecoded['order']['dateCreated']
+                                     $startOrderSyncTime ?? $responseDecoded['order']['dateUpdated'] ?? $responseDecoded['order']['dateCreated']
                                    );
                                }
                                update_option('mto_order_sync_status', 1);

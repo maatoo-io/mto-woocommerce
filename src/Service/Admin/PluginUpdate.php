@@ -192,6 +192,21 @@ class PluginUpdate
             
             update_option( '_mto_db_version', MTO_PLUGIN_VERSION );
         }
+
+        // v1.7.3 - Schedule forced order sync
+        if ( !get_option( '_mto_db_version' ) || version_compare( get_option( '_mto_db_version' ), '1.7.3', "<" ) ) {
+            
+            $wpdb->query(
+                "update {$wpdb->prefix}postmeta
+                set meta_value = null
+                where 
+                    meta_key = '_mto_last_sync'
+                    and post_id in (select ID from {$wpdb->prefix}posts where post_type = 'shop_order');"); 
+
+            as_schedule_single_action(time() - 1, 'mto_sync_orders');
+            
+            update_option( '_mto_db_version', MTO_PLUGIN_VERSION );
+        }
     }
 
 }

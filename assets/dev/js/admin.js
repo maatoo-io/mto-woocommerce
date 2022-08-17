@@ -43,7 +43,8 @@ jQuery(($) => {
         marketing: $form.find('#marketing').is(':checked'),
         marketing_checked: $form.find('#marketing_checked').is(':checked'),
         marketing_cta: $form.find('#marketing_cta').val(),
-        marketing_position: $form.find('#marketing_position').val()
+        marketing_position: $form.find('#marketing_position').val(),
+        product_image_sync_quality: $form.find('#product_image_sync_quality').val()
       },
       dataType: 'json'
     })

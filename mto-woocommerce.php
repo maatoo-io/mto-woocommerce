@@ -2,7 +2,7 @@
 /**
  * Plugin Name: maatoo for WooCommerce
  * Description: Connect your online shop to drive more revenue with intelligent automations, e.g. abanoned cart reminders and more.
- * Version:     1.7.3
+ * Version:     1.8.0
  * Author: maatoo.io
  * Author URI: https://maatoo.io
  * License: GPL-3.0+
@@ -47,7 +47,7 @@ if (file_exists($composer_path)) {
 }
 
 if (!defined('MTO_PLUGIN_VERSION')) {
-    define('MTO_PLUGIN_VERSION', '1.7.3');
+    define('MTO_PLUGIN_VERSION', '1.8.0');
 }
 
 if (!defined('MTO_PLUGIN_SLUG')) {
@@ -100,8 +100,12 @@ if (!defined('MTO_ALLOWED_MARKETING_CTA_TAGS')) {
     define('MTO_ALLOWED_MARKETING_CTA_TAGS', "<a><br><b>");
 }
 
-if (!defined('MTO_DEDAULT_MARKETING_CTA_POSITION')) {
-    define('MTO_DEDAULT_MARKETING_CTA_POSITION', "woocommerce_after_checkout_billing_form");
+if (!defined('MTO_DEFAULT_MARKETING_CTA_POSITION')) {
+    define('MTO_DEFAULT_MARKETING_CTA_POSITION', "woocommerce_after_checkout_billing_form");
+}
+
+if (!defined('MTO_DEFAULT_PRODUCT_IMAGE_SYNC_QUALITY')) {
+    define('MTO_DEFAULT_PRODUCT_IMAGE_SYNC_QUALITY', "medium");
 }
 
 add_action( 'plugins_loaded', [MtoInstall::class, 'createDraftOrderTable'] );

@@ -13,7 +13,8 @@ class MtoUser
     private bool $isMarketingEnabled = false;
     private bool $isMarketingCheckedEnabled = true;
     private ?string $marketingCta = null;
-    private string $marketingPosition = MTO_DEDAULT_MARKETING_CTA_POSITION;
+    private string $marketingPosition = MTO_DEFAULT_MARKETING_CTA_POSITION;
+    private ?string $productImageSyncQuality = null;
 
     public function __construct()
     {
@@ -29,7 +30,8 @@ class MtoUser
         $this->isMarketingEnabled = (bool)($options['marketing'] ?? false);
         $this->isMarketingCheckedEnabled = (bool)($options['marketing_checked'] ?? true);
         $this->marketingCta = $options['marketing_cta'] ?? null;
-        $this->marketingPosition = $options['marketing_position'] ?? MTO_DEDAULT_MARKETING_CTA_POSITION;
+        $this->marketingPosition = $options['marketing_position'] ?? MTO_DEFAULT_MARKETING_CTA_POSITION;
+        $this->productImageSyncQuality = $options['product_image_sync_quality'] ?? MTO_DEFAULT_PRODUCT_IMAGE_SYNC_QUALITY;
     }
 
     /**
@@ -98,6 +100,14 @@ class MtoUser
     public function getMarketingPosition(): string
     {
         return $this->marketingPosition;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProductImageSyncQuality(): string
+    {
+        return $this->productImageSyncQuality;
     }
 
     /**
@@ -185,7 +195,22 @@ class MtoUser
         return $this;
     }
 
-    public static function toMtoUser($username, $password, $url, $isBirthdayEnabled = false, $isMarketingEnabled = false, $isMarketingCheckedEnabled = true, $marketingCta = null, $marketingPosition = '')
+    /**
+     * Set product sync image quality.
+     *
+     * @param $productSyncImageQuality
+     *
+     * @return $this
+     */
+    public function setProductImageSyncQuality($productImageSyncQuality): MtoUser
+    {
+        if ($productImageSyncQuality !== '') {
+            $this->productImageSyncQuality = $productImageSyncQuality;
+        }
+        return $this;
+    }
+
+    public static function toMtoUser($username, $password, $url, $isBirthdayEnabled = false, $isMarketingEnabled = false, $isMarketingCheckedEnabled = true, $marketingCta = null, $marketingPosition = '', $productImageSyncQuality = '')
     {
         $user = new MtoUser();
         return $user->setUsername($username)
@@ -195,6 +220,7 @@ class MtoUser
           ->setIsMarketingEnabled($isMarketingEnabled)
           ->setIsMarketingCheckedEnabled($isMarketingCheckedEnabled)
           ->setMarketingCta($marketingCta)
-          ->setMarketingPosition($marketingPosition);
+          ->setMarketingPosition($marketingPosition)
+          ->setProductImageSyncQuality($productImageSyncQuality);
     }
 }

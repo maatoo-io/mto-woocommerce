@@ -26,6 +26,9 @@ class MtoProduct extends AbstractMtoEntity
             return null;
         }
         parent::__construct($product_id);
+
+        $options = get_option('mto');
+
         $this->id = get_post_meta($product_id, '_mto_id', true) ?: null;
         $this->lastSyncDate = get_post_meta($product_id, '_mto_last_sync', true) ?: null;
         $this->sku = $product->get_sku();
@@ -36,7 +39,7 @@ class MtoProduct extends AbstractMtoEntity
         $this->title = $product->get_title() ?: 'not set';
         $this->description = $product->get_description() ?: '';
         $this->shortDescription = $product->get_short_description() ?: '';
-        $this->imageUrl = wp_get_attachment_image_url($product->get_image_id()) ?: '';
+        $this->imageUrl = wp_get_attachment_image_url($product->get_image_id(), !empty($options['product_image_sync_quality']) ? $options['product_image_sync_quality'] : MTO_DEFAULT_PRODUCT_IMAGE_SYNC_QUALITY) ?: '';
         $this->datePublished = (string)$product->get_date_created() ?: null;
         $this->isVisible = $product->is_visible();
     }

@@ -117,6 +117,19 @@ $marketingCta = stripcslashes($mtoUser->getMarketingCta()) ?: __(
                 echo $mtoUser->isBirthdayEnabled() ? 'checked' : ''; ?>/> <?php
                 _e('Add Birthday Field to checkout page', 'mto-woocommerce'); ?>
             </label>
+            <section class="container" id="advanced_options">
+                <label for="product_image_sync_quality">
+                    <?php _e('Product Image Size', 'mto-woocommerce'); ?>
+                    <select id="product_image_sync_quality" name="product_image_sync_quality">
+                        <?php
+                        $productImageSyncQuality = $mtoUser->getProductImageSyncQuality();
+                        foreach ($imageSizesList as $key => $value ) {
+                            echo '<option value="' . esc_attr( $key ) . '" ' . selected($key == $productImageSyncQuality, true, false ) . '>' . esc_html( $value ) . '</option>';
+                        }
+                        ?>
+                    </select>
+                </label>
+            </section>
             <input type="submit" name="save" value="<?php
             _e('Update Configuration', 'mto-woocommerce'); ?>">
         </form>

@@ -43,6 +43,45 @@ class Options
             $nextEvent =  date('m/d/Y H:i:s', $startTimestamp); 
         }
 
+        $imageSizesList = $this->get_all_image_sizes_list();
         include MTO_PLUGIN_TEMPLATES . 'admin/dashboard.php';
+    }
+
+
+    /**
+     * Get all the registered image sizes along with their dimensions
+     *
+     * @global array $_wp_additional_image_sizes
+     *
+     * @link http://core.trac.wordpress.org/ticket/18947 Reference ticket
+     *
+     * @return array $image_sizes The image sizes
+     */
+    function get_all_image_sizes() {
+        global $_wp_additional_image_sizes;
+        $image_sizes = array();
+        $default_image_sizes = get_intermediate_image_sizes();
+        foreach ($default_image_sizes as $size) {
+            $image_sizes[$size]['width'] = intval( get_option("{$size}_size_w"));
+            $image_sizes[$size]['height'] = intval( get_option("{$size}_size_h"));
+            $image_sizes[$size]['crop'] = get_option("{$size}_crop") ? get_option("{$size}_crop") : false;
+        }
+        if (isset($_wp_additional_image_sizes) && count($_wp_additional_image_sizes)) {
+            $image_sizes = array_merge( $image_sizes, $_wp_additional_image_sizes );
+        }
+        return $image_sizes;
+    }
+
+    /**
+     * @return array
+     */
+    function get_all_image_sizes_list() {
+        $response = array();
+        foreach ($this->get_all_image_sizes() as $key => $data) {
+            $label = ucwords(str_replace('_', ' ', $key));
+            $label = __($label);
+            $response[$key] = "{$label} ({$data['width']} x {$data['height']})";
+        }
+        return $response;
     }
 }

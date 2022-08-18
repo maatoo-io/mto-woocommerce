@@ -31,7 +31,7 @@ class MtoUser
         $this->isMarketingCheckedEnabled = (bool)($options['marketing_checked'] ?? true);
         $this->marketingCta = $options['marketing_cta'] ?? null;
         $this->marketingPosition = $options['marketing_position'] ?? MTO_DEFAULT_MARKETING_CTA_POSITION;
-        $this->productImageSyncQuality = $options['product_image_sync_quality'] ?? MTO_DEFAULT_PRODUCT_IMAGE_SYNC_QUALITY;
+        $this->productImageSyncQuality = $options['product_image_sync_quality'] ?? "";
     }
 
     /**

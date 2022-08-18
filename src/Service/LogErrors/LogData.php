@@ -74,12 +74,12 @@ class LogData
         $html = '<div class="download-logs">';
         $fileApi = plugin_dir_url(__FILE__) . 'api-errors.txt';
         $fileTech = plugin_dir_url(__FILE__) . 'technical-errors.txt';
-        $tech = file_get_contents($fileTech);
+        $tech = @file_get_contents($fileTech);
         if(!empty($tech)){
             $label = __('Failed  plugin tasks', 'mto-woocommerce');
             $html .= "<a href='{$fileTech}' download/>{$label}</a>";
         }
-        $api = file_get_contents($fileApi);
+        $api = @file_get_contents($fileApi);
         if(!empty($api)){
             $label = __('Failed API requests', 'mto-woocommerce');
             $html .= "<a href='{$fileApi}' download/>{$label}</a>";

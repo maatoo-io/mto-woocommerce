@@ -2,9 +2,13 @@
 
 namespace Maatoo\WooCommerce\Entity;
 
+use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
+use WC_Product_Variable;
+use WC_Product_Variation;
+
 class MtoProduct extends AbstractMtoEntity
 {
-    private ?int $id = null;
+    private ?int $id;
     private string $externalProductId;
     private float $price = 0;
     private float $regularPrice = 0;
@@ -15,19 +19,19 @@ class MtoProduct extends AbstractMtoEntity
     private string $sku;
     private string $imageUrl;
     private string $datePublished = '';
-    private bool   $isVisible = true;
-    private ?int $productCategory;
-    private ?int $categoryId; //maatoo category id
+    private bool $isVisible = true;
+    private bool $isProductVariable = false;
+    private array $productVariations = [];
 
     public function __construct($product_id = null)
     {
         $product = wc_get_product($product_id);
         if (!$product) {
-            return null;
+            return;
         }
-        parent::__construct($product_id);
 
         $options = get_option('mto');
+        parent::__construct($product_id);
 
         $this->id = get_post_meta($product_id, '_mto_id', true) ?: null;
         $this->lastSyncDate = get_post_meta($product_id, '_mto_last_sync', true) ?: null;
@@ -42,8 +46,36 @@ class MtoProduct extends AbstractMtoEntity
         $this->imageUrl = wp_get_attachment_image_url($product->get_image_id(), !empty($options['product_image_sync_quality']) ? $options['product_image_sync_quality'] : MTO_DEFAULT_PRODUCT_IMAGE_SYNC_QUALITY) ?: '';
         $this->datePublished = (string)$product->get_date_created() ?: null;
         $this->isVisible = $product->is_visible();
+
     }
 
+    /**
+     * @param WC_Product_Variation[] $variations
+     * @param $options
+     */
+    protected function setProductVariationsData($variations, $options): void
+    {
+        $this->productVariations = [];
+        $category = $this->getCategory();
+        $mtoCategory = new MtoProductCategory($category);
+        foreach($variations as $productVariation){
+            $this->productVariations[] = [
+                'id' => $productVariation->get_id(),
+                'sku' => $productVariation->get_sku(),
+                'externalProductId' => (string)$productVariation->get_id(),
+                'price' => $productVariation->get_price() ?: 0,
+                'regularPrice' => $productVariation->get_regular_price(),
+                'url' => $productVariation->get_permalink(),
+                'title' => $productVariation->get_title() ?: 'not set',
+                'description' => $productVariation->get_description() ?: '',
+                'shortDescription' => $productVariation->get_short_description()?: '',
+                'imageUrl' => wp_get_attachment_image_url($productVariation->get_image_id(), !empty($options['product_image_sync_quality']) ? $options['product_image_sync_quality'] : MTO_DEFAULT_PRODUCT_IMAGE_SYNC_QUALITY) ?: '',
+                'datePublished' => $productVariation->get_date_created() ?: null,
+                'productCategory' => $mtoCategory ? $mtoCategory->getId() : null,
+                'isVisible' => $productVariation->is_visible()
+            ];
+        }
+    }
     /**
      * @return string
      */
@@ -59,9 +91,9 @@ class MtoProduct extends AbstractMtoEntity
     {
         if ($this->shortDescription !== '') {
             return $this->shortDescription;
-        } else {
-            return $this->description;
         }
+
+        return $this->description;
     }
 
     /**
@@ -87,9 +119,9 @@ class MtoProduct extends AbstractMtoEntity
     {
         if ($this->regularPrice !== $this->getPrice()) {
             return $this->regularPrice;
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
     /**
@@ -170,6 +202,11 @@ class MtoProduct extends AbstractMtoEntity
         return $this->isVisible;
     }
 
+    public function isProductVariable(): bool
+    {
+        return $this->isProductVariable;
+    }
+
     /**
      * To Array.
      *
@@ -193,6 +230,11 @@ class MtoProduct extends AbstractMtoEntity
           'externalDatePublished' => $this->getDatePublished() ?: null,
           'isVisible' => $this->isVisible()
         ];
+    }
+
+    public function getProductVariations(): array
+    {
+        return $this->productVariations;
     }
 
     public static function isProductHasBeenSynced($productId){

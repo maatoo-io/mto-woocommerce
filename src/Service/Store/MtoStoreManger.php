@@ -9,6 +9,7 @@ use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
 use Simplon\Url\Url;
+use WC_Product_Variation;
 
 /**
  * Class MtoStoreManger
@@ -73,6 +74,25 @@ class MtoStoreManger
     }
 
     /**
+     * Get All Products.
+     *
+     * @return WC_Product_Variation[]
+     */
+    public static function getVariationsForProduct(int $productId): array
+    {
+       return wc_get_products(array(
+            'status' => array( 'private', 'publish' ),
+            'type' => 'variation',
+            'parent' => $productId,
+            'orderby' => array(
+                'menu_order' => 'ASC',
+                'ID' => 'DESC',
+            ),
+            'return' => 'objects',
+        ));
+    }
+
+    /**
      * Get All Orders.
      *
      * @return \WP_Query
@@ -114,10 +134,15 @@ class MtoStoreManger
                 ],
             ];
         }
-
         return new \WP_Query($args);
     }
 
+    /**
+     * @param null $items
+     *
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public static function getOrdersLines($items = null)
     {
 

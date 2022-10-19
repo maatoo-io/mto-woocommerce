@@ -17,17 +17,19 @@
 
 namespace Maatoo\WooCommerce;
 
+use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Registry\AdminAssets;
-use Maatoo\WooCommerce\Registry\MtoInstall;
-use Maatoo\WooCommerce\Service\Ajax\AjaxHooks;
 use Maatoo\WooCommerce\Registry\FrontAssets;
+use Maatoo\WooCommerce\Registry\MtoInstall;
 use Maatoo\WooCommerce\Registry\Options;
+use Maatoo\WooCommerce\Service\Admin\PluginUpdate;
+use Maatoo\WooCommerce\Service\Ajax\AjaxHooks;
 use Maatoo\WooCommerce\Service\Front\MtoConversion;
 use Maatoo\WooCommerce\Service\Front\WooHooks;
+use Maatoo\WooCommerce\Service\Maatoo\MtoSync;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\OrderHooks;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
-use Maatoo\WooCommerce\Service\Admin\PluginUpdate;
 
 defined('ABSPATH') or exit;
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -129,7 +131,6 @@ class MtoWoocommerce
         add_action('mto_sync_products', ['\Maatoo\WooCommerce\Service\Maatoo\MtoSync', 'runProductSync']);
         add_action('mto_sync_orders', ['\Maatoo\WooCommerce\Service\Maatoo\MtoSync', 'runOrderSync']);
     }
-
 
     private function registerAssets()
     {

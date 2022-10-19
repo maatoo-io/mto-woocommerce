@@ -50,33 +50,6 @@ class MtoProduct extends AbstractMtoEntity
     }
 
     /**
-     * @param WC_Product_Variation[] $variations
-     * @param $options
-     */
-    protected function setProductVariationsData($variations, $options): void
-    {
-        $this->productVariations = [];
-        $category = $this->getCategory();
-        $mtoCategory = new MtoProductCategory($category);
-        foreach($variations as $productVariation){
-            $this->productVariations[] = [
-                'id' => $productVariation->get_id(),
-                'sku' => $productVariation->get_sku(),
-                'externalProductId' => (string)$productVariation->get_id(),
-                'price' => $productVariation->get_price() ?: 0,
-                'regularPrice' => $productVariation->get_regular_price(),
-                'url' => $productVariation->get_permalink(),
-                'title' => $productVariation->get_title() ?: 'not set',
-                'description' => $productVariation->get_description() ?: '',
-                'shortDescription' => $productVariation->get_short_description()?: '',
-                'imageUrl' => wp_get_attachment_image_url($productVariation->get_image_id(), !empty($options['product_image_sync_quality']) ? $options['product_image_sync_quality'] : MTO_DEFAULT_PRODUCT_IMAGE_SYNC_QUALITY) ?: '',
-                'datePublished' => $productVariation->get_date_created() ?: null,
-                'productCategory' => $mtoCategory ? $mtoCategory->getId() : null,
-                'isVisible' => $productVariation->is_visible()
-            ];
-        }
-    }
-    /**
      * @return string
      */
     public function getTitle(): string

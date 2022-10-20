@@ -22,12 +22,19 @@ class MtoProduct extends AbstractMtoEntity
     private bool $isVisible = true;
     private bool $isProductVariable = false;
     private array $productVariations = [];
+    private bool $isProductVariant = false;
+    private ?int $parentId;
 
     public function __construct($product_id = null)
     {
         $product = wc_get_product($product_id);
         if (!$product) {
             return;
+        }
+
+        if ($product instanceof WC_Product_Variation) {
+            $this->isProductVariant = true;
+            $this->parentId = $product->get_parent_id();
         }
 
         $options = get_option('mto');
@@ -146,7 +153,13 @@ class MtoProduct extends AbstractMtoEntity
         if (!$this->externalProductId) {
             return false;
         }
-        $terms = wp_get_post_terms($this->getExternalProductId(), MtoProductCategory::$taxonomy);
+
+        $externalProductId = $this->getExternalProductId();
+        if ($this->isProductVariant()) {
+            $externalProductId = $this->parentId;
+        }
+
+        $terms = wp_get_post_terms($externalProductId, MtoProductCategory::$taxonomy);
         if (!$terms) {
             return false;
         }
@@ -178,6 +191,11 @@ class MtoProduct extends AbstractMtoEntity
     public function isProductVariable(): bool
     {
         return $this->isProductVariable;
+    }
+
+    public function isProductVariant(): bool
+    {
+        return $this->isProductVariant;
     }
 
     /**

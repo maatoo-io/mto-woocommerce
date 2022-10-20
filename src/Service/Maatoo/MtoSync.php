@@ -44,6 +44,7 @@ class MtoSync
             }
 
             $products = MtoStoreManger::getAllProducts(false, $start, $limit);
+
             $statusProduct = ProductHooks::isProductsSynced($products->have_posts() ? $products->posts : []);
             if(!$statusProduct){
                 $key = 'mto_product_sync_attempt_' . $start . '_' . $limit;

@@ -91,9 +91,9 @@ class MtoConnector
 
             $lastFullSync = get_option('_mto_last_sync');
             if (function_exists("wp_date")) {
-                $lastFullSyncDate =  wp_date('Y-m-d H:i:s', strtotime($lastFullSync)); 
+                $lastFullSyncDate =  wp_date('Y-m-d H:i:s', strtotime($lastFullSync));
             } else {
-                $lastFullSyncDate =  date('Y-m-d H:i:s', strtotime($lastFullSync)); 
+                $lastFullSyncDate =  date('Y-m-d H:i:s', strtotime($lastFullSync));
             }
 
             $hook = 'mto_sync_orders';
@@ -259,13 +259,15 @@ class MtoConnector
     {
         try {
             $client = $this->client;
-            $requests = function ($products, $endpoint) use ($client)
+
+            $requests = static function ($products, $endpoint) use ($client)
             {
                 foreach ($products as $productId) {
                     $product = new MtoProduct($productId);
                     if (!$product) {
                         continue;
                     }
+
                     yield function () use ($client, $endpoint, $product)
                     {
                         $route = str_replace('{id}', $product->getId(), $endpoint->route);
@@ -273,6 +275,7 @@ class MtoConnector
                     };
                 }
             };
+
             $pool = new Pool(
               $client, $requests($products, $endpoint), [
                        'concurrency' => 5,
@@ -305,7 +308,6 @@ class MtoConnector
             );
             $promise = $pool->promise();
             $promise->wait();
-
             return $promise->getState();
         } catch (\Exception $exception) {
             LogData::writeTechErrors($exception->getMessage());

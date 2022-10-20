@@ -105,7 +105,7 @@ class MtoUser
     /**
      * @return string
      */
-    public function getProductImageSyncQuality(): string
+    public function getProductImageSyncQuality(): ?string
     {
         return $this->productImageSyncQuality;
     }

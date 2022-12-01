@@ -51,7 +51,7 @@ class MtoProduct extends AbstractMtoEntity
         $this->description = $product->get_description() ?: '';
         $this->shortDescription = $product->get_short_description() ?: '';
         $this->imageUrl = wp_get_attachment_image_url($product->get_image_id(), !empty($options['product_image_sync_quality']) ? $options['product_image_sync_quality'] : MTO_DEFAULT_PRODUCT_IMAGE_SYNC_QUALITY) ?: '';
-        $this->datePublished = (string)$product->get_date_created() ?: null;
+        $this->datePublished = (string)$product->get_date_created() ?: '';
         $this->isVisible = $product->is_visible();
 
     }

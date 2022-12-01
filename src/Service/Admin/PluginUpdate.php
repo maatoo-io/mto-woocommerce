@@ -207,6 +207,13 @@ class PluginUpdate
             
             update_option( '_mto_db_version', MTO_PLUGIN_VERSION );
         }
+
+        // v1.9.1 - Reschedule product sync if failed
+        if ( !get_option( '_mto_db_version' ) || version_compare( get_option( '_mto_db_version' ), '1.9.1', "<" ) ) {
+            as_unschedule_all_actions('mto_sync_products');
+            as_schedule_recurring_action(time() + 1, MTO_SYNC_INTERVAL, 'mto_sync_products');
+            update_option( '_mto_db_version', MTO_PLUGIN_VERSION );
+        }
     }
 
 }

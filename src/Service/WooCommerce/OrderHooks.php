@@ -147,7 +147,9 @@ class OrderHooks
                 }
                 update_post_meta($orderId, '_mto_is_subscribed', $isSubscribed ? '1' : '0');
                 update_post_meta($orderId, '_mto_contact_id', $contact);
-                update_post_meta($orderId, '_mto_birthday', $_POST['billing_birth_date'] ?? '');
+                if (!empty($_POST['billing_birth_date'])) {
+                    update_post_meta($orderId, '_mto_birthday', $_POST['billing_birth_date'] ?? '');
+                }
                 // clear conversion data
                 if (!empty($_COOKIE['mto_conversion'])) {
                     update_post_meta($orderId, '_mto_conversion', $_COOKIE['mto_conversion']);

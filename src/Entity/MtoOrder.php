@@ -16,6 +16,9 @@ class MtoOrder extends AbstractMtoEntity
     private ?string $dateCancelled = '';
     private string $paymentMethod = '';
     private float $value;
+    private float $taxValue;
+    private float $shippingValue;
+    private float $discountValue;
     private string $url;
     private string $status;
     private string $email;
@@ -34,6 +37,9 @@ class MtoOrder extends AbstractMtoEntity
         $this->id = get_post_meta($orderId, '_mto_id', true) ?: (get_post_meta($orderId, 'mto_draft_order_id', true) ?:null);
         $this->externalOrderId = (string)$orderId;
         $this->value = floatval($order->get_total() ?: get_post_meta($orderId, '_order_total', true) ?: 0);
+        $this->taxValue = floatval($order->get_total_tax() ?: 0);
+        $this->shippingValue = floatval($order->get_shipping_total() ?: 0);
+        $this->discountValue = floatval($order->get_total_discount() ?: 0);
         $this->url = $order->get_view_order_url();
         $this->status = $order->get_status();
         $this->email = (string)$order->get_billing_email() ?: ($_POST['billing_email'] ?? '');
@@ -166,6 +172,30 @@ class MtoOrder extends AbstractMtoEntity
     }
 
     /**
+     * @return float
+     */
+    public function getTaxValue()
+    {
+        return $this->taxValue;
+    }
+
+     /**
+     * @return float
+     */
+    public function getShippingValue()
+    {
+        return $this->shippingValue;
+    }
+
+     /**
+     * @return float
+     */
+    public function getDiscountValue()
+    {
+        return $this->discountValue;
+    }
+
+    /**
      * @return int|null
      */
     public function getId(): ?int
@@ -258,6 +288,9 @@ class MtoOrder extends AbstractMtoEntity
             'externalDateCancelled' => $this->getDateCancelled(),
             'paymentMethod' => $this->getPayementMethod(),
             'value' => $this->getValue(),
+            'taxValue' => $this->getTaxValue(),
+            'shippingValue' => $this->getShippingValue(),
+            'discountValue' => $this->getDiscountValue(),
             'url' => $this->getUrl(),
             'status' => $this->getStatus(),
             'email' => $this->getEmail(),
@@ -288,6 +321,9 @@ class MtoOrder extends AbstractMtoEntity
             'lastName' => $this->getLastName(),
             'conversion' => $this->getConversion(),
             'value' => $this->getValue(),
+            'taxValue' => $this->getTaxValue(),
+            'shippingValue' => $this->getShippingValue(),
+            'discountValue' => $this->getDiscountValue(),
         ];
     }
 }

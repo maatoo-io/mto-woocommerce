@@ -186,16 +186,18 @@ class OrderHooks
     {
         update_post_meta($orderId, 'test_sync', time());
         $isSubscribed = (bool)get_post_meta($orderId, '_mto_is_subscribed', true);
-        if ($isSubscribed && !empty($postData['billing_email'])) {
+        if (!empty($postData['billing_email'])) {
             $contact = get_post_meta($orderId, '_mto_contact_id', true);
             $bd =  get_post_meta($orderId, '_mto_birthday', true);
             $args =  [
                 'firstname' => $postData['billing_first_name'] ?? 'not set',
                 'lastname' => $postData['billing_last_name'] ?? 'not set',
                 'email' => $postData['billing_email'] ?? '',
-                'phone' => $postData['billing_phone'] ?? '',
-                'tags' => [MTO_STORE_TAG_ID]
+                'phone' => $postData['billing_phone'] ?? ''
             ];
+            if($isSubscribed) {
+                $args['tags'] = [MTO_STORE_TAG_ID];
+            }
             if(!empty($bd)){
                 $args['birthday_date'] = $bd;
             }

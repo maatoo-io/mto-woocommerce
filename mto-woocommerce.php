@@ -2,7 +2,7 @@
 /**
  * Plugin Name: maatoo for WooCommerce
  * Description: Connect your online shop to drive more revenue with intelligent automations, e.g. abanoned cart reminders and more.
- * Version:     1.9.2
+ * Version:     1.9.3
  * Author: maatoo.io
  * Author URI: https://maatoo.io
  * License: GPL-3.0+
@@ -12,7 +12,7 @@
  * Requires at least: 4.9
  * Tested up to: 6.1
  * WC requires at least: 3.7.2
- * WC tested up to: 7.4.1
+ * WC tested up to: 7.5.0
  */
 
 namespace Maatoo\WooCommerce;
@@ -49,7 +49,7 @@ if (file_exists($composer_path)) {
 }
 
 if (!defined('MTO_PLUGIN_VERSION')) {
-    define('MTO_PLUGIN_VERSION', '1.9.2');
+    define('MTO_PLUGIN_VERSION', '1.9.3');
 }
 
 if (!defined('MTO_PLUGIN_SLUG')) {

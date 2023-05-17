@@ -195,6 +195,9 @@ class OrderHooks
                 'email' => $postData['billing_email'] ?? '',
                 'phone' => $postData['billing_phone'] ?? ''
             ];
+            if(!empty(get_user_locale())) {
+                $args['preferred_locale'] = get_user_locale();
+            }
             if($isSubscribed) {
                 $args['tags'] = [MTO_STORE_TAG_ID];
             }

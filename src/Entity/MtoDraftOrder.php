@@ -15,7 +15,7 @@ class MtoDraftOrder
     private ?int $id; //session id
     private int $storeId;
     private string $externalId = ''; // identify record in local database. For maatoo local ID is named "External"
-    private ?int $mtoId; // id in maatoo database
+    private ?int $mtoId = null; // id in maatoo database
     private int $mtoLeadId; // customer id in maatoo database
     private array $cart; // array of items data which are in the cart
     private float $cartValue; // cart total value

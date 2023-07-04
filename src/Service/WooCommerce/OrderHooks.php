@@ -9,6 +9,7 @@ use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\Store\MtoStoreManger;
 use Maatoo\WooCommerce\Service\WooCommerce\DraftOrdersLineSync;
+use Maatoo\WooCommerce\Service\Maatoo\MtoSync;
 
 class OrderHooks
 {
@@ -184,7 +185,7 @@ class OrderHooks
 
     public function singleOrderSync($orderId, $postData)
     {
-        update_post_meta($orderId, 'test_sync', time());
+        update_post_meta($orderId, 'test_sync', "here_iam");
         $isSubscribed = (bool)get_post_meta($orderId, '_mto_is_subscribed', true);
         if (!empty($postData['billing_email'])) {
             $contact = get_post_meta($orderId, '_mto_contact_id', true);
@@ -196,7 +197,7 @@ class OrderHooks
                 'phone' => $postData['billing_phone'] ?? ''
             ];
             if(!empty(get_user_locale())) {
-                $args['preferred_locale'] = get_user_locale();
+                $args['preferred_locale'] = MtoSync::normalizeLocale(get_user_locale());
             }
             if($isSubscribed) {
                 $args['tags'] = [MTO_STORE_TAG_ID];

@@ -44,8 +44,8 @@ class MtoProduct extends AbstractMtoEntity
         $this->lastSyncDate = get_post_meta($product_id, '_mto_last_sync', true) ?: null;
         $this->sku = $product->get_sku();
         $this->externalProductId = (string)$product_id;
-        $this->price = $product->get_price() ?: 0;
-        $this->regularPrice = $product->get_regular_price() ?: 0;
+        $this->price = (float)$product->get_price() ?: 0;
+        $this->regularPrice = (float)$product->get_regular_price() ?: 0;
         $this->url = $product->get_permalink();
         $this->title = $product->get_title() ?: 'not set';
         $this->description = $product->get_description() ?: '';
@@ -208,18 +208,18 @@ class MtoProduct extends AbstractMtoEntity
         $category = $this->getCategory();
         $mtoCategory = new MtoProductCategory($category);
         return [
-          'store' => $this->getStore(),
-          'externalProductId' => $this->getExternalProductId(),
-          'price' => $this->getPrice(),
-          'regularPrice' => $this->getRegularPrice(),
-          'url' => $this->getUrl(),
-          'title' => $this->getTitle(),
-          'description' => $this->getDescription(),
-          'sku' => $this->getSku() ?: null,
-          'imageUrl' => $this->getImageUrl() ?: wc_placeholder_img_src(),
-          'productCategory' => $mtoCategory ? $mtoCategory->getId() : null,
-          'externalDatePublished' => $this->getDatePublished() ?: null,
-          'isVisible' => $this->isVisible()
+            'store' => $this->getStore(),
+            'externalProductId' => $this->getExternalProductId(),
+            'price' => $this->getPrice(),
+            'regularPrice' => $this->getRegularPrice(),
+            'url' => $this->getUrl(),
+            'title' => $this->getTitle(),
+            'description' => $this->getDescription(),
+            'sku' => $this->getSku() ?: null,
+            'imageUrl' => $this->getImageUrl() ?: wc_placeholder_img_src(),
+            'productCategory' => $mtoCategory ? $mtoCategory->getId() : null,
+            'externalDatePublished' => $this->getDatePublished() ?: null,
+            'isVisible' => $this->isVisible()
         ];
     }
 

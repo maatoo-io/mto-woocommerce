@@ -1,0 +1,19 @@
+{
+  "name": "maatoo/mto-woocommerce",
+  "description": "woocommerce addon",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "maatoo.io",
+      "email": "support@maatoo.io"
+    }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": "^6.5.5",
+    "simplon/url": "^0.6.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8"
+  }
+}

@@ -3,11 +3,11 @@
 namespace Maatoo\WooCommerce\Service\Maatoo;
 
 use \Exception;
-use \GuzzleHttp\Client;
-use \GuzzleHttp\Pool;
-use \GuzzleHttp\Exception\RequestException;
-use \GuzzleHttp\Promise\PromiseInterface;
-use \GuzzleHttp\Psr7\Response;
+use MaatooDependencies\GuzzleHttp\Client;
+use MaatooDependencies\GuzzleHttp\Pool;
+use MaatooDependencies\GuzzleHttp\Exception\RequestException;
+use MaatooDependencies\GuzzleHttp\Promise\PromiseInterface;
+use MaatooDependencies\GuzzleHttp\Psr7\Response;
 use Maatoo\WooCommerce\Entity\MtoOrder;
 use Maatoo\WooCommerce\Entity\MtoProduct;
 use Maatoo\WooCommerce\Entity\MtoProductCategory;
@@ -80,7 +80,7 @@ class MtoConnector
      * Health Check.
      *
      * @return bool|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Maatoo\WooCommerce\Dependencies\GuzzleHttp\Exception\GuzzleException
      */
     public function healthCheck()
     {
@@ -143,7 +143,7 @@ class MtoConnector
      *
      * @return array|null
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Maatoo\WooCommerce\Dependencies\GuzzleHttp\Exception\GuzzleException
      */
     public function getResponseData($endpointConfig, $args = []): ?array
     {
@@ -195,7 +195,7 @@ class MtoConnector
      * @param MtoStore $store
      *
      * @return false|MtoStore
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Maatoo\WooCommerce\Dependencies\GuzzleHttp\Exception\GuzzleException
      */
     public function registerStore(MtoStore $store)
     {
@@ -229,7 +229,7 @@ class MtoConnector
      *
      * @return false|mixed
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Maatoo\WooCommerce\Dependencies\GuzzleHttp\Exception\GuzzleException
      */
     private function isStoreRegistered(MtoStore $store)
     {
@@ -252,7 +252,7 @@ class MtoConnector
      * Create Products on maatoo service.
      *
      * @param array $products
-     *
+     * @param $endpoint
      * @return string with state
      */
     public function sendProducts(array $products, $endpoint)
@@ -497,7 +497,7 @@ class MtoConnector
 
     /**
      * @param $shortName
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Maatoo\WooCommerce\Dependencies\GuzzleHttp\Exception\GuzzleException
      */
     public function createTag($shortName)
     {
@@ -525,7 +525,7 @@ class MtoConnector
      * @param $contact
      * @param $data
      * @return false
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Maatoo\WooCommerce\Dependencies\GuzzleHttp\Exception\GuzzleException
      */
     public function updateContact($contact, $data)
     {
@@ -548,7 +548,7 @@ class MtoConnector
      * @param $endpoint
      * @param int $orderId - if id is set, it means that orderlines should be retrieved for specific orderId
      * @return array|false|void|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Maatoo\WooCommerce\Dependencies\GuzzleHttp\Exception\GuzzleException
      */
     public function getRemoteList($endpoint, int $orderId = 0, $mtoOrderID=null)
     {

@@ -1,6 +1,7 @@
 # ignore composer dependency directories
 vendor
 /composer.lock
+build
 
 # ignore node dependency directories
 /assets/node_modules/

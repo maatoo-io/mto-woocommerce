@@ -2,13 +2,13 @@
 
 namespace Maatoo\WooCommerce\Service\Store;
 
+use MaatooDependencies\Simplon\Url\Url;
 use Maatoo\WooCommerce\Entity\MtoOrderLine;
 use Maatoo\WooCommerce\Entity\MtoStore;
 use Maatoo\WooCommerce\Entity\MtoUser;
 use Maatoo\WooCommerce\Service\LogErrors\LogData;
 use Maatoo\WooCommerce\Service\Maatoo\MtoConnector;
 use Maatoo\WooCommerce\Service\WooCommerce\ProductHooks;
-use Simplon\Url\Url;
 use WC_Product_Variation;
 
 /**

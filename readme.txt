@@ -26,7 +26,20 @@ An answer to that question.
 
 = What about foo bar? =
 
-Answer to foo bar dilemma.
+= Development =
+
+Package uses a prefixer for vendor packages in order to not conflict with other existing dependencies used by other plugins
+In order to update any of the packages please check composer_vendor.json
+
+Install globally ilab/namespacer
+
+composer global require ilab/namespacer
+
+Run
+~/.composer/vendor/bin/namespacer --composer composer_vendor.json  --package mtodep --namespace Maatoo\Dependencies build/
+
+For vendor updates
+
 
 == Screenshots ==
 

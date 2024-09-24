@@ -13,12 +13,12 @@ use Maatoo\WooCommerce\Service\WooCommerce\DraftOrdersLineSync;
 class MtoDraftOrder
 {
     private ?int $id = null; //session id
-    private int $storeId;
+    private ?int $storeId = null;
     private string $externalId = ''; // identify record in local database. For maatoo local ID is named "External"
     private ?int $mtoId = null; // id in maatoo database
-    private int $mtoLeadId; // customer id in maatoo database
-    private array $cart; // array of items data which are in the cart
-    private float $cartValue; // cart total value
+    private ?int $mtoLeadId = null ; // customer id in maatoo database
+    private array $cart = []; // array of items data which are in the cart
+    private ?float $cartValue = null; // cart total value
     private ?string $dateCreated = '';
     private ?string $dateModified = '';
 
@@ -145,13 +145,13 @@ class MtoDraftOrder
     {
         return [
             'mto_id' => (string)$this->mtoId ?: null,
-            'mto_store' => (string)$this->storeId,
-            'mto_session_key' => (string)$this->externalId,
-            'mto_lead_id' => (string)$this->mtoLeadId,
+            'mto_store' => (string)$this->storeId ?:null,
+            'mto_session_key' => (string)$this->externalId ?:null,
+            'mto_lead_id' => (string)$this->mtoLeadId ?:null,
             'mto_cart' => serialize($this->cart),
-            'mto_cart_value' => $this->cartValue,
+            'mto_cart_value' => $this->cartValue ?:null,
             'date_created' => property_exists($this, 'dateCreated') && !empty($this->dateCreated) ? $this->dateCreated : date('Y-m-d H:i:s', strtotime('now')),
-            'date_modified' => $this->dateModified
+            'date_modified' => $this->dateModified ?:null
         ];
     }
 

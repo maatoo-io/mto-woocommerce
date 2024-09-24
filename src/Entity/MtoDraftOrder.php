@@ -12,7 +12,7 @@ use Maatoo\WooCommerce\Service\WooCommerce\DraftOrdersLineSync;
  */
 class MtoDraftOrder
 {
-    private ?int $id; //session id
+    private ?int $id = null; //session id
     private int $storeId;
     private string $externalId = ''; // identify record in local database. For maatoo local ID is named "External"
     private ?int $mtoId = null; // id in maatoo database
